@@ -67,3 +67,11 @@ def get_namespace(input_directory: Path, output_directory: Path) -> dict[str, Sc
             class_name=class_name,
         )
     return namespace
+
+
+def get_version(namespace: dict[str, SchemaMetadata]) -> str:
+    """
+    Get the version of the bo4e schemas.
+    """
+    # The chosen class is arbitrary. All bo's and com's should contain the same version information.
+    return namespace["Angebot"].schema_parsed["properties"]["_version"]["default"]

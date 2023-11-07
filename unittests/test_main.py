@@ -28,6 +28,10 @@ class TestMain:
         assert issubclass(Angebot, BaseModel)
         assert "typ" in Angebot.model_fields
 
+        from .output.bo4e import __version__  # type: ignore[import-not-found]
+
+        assert __version__ == "0.6.1rc13"
+
     def test_single(self):
         namespace = get_namespace(INPUT_DIR, OUTPUT_DIR)
         schema_metadata = namespace["Angebot"]
