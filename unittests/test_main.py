@@ -22,8 +22,8 @@ class TestMain:
         assert (OUTPUT_DIR / "com" / "com.py").exists()
         assert (OUTPUT_DIR / "enum" / "typ.py").exists()
 
-        # pylint: disable=import-outside-toplevel
-        from .output.bo4e.bo.angebot import Angebot
+        # pylint: disable=import-outside-toplevel, import-error
+        from .output.bo4e.bo.angebot import Angebot  # type: ignore[import-not-found]
 
         assert issubclass(Angebot, BaseModel)
         assert "typ" in Angebot.model_fields
