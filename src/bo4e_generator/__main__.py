@@ -38,7 +38,7 @@ def generate_bo4e_schemas(input_directory: Path, output_directory: Path):
     required=True,
 )
 @click.help_option()
-@click.version_option(package_name="BO4E-python-generator")
+@click.version_option(package_name="BO4E-Python-Generator")
 def main(input_dir: Path, output_dir: Path):
     """
     CLI entry point for the bo4e-generator.

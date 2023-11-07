@@ -1,5 +1,5 @@
 [project]
-name = "BO4E-python-generator"
+name = "BO4E-Python-Generator"
 description = "This tool auto generates (customizable) pydantic v2 Code to implement the BO4E-Schemas."
 license = { text = "MIT" }
 requires-python = ">=3.11"
