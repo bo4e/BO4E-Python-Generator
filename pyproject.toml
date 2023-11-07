@@ -16,12 +16,18 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
 ]
-dependencies = []     # add all the dependencies from requirements.in here, too
+dependencies = [
+    "datamodel-code-generator",
+    "click",
+]     # add all the dependencies from requirements.in here, too
 dynamic = ["readme", "version"]
 
 [project.urls]
 Changelog = "https://github.com/Hochfrequenz/python_template_repository/releases"
 Homepage = "https://github.com/Hochfrequenz/python_template_repository"
+
+[project.scripts]
+bo4e-generator = "bo4e_generator.__main__:main"
 
 [tool.black]
 line-length = 120
@@ -29,6 +35,11 @@ line-length = 120
 [tool.isort]
 line_length = 120
 profile = "black"
+
+[tool.pylint]
+disable = [
+    "R0903",  # disable too-few-public-methods
+]
 
 [tool.pylint."MESSAGES CONTROL"]
 max-line-length = 120
