@@ -35,7 +35,8 @@ class TestMain:
         assert "typ" in Angebot.model_fields
 
     def test_single(self):
-        namespace = get_namespace(INPUT_DIR, OUTPUT_DIR)
+        os.chdir(BASE_DIR)
+        namespace = get_namespace(INPUT_DIR.resolve(), OUTPUT_DIR.resolve())
         schema_metadata = namespace["Angebot"]
         result = generate_bo4e_schema(schema_metadata, namespace)
 
