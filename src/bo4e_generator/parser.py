@@ -198,13 +198,14 @@ def generate_bo4e_schema(schema_metadata: SchemaMetadata, namespace: dict[str, S
     Generate a pydantic v2 model from the given schema. Returns the resulting code as string.
     """
     data_model_types = get_bo4e_data_model_types(
-        DataModelType.PydanticV2BaseModel, target_python_version=PythonVersion.PY_311, namespace=namespace
+        DataModelType.PydanticBaseModel, target_python_version=PythonVersion.PY_311, namespace=namespace
     )
     monkey_patch_field_name_resolver()
     monkey_patch_relative_import()
 
     parser = JsonSchemaParser(
         schema_metadata.schema_text,
+        base_class="sqlmodel.SQLModel",
         data_model_type=data_model_types.data_model,
         data_model_root_type=data_model_types.root_model,
         data_model_field_type=data_model_types.field_model,
