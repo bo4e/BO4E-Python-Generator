@@ -226,6 +226,7 @@ def generate_bo4e_schema(schema_metadata: SchemaMetadata, namespace: dict[str, S
         remove_special_field_name_prefix=True,
         special_field_name_prefix="field_",
         allow_extra_fields=False,
+        custom_template_dir=Path.cwd() / Path(".\custom_templates"),
     )
     result = parser.parse()
     if isinstance(result, dict):
