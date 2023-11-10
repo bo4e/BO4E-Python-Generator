@@ -6,7 +6,7 @@ from pathlib import Path
 import click
 
 from bo4e_generator.parser import create_init_files, generate_bo4e_schema
-from bo4e_generator.schema import get_namespace
+from bo4e_generator.schema import get_namespace, get_version
 
 
 def resolve_paths(input_directory: Path, output_directory: Path) -> tuple[Path, Path]:
@@ -30,7 +30,7 @@ def generate_bo4e_schemas(input_directory: Path, output_directory: Path):
         result = generate_bo4e_schema(schema_metadata, namespace)
         schema_metadata.save(result)
         print(f"Generated {schema_metadata}")
-    create_init_files(output_directory)
+    create_init_files(output_directory, get_version(namespace))
     print(f"Generated __init__.py files in {output_directory}")
 
 
