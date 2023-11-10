@@ -14,7 +14,7 @@ INPUT_DIR = Path(__file__).parent / "test_data/bo4e_schemas"
 class TestMain:
     def test_main(self):
         runner = CliRunner()
-        result = runner.invoke(main, ["--input-dir", str(INPUT_DIR), "--output-dir", str(OUTPUT_DIR), "--pydantic-v2"])
+        result = runner.invoke(main, ["--input-dir", str(INPUT_DIR), "--output-dir", str(OUTPUT_DIR), "-p2"])
 
         assert result.exit_code == 0, f"Error: {result.output}"
         assert (OUTPUT_DIR / "bo" / "angebot.py").exists()

@@ -39,7 +39,7 @@ def generate_bo4e_schemas(input_directory: Path, output_directory: Path, pydanti
 )
 @click.option(
     "--pydantic-v1/--pydantic-v2",
-    "-p",
+    "-p1/-p2",
     is_flag=True,
     help="Generate pydantic v1 models instead of pydantic v2 models.",
     required=False,
