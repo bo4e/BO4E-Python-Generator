@@ -9,13 +9,13 @@ from bo4e_generator.parser import create_init_files, generate_bo4e_schema
 from bo4e_generator.schema import get_namespace
 
 
-def generate_bo4e_schemas(input_directory: Path, output_directory: Path):
+def generate_bo4e_schemas(input_directory: Path, output_directory: Path, pydantic_v1: bool = False):
     """
     Generate all BO4E schemas from the given input directory and save them in the given output directory.
     """
     namespace = get_namespace(input_directory, output_directory)
     for schema_metadata in namespace.values():
-        result = generate_bo4e_schema(schema_metadata, namespace)
+        result = generate_bo4e_schema(schema_metadata, namespace, pydantic_v1)
         schema_metadata.save(result)
         print(f"Generated {schema_metadata}")
     create_init_files(output_directory)
@@ -37,13 +37,21 @@ def generate_bo4e_schemas(input_directory: Path, output_directory: Path):
     help="Output directory for the generated python files.",
     required=True,
 )
+@click.option(
+    "--pydantic-v1/--pydantic-v2",
+    "-p",
+    is_flag=True,
+    help="Generate pydantic v1 models instead of pydantic v2 models.",
+    required=False,
+    default=False,
+)
 @click.help_option()
 @click.version_option(package_name="BO4E-Python-Generator")
-def main(input_dir: Path, output_dir: Path):
+def main(input_dir: Path, output_dir: Path, pydantic_v1: bool):
     """
     CLI entry point for the bo4e-generator.
     """
-    generate_bo4e_schemas(input_dir, output_dir)
+    generate_bo4e_schemas(input_dir, output_dir, pydantic_v1)
 
 
 if __name__ == "__main__":

@@ -14,8 +14,8 @@ INPUT_DIR = Path(__file__).parent / "test_data/bo4e_schemas"
 class TestMain:
     def test_main(self):
         runner = CliRunner()
-        result = runner.invoke(main, ["--input-dir", str(INPUT_DIR), "--output-dir", str(OUTPUT_DIR)])
-        # generate_bo4e_schemas(input_directory=INPUT_DIR, output_directory=OUTPUT_DIR)
+        result = runner.invoke(main, ["--input-dir", str(INPUT_DIR), "--output-dir", str(OUTPUT_DIR), "--pydantic-v2"])
+
         assert result.exit_code == 0, f"Error: {result.output}"
         assert (OUTPUT_DIR / "bo" / "angebot.py").exists()
         assert (OUTPUT_DIR / "bo" / "preisblatt_netznutzung.py").exists()
