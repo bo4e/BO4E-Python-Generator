@@ -193,12 +193,16 @@ def remove_future_import(python_code: str) -> str:
     return re.sub(r"from __future__ import annotations\n\n", "", python_code)
 
 
-def generate_bo4e_schema(schema_metadata: SchemaMetadata, namespace: dict[str, SchemaMetadata]) -> str:
+def generate_bo4e_schema(
+    schema_metadata: SchemaMetadata, namespace: dict[str, SchemaMetadata], pydantic_v1: bool = False
+) -> str:
     """
     Generate a pydantic v2 model from the given schema. Returns the resulting code as string.
     """
     data_model_types = get_bo4e_data_model_types(
-        DataModelType.PydanticV2BaseModel, target_python_version=PythonVersion.PY_311, namespace=namespace
+        DataModelType.PydanticBaseModel if pydantic_v1 else DataModelType.PydanticV2BaseModel,
+        target_python_version=PythonVersion.PY_311,
+        namespace=namespace,
     )
     monkey_patch_field_name_resolver()
     monkey_patch_relative_import()
@@ -210,7 +214,7 @@ def generate_bo4e_schema(schema_metadata: SchemaMetadata, namespace: dict[str, S
         data_model_field_type=data_model_types.field_model,
         data_type_manager_type=data_model_types.data_type_manager,
         dump_resolve_reference_action=data_model_types.dump_resolve_reference_action,
-        use_annotated=True,
+        use_annotated=not pydantic_v1,
         use_double_quotes=True,
         use_schema_description=True,
         use_subclass_enum=True,
