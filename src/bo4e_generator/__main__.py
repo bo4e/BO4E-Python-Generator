@@ -6,19 +6,31 @@ from pathlib import Path
 import click
 
 from bo4e_generator.parser import create_init_files, generate_bo4e_schema
-from bo4e_generator.schema import get_namespace
+from bo4e_generator.schema import get_namespace, get_version
+
+
+def resolve_paths(input_directory: Path, output_directory: Path) -> tuple[Path, Path]:
+    """
+    Resolve the input and output paths. The data-model-parser have problems with handling relative paths.
+    """
+    if not input_directory.is_absolute():
+        input_directory = input_directory.resolve()
+    if not output_directory.is_absolute():
+        output_directory = output_directory.resolve()
+    return input_directory, output_directory
 
 
 def generate_bo4e_schemas(input_directory: Path, output_directory: Path, pydantic_v1: bool = False):
     """
     Generate all BO4E schemas from the given input directory and save them in the given output directory.
     """
+    input_directory, output_directory = resolve_paths(input_directory, output_directory)
     namespace = get_namespace(input_directory, output_directory)
     for schema_metadata in namespace.values():
         result = generate_bo4e_schema(schema_metadata, namespace, pydantic_v1)
         schema_metadata.save(result)
         print(f"Generated {schema_metadata}")
-    create_init_files(output_directory)
+    create_init_files(output_directory, get_version(namespace))
     print(f"Generated __init__.py files in {output_directory}")
 
 

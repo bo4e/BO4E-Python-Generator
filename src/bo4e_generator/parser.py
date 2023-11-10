@@ -175,11 +175,13 @@ def monkey_patch_relative_import():
     datamodel_code_generator.parser.base.relative = relative
 
 
-def create_init_files(output_path: Path) -> None:
+def create_init_files(output_path: Path, version: str) -> None:
     """
     Create __init__.py files in all subdirectories of the given output directory and in the directory itself.
     """
-    (output_path / "__init__.py").touch()
+    (output_path / "__init__.py").write_text(
+        f'""" Contains information about the bo4e version """\n\n__version__ = "{version}"\n'
+    )
     for directory in output_path.glob("**/"):
         (directory / "__init__.py").touch()
 
