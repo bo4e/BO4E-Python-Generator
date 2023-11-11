@@ -15,7 +15,7 @@ from datamodel_code_generator.model.enum import Enum as _Enum
 from datamodel_code_generator.parser.jsonschema import JsonSchemaParser
 from datamodel_code_generator.reference import camel_to_snake, snake_to_upper_camel
 
-from bo4e_generator.schema import SchemaMetadata
+from bo4e_generator.schema import SchemaMetadata, get_namespace
 
 
 def get_bo4e_data_model_types(
@@ -36,13 +36,6 @@ def get_bo4e_data_model_types(
     def _module_path(self) -> list[str]:
         if self.name not in namespace:
             raise ValueError(f"Model not in namespace: {self.name}")
-        if self.file_path:
-            return [
-                *self.file_path.parts[:-1],
-                self.file_path.stem,
-                namespace[self.name].pkg,
-                namespace[self.name].module_name,
-            ]
         return [namespace[self.name].pkg, namespace[self.name].module_name]
 
     @property  # type: ignore[misc]
@@ -99,7 +92,7 @@ def monkey_patch_field_name_resolver():
 
         name = re.sub(r"[¹²³⁴⁵⁶⁷⁸⁹]|\W", "_", name)
         if name[0].isnumeric():
-            name = f"{self.special_field_name_prefix}{name}"  # Changed line by me
+            name = f"{self.special_field_name_prefix}_{name}"  # Changed line by me
 
         # We should avoid having a field begin with an underscore, as it
         # causes pydantic to consider it as private
@@ -175,15 +168,11 @@ def monkey_patch_relative_import():
     datamodel_code_generator.parser.base.relative = relative
 
 
-def create_init_files(output_path: Path, version: str) -> None:
+def bo4e_init_file_content(version: str) -> str:
     """
     Create __init__.py files in all subdirectories of the given output directory and in the directory itself.
     """
-    (output_path / "__init__.py").write_text(
-        f'""" Contains information about the bo4e version """\n\n__version__ = "{version}"\n'
-    )
-    for directory in output_path.glob("**/"):
-        (directory / "__init__.py").touch()
+    return f'""" Contains information about the bo4e version """\n\n__version__ = "{version}"\n'
 
 
 def remove_future_import(python_code: str) -> str:
@@ -193,11 +182,12 @@ def remove_future_import(python_code: str) -> str:
     return re.sub(r"from __future__ import annotations\n\n", "", python_code)
 
 
-def generate_bo4e_schema(
-    schema_metadata: SchemaMetadata, namespace: dict[str, SchemaMetadata], pydantic_v1: bool = False
-) -> str:
+def parse_bo4e_schemas(
+    input_directory: Path, namespace: dict[str, SchemaMetadata], pydantic_v1: bool = False
+) -> dict[Path, str]:
     """
-    Generate a pydantic v2 model from the given schema. Returns the resulting code as string.
+    Generate all BO4E schemas from the given input directory. Returns all file contents as dictionary:
+    file path (relative to arbitrary output directory) => file content.
     """
     data_model_types = get_bo4e_data_model_types(
         DataModelType.PydanticBaseModel if pydantic_v1 else DataModelType.PydanticV2BaseModel,
@@ -208,7 +198,7 @@ def generate_bo4e_schema(
     monkey_patch_relative_import()
 
     parser = JsonSchemaParser(
-        schema_metadata.schema_text,
+        input_directory,
         data_model_type=data_model_types.data_model,
         data_model_root_type=data_model_types.root_model,
         data_model_field_type=data_model_types.field_model,
@@ -223,29 +213,30 @@ def generate_bo4e_schema(
         set_default_enum_member=True,
         snake_case_field=True,
         field_constraints=True,
-        class_name=schema_metadata.class_name,
         capitalise_enum_members=True,
-        base_path=schema_metadata.input_file.parent,
+        base_path=input_directory,
         remove_special_field_name_prefix=True,
-        special_field_name_prefix="field_",
         allow_extra_fields=False,
     )
-    result = parser.parse()
-    if isinstance(result, dict):
+    parse_result = parser.parse()
+    file_contents = {}
+    for schema_metadata in namespace.values():
         if schema_metadata.module_name.startswith("_"):
             # Because somehow the generator uses the prefix also on the module name. Don't know why.
             module_path = (schema_metadata.pkg, f"field{schema_metadata.module_name}.py")
         else:
             module_path = (schema_metadata.pkg, f"{schema_metadata.module_name}.py")
-        try:
-            result = result[module_path].body
-        except KeyError as error:
+
+        if module_path not in parse_result:
             raise KeyError(
                 f"Could not find module {'.'.join(module_path)} in results: "
-                f"{list(result.keys())}"  # type: ignore[union-attr]
+                f"{list(parse_result.keys())}"  # type: ignore[union-attr]
                 # Item "str" of "str | dict[tuple[str, ...], Result]" has no attribute "keys"
                 # Somehow, mypy is not good enough to understand the instance-check above
-            ) from error
+            )
 
-    result = remove_future_import(result)
-    return result
+        file_contents[schema_metadata.output_file] = remove_future_import(parse_result.pop(module_path).body)
+
+    file_contents.update({Path(*module_path): result.body for module_path, result in parse_result.items()})
+
+    return file_contents
