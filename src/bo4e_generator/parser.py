@@ -219,6 +219,8 @@ def parse_bo4e_schemas(
         allow_extra_fields=False,
     )
     parse_result = parser.parse()
+    if not isinstance(parse_result, dict):
+        raise ValueError(f"Unexpected type of parse result: {type(parse_result)}")
     file_contents = {}
     for schema_metadata in namespace.values():
         if schema_metadata.module_name.startswith("_"):
