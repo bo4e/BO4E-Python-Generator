@@ -34,7 +34,7 @@ def generate_bo4e_schemas(input_directory: Path, output_directory: Path, pydanti
         file_path.write_text(file_content)
         print(f"Created {file_path}")
 
-    print(f"Done.")
+    print("Done.")
 
 
 @click.command()

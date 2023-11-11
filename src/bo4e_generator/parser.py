@@ -15,7 +15,7 @@ from datamodel_code_generator.model.enum import Enum as _Enum
 from datamodel_code_generator.parser.jsonschema import JsonSchemaParser
 from datamodel_code_generator.reference import camel_to_snake, snake_to_upper_camel
 
-from bo4e_generator.schema import SchemaMetadata, get_namespace
+from bo4e_generator.schema import SchemaMetadata
 
 
 def get_bo4e_data_model_types(
