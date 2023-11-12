@@ -71,68 +71,6 @@ def get_bo4e_data_model_types(
     )
 
 
-def monkey_patch_field_name_resolver():
-    """
-    Function taken from datamodel_code_generator.reference.FieldNameResolver.
-    Related issue: https://github.com/koxudaxi/datamodel-code-generator/issues/1644
-    Related PR: https://github.com/koxudaxi/datamodel-code-generator/pull/1654
-    The current implementation struggles if you have enum values starting with invalid characters (e.g. numbers) but
-    want to be able to remove leading underscores from field names.
-    This monkey patch (dirty) fixes this issue.
-    """
-
-    # pylint: disable=too-many-branches
-    def _get_valid_name(
-        self,
-        name: str,
-        excludes: Optional[Set[str]] = None,
-        ignore_snake_case_field: bool = False,
-        upper_camel: bool = False,
-    ) -> str:
-        if not name:
-            name = self.empty_field_name
-        if name[0] == "#":
-            name = name[1:] or self.empty_field_name
-
-        if self.snake_case_field and not ignore_snake_case_field and self.original_delimiter is not None:
-            name = snake_to_upper_camel(name, delimiter=self.original_delimiter)
-
-        name = re.sub(r"[¹²³⁴⁵⁶⁷⁸⁹]|\W", "_", name)
-        if name[0].isnumeric():
-            name = f"{self.special_field_name_prefix}{name}"  # Changed line by me
-
-        # We should avoid having a field begin with an underscore, as it
-        # causes pydantic to consider it as private
-        while name.startswith("_"):
-            if self.remove_special_field_name_prefix:
-                name = name[1:]
-            else:
-                name = f"{self.special_field_name_prefix}{name}"
-                break
-        if self.capitalise_enum_members or self.snake_case_field and not ignore_snake_case_field:
-            name = camel_to_snake(name)
-        count = 1
-        # pylint: disable=protected-access
-        if iskeyword(name) or not self._validate_field_name(name):
-            name += "_"
-        if upper_camel:
-            new_name = snake_to_upper_camel(name)
-        elif self.capitalise_enum_members:
-            new_name = name.upper()
-        else:
-            new_name = name
-        while (
-            not (new_name.isidentifier() or not self._validate_field_name(new_name))
-            or iskeyword(new_name)
-            or (excludes and new_name in excludes)
-        ):
-            new_name = f"{name}{count}" if upper_camel else f"{name}_{count}"
-            count += 1
-        return new_name
-
-    datamodel_code_generator.reference.FieldNameResolver.get_valid_name = _get_valid_name
-
-
 def monkey_patch_relative_import():
     """
     Function taken from datamodel_code_generator.parser.base.
@@ -204,7 +142,6 @@ def generate_bo4e_schema(
         target_python_version=PythonVersion.PY_311,
         namespace=namespace,
     )
-    monkey_patch_field_name_resolver()
     monkey_patch_relative_import()
 
     parser = JsonSchemaParser(
