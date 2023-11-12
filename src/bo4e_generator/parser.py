@@ -3,9 +3,8 @@ Contains code to generate pydantic v2 models from json schemas.
 Since the used tool doesn't support all features we need, we monkey patch some functions.
 """
 import re
-from keyword import iskeyword
 from pathlib import Path
-from typing import Optional, Set, Tuple
+from typing import Tuple
 
 import datamodel_code_generator.parser.base
 import datamodel_code_generator.reference
@@ -13,7 +12,6 @@ from datamodel_code_generator import DataModelType, PythonVersion
 from datamodel_code_generator.model import DataModelSet, get_data_model_types
 from datamodel_code_generator.model.enum import Enum as _Enum
 from datamodel_code_generator.parser.jsonschema import JsonSchemaParser
-from datamodel_code_generator.reference import camel_to_snake, snake_to_upper_camel
 
 from bo4e_generator.schema import SchemaMetadata
 
