@@ -162,7 +162,6 @@ def generate_bo4e_schema(
         capitalise_enum_members=True,
         base_path=schema_metadata.input_file.parent,
         remove_special_field_name_prefix=True,
-        special_field_name_prefix="field_",
         allow_extra_fields=False,
     )
     result = parser.parse()
