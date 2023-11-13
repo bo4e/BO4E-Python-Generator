@@ -5,7 +5,7 @@ from pathlib import Path
 
 import click
 
-from bo4e_generator.parser import create_init_files, generate_bo4e_schema
+from bo4e_generator.parser import bo4e_init_file_content, parse_bo4e_schemas
 from bo4e_generator.schema import get_namespace, get_version
 
 
@@ -25,13 +25,16 @@ def generate_bo4e_schemas(input_directory: Path, output_directory: Path, pydanti
     Generate all BO4E schemas from the given input directory and save them in the given output directory.
     """
     input_directory, output_directory = resolve_paths(input_directory, output_directory)
-    namespace = get_namespace(input_directory, output_directory)
-    for schema_metadata in namespace.values():
-        result = generate_bo4e_schema(schema_metadata, namespace, pydantic_v1)
-        schema_metadata.save(result)
-        print(f"Generated {schema_metadata}")
-    create_init_files(output_directory, get_version(namespace))
-    print(f"Generated __init__.py files in {output_directory}")
+    namespace = get_namespace(input_directory)
+    file_contents = parse_bo4e_schemas(input_directory, namespace, pydantic_v1)
+    file_contents[Path("__init__.py")] = bo4e_init_file_content(get_version(namespace))
+    for relative_file_path, file_content in file_contents.items():
+        file_path = output_directory / relative_file_path
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+        file_path.write_text(file_content)
+        print(f"Created {file_path}")
+
+    print("Done.")
 
 
 @click.command()
