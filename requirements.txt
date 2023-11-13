@@ -10,7 +10,7 @@ argcomplete==3.1.2
     # via datamodel-code-generator
 attrs==23.1.0
     # via jsonschema
-black==23.9.1
+black==23.11.0
     # via datamodel-code-generator
 certifi==2023.7.22
     # via requests
@@ -20,7 +20,7 @@ charset-normalizer==3.3.0
     # via requests
 click==8.1.7
     # via
-    #   -r .\requirements.in
+    #   -r requirements.in
     #   black
 colorama==0.4.6
     # via click
