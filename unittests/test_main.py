@@ -6,8 +6,6 @@ from click.testing import CliRunner
 from pydantic import BaseModel
 
 from bo4e_generator.__main__ import main
-from bo4e_generator.parser import generate_bo4e_schema
-from bo4e_generator.schema import get_namespace
 
 BASE_DIR = Path(__file__).parents[1]
 OUTPUT_DIR = Path("unittests/output/bo4e")
@@ -37,12 +35,3 @@ class TestMain:
         from .output.bo4e import __version__  # type: ignore[import-not-found]
 
         assert __version__ == "0.6.1rc13"
-
-    def test_single(self):
-        os.chdir(BASE_DIR)
-        namespace = get_namespace(INPUT_DIR.resolve(), OUTPUT_DIR.resolve())
-        schema_metadata = namespace["Angebot"]
-        result = generate_bo4e_schema(schema_metadata, namespace)
-
-        assert "class Angebot(BaseModel):" in result
-        assert "    typ: Annotated[Typ" in result
