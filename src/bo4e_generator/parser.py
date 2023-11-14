@@ -2,11 +2,10 @@
 Contains code to generate pydantic v2 models from json schemas.
 Since the used tool doesn't support all features we need, we monkey patch some functions.
 """
-import json
 import re
 from collections import defaultdict
 from pathlib import Path
-from typing import Tuple
+from typing import Any, DefaultDict, Dict, Tuple
 
 import datamodel_code_generator.parser.base
 import datamodel_code_generator.reference
@@ -134,10 +133,10 @@ def parse_bo4e_schemas(
     )
     monkey_patch_relative_import()
 
-    additional_arguments = {}
+    additional_arguments: Dict[str, Any] = {}
 
     if sql_model:
-        additional_sql_data = defaultdict(dict)
+        additional_sql_data: DefaultDict[str, Any] = defaultdict(dict)
         for schema_metadata in namespace.values():
             if schema_metadata.pkg != "enum":
                 additional_sql_data[schema_metadata.class_name]["SQL"] = {
@@ -147,7 +146,7 @@ def parse_bo4e_schemas(
         additional_arguments["extra_template_data"] = additional_sql_data
         additional_arguments["additional_imports"] = ["sqlmodel.Field"]
         additional_arguments["base_class"] = "sqlmodel.SQLModel"
-        additional_arguments["custom_template_dir"] = Path.cwd() / Path(".\custom_templates")
+        additional_arguments["custom_template_dir"] = Path.cwd() / Path("custom_templates")
 
     parser = JsonSchemaParser(
         input_directory,
