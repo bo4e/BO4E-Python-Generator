@@ -3,9 +3,8 @@ Contains code to generate pydantic v2 models from json schemas.
 Since the used tool doesn't support all features we need, we monkey patch some functions.
 """
 import re
-from keyword import iskeyword
 from pathlib import Path
-from typing import Optional, Set, Tuple
+from typing import Tuple
 
 import datamodel_code_generator.parser.base
 import datamodel_code_generator.reference
@@ -13,7 +12,6 @@ from datamodel_code_generator import DataModelType, PythonVersion
 from datamodel_code_generator.model import DataModelSet, get_data_model_types
 from datamodel_code_generator.model.enum import Enum as _Enum
 from datamodel_code_generator.parser.jsonschema import JsonSchemaParser
-from datamodel_code_generator.reference import camel_to_snake, snake_to_upper_camel
 
 from bo4e_generator.schema import SchemaMetadata
 
@@ -36,13 +34,6 @@ def get_bo4e_data_model_types(
     def _module_path(self) -> list[str]:
         if self.name not in namespace:
             raise ValueError(f"Model not in namespace: {self.name}")
-        if self.file_path:
-            return [
-                *self.file_path.parts[:-1],
-                self.file_path.stem,
-                namespace[self.name].pkg,
-                namespace[self.name].module_name,
-            ]
         return [namespace[self.name].pkg, namespace[self.name].module_name]
 
     @property  # type: ignore[misc]
@@ -69,68 +60,6 @@ def get_bo4e_data_model_types(
         dump_resolve_reference_action=data_model_types.dump_resolve_reference_action,
         known_third_party=data_model_types.known_third_party,
     )
-
-
-def monkey_patch_field_name_resolver():
-    """
-    Function taken from datamodel_code_generator.reference.FieldNameResolver.
-    Related issue: https://github.com/koxudaxi/datamodel-code-generator/issues/1644
-    Related PR: https://github.com/koxudaxi/datamodel-code-generator/pull/1654
-    The current implementation struggles if you have enum values starting with invalid characters (e.g. numbers) but
-    want to be able to remove leading underscores from field names.
-    This monkey patch (dirty) fixes this issue.
-    """
-
-    # pylint: disable=too-many-branches
-    def _get_valid_name(
-        self,
-        name: str,
-        excludes: Optional[Set[str]] = None,
-        ignore_snake_case_field: bool = False,
-        upper_camel: bool = False,
-    ) -> str:
-        if not name:
-            name = self.empty_field_name
-        if name[0] == "#":
-            name = name[1:] or self.empty_field_name
-
-        if self.snake_case_field and not ignore_snake_case_field and self.original_delimiter is not None:
-            name = snake_to_upper_camel(name, delimiter=self.original_delimiter)
-
-        name = re.sub(r"[¹²³⁴⁵⁶⁷⁸⁹]|\W", "_", name)
-        if name[0].isnumeric():
-            name = f"{self.special_field_name_prefix}{name}"  # Changed line by me
-
-        # We should avoid having a field begin with an underscore, as it
-        # causes pydantic to consider it as private
-        while name.startswith("_"):
-            if self.remove_special_field_name_prefix:
-                name = name[1:]
-            else:
-                name = f"{self.special_field_name_prefix}{name}"
-                break
-        if self.capitalise_enum_members or self.snake_case_field and not ignore_snake_case_field:
-            name = camel_to_snake(name)
-        count = 1
-        # pylint: disable=protected-access
-        if iskeyword(name) or not self._validate_field_name(name):
-            name += "_"
-        if upper_camel:
-            new_name = snake_to_upper_camel(name)
-        elif self.capitalise_enum_members:
-            new_name = name.upper()
-        else:
-            new_name = name
-        while (
-            not (new_name.isidentifier() or not self._validate_field_name(new_name))
-            or iskeyword(new_name)
-            or (excludes and new_name in excludes)
-        ):
-            new_name = f"{name}{count}" if upper_camel else f"{name}_{count}"
-            count += 1
-        return new_name
-
-    datamodel_code_generator.reference.FieldNameResolver.get_valid_name = _get_valid_name
 
 
 def monkey_patch_relative_import():
@@ -175,15 +104,11 @@ def monkey_patch_relative_import():
     datamodel_code_generator.parser.base.relative = relative
 
 
-def create_init_files(output_path: Path, version: str) -> None:
+def bo4e_init_file_content(version: str) -> str:
     """
     Create __init__.py files in all subdirectories of the given output directory and in the directory itself.
     """
-    (output_path / "__init__.py").write_text(
-        f'""" Contains information about the bo4e version """\n\n__version__ = "{version}"\n'
-    )
-    for directory in output_path.glob("**/"):
-        (directory / "__init__.py").touch()
+    return f'""" Contains information about the bo4e version """\n\n__version__ = "{version}"\n'
 
 
 def remove_future_import(python_code: str) -> str:
@@ -193,25 +118,29 @@ def remove_future_import(python_code: str) -> str:
     return re.sub(r"from __future__ import annotations\n\n", "", python_code)
 
 
-def generate_bo4e_schema(schema_metadata: SchemaMetadata, namespace: dict[str, SchemaMetadata]) -> str:
+def parse_bo4e_schemas(
+    input_directory: Path, namespace: dict[str, SchemaMetadata], pydantic_v1: bool = False
+) -> dict[Path, str]:
     """
-    Generate a pydantic v2 model from the given schema. Returns the resulting code as string.
+    Generate all BO4E schemas from the given input directory. Returns all file contents as dictionary:
+    file path (relative to arbitrary output directory) => file content.
     """
     data_model_types = get_bo4e_data_model_types(
-        DataModelType.PydanticBaseModel, target_python_version=PythonVersion.PY_311, namespace=namespace
+        DataModelType.PydanticBaseModel if pydantic_v1 else DataModelType.PydanticV2BaseModel,
+        target_python_version=PythonVersion.PY_311,
+        namespace=namespace,
     )
-    monkey_patch_field_name_resolver()
     monkey_patch_relative_import()
 
     parser = JsonSchemaParser(
-        schema_metadata.schema_text,
+        input_directory,
         base_class="sqlmodel.SQLModel",
         data_model_type=data_model_types.data_model,
         data_model_root_type=data_model_types.root_model,
         data_model_field_type=data_model_types.field_model,
         data_type_manager_type=data_model_types.data_type_manager,
         dump_resolve_reference_action=data_model_types.dump_resolve_reference_action,
-        use_annotated=True,
+        use_annotated=not pydantic_v1,
         use_double_quotes=True,
         use_schema_description=True,
         use_subclass_enum=True,
@@ -220,30 +149,33 @@ def generate_bo4e_schema(schema_metadata: SchemaMetadata, namespace: dict[str, S
         set_default_enum_member=True,
         snake_case_field=True,
         field_constraints=True,
-        class_name=schema_metadata.class_name,
         capitalise_enum_members=True,
-        base_path=schema_metadata.input_file.parent,
+        base_path=input_directory,
         remove_special_field_name_prefix=True,
-        special_field_name_prefix="field_",
         allow_extra_fields=False,
         custom_template_dir=Path.cwd() / Path(".\custom_templates"),
     )
-    result = parser.parse()
-    if isinstance(result, dict):
+    parse_result = parser.parse()
+    if not isinstance(parse_result, dict):
+        raise ValueError(f"Unexpected type of parse result: {type(parse_result)}")
+    file_contents = {}
+    for schema_metadata in namespace.values():
         if schema_metadata.module_name.startswith("_"):
             # Because somehow the generator uses the prefix also on the module name. Don't know why.
             module_path = (schema_metadata.pkg, f"field{schema_metadata.module_name}.py")
         else:
             module_path = (schema_metadata.pkg, f"{schema_metadata.module_name}.py")
-        try:
-            result = result[module_path].body
-        except KeyError as error:
+
+        if module_path not in parse_result:
             raise KeyError(
                 f"Could not find module {'.'.join(module_path)} in results: "
-                f"{list(result.keys())}"  # type: ignore[union-attr]
+                f"{list(parse_result.keys())}"  # type: ignore[union-attr]
                 # Item "str" of "str | dict[tuple[str, ...], Result]" has no attribute "keys"
                 # Somehow, mypy is not good enough to understand the instance-check above
-            ) from error
+            )
 
-    result = remove_future_import(result)
-    return result
+        file_contents[schema_metadata.output_file] = remove_future_import(parse_result.pop(module_path).body)
+
+    file_contents.update({Path(*module_path): result.body for module_path, result in parse_result.items()})
+
+    return file_contents

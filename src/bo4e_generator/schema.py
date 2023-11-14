@@ -19,10 +19,11 @@ class SchemaMetadata(BaseModel):
     schema_text: str
     schema_parsed: SchemaType
     class_name: str
-    input_file: Path
     pkg: str
     "e.g. 'bo'"
+    input_file: Path
     output_file: Path
+    "The output file will be a relative path"
     module_name: str
     "e.g. 'preisblatt_netznutzung"
 
@@ -45,7 +46,7 @@ def camel_to_snake(name: str) -> str:
     return re.sub("([a-z0-9])([A-Z])", r"\1_\2", name).lower()
 
 
-def get_namespace(input_directory: Path, output_directory: Path) -> dict[str, SchemaMetadata]:
+def get_namespace(input_directory: Path) -> dict[str, SchemaMetadata]:
     """
     Create a namespace for the bo4e classes.
     """
@@ -61,7 +62,7 @@ def get_namespace(input_directory: Path, output_directory: Path) -> dict[str, Sc
             pkg=file_path.parent.name,
             module_name=module_name,
             input_file=file_path,
-            output_file=output_directory / file_path.relative_to(input_directory).with_name(f"{module_name}.py"),
+            output_file=file_path.relative_to(input_directory).with_name(f"{module_name}.py"),
             schema_text=schema_text,
             schema_parsed=schema_parsed,
             class_name=class_name,
