@@ -1,7 +1,7 @@
 {% for decorator in decorators -%}
 {{ decorator }}
 {% endfor -%}
-class {{ class_name }}({% if base_class %}{{ base_class }}{% endif %}, table=True):{% if comment is defined %}  # {{ comment }}{% endif %}
+class {{ class_name }}({% if base_class %}{{ base_class }}{% endif %}{% if SQL %}, table=True{% endif %}):{% if comment is defined %}  # {{ comment }}{% endif %}
 {%- if description %}
     """
     {{ description | indent(4) }}
@@ -37,3 +37,5 @@ class {{ class_name }}({% if base_class %}{{ base_class }}{% endif %}, table=Tru
     {{ method }}
 {%- endfor -%}
 {%- endfor -%}
+{%- if SQL and SQL['primary'] %}
+    {{ SQL['primary'] }}{%- endif %}

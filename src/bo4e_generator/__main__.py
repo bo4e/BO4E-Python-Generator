@@ -20,13 +20,15 @@ def resolve_paths(input_directory: Path, output_directory: Path) -> tuple[Path, 
     return input_directory, output_directory
 
 
-def generate_bo4e_schemas(input_directory: Path, output_directory: Path, pydantic_v1: bool = False):
+def generate_bo4e_schemas(
+    input_directory: Path, output_directory: Path, pydantic_v1: bool = False, sql_model: bool = False
+):
     """
     Generate all BO4E schemas from the given input directory and save them in the given output directory.
     """
     input_directory, output_directory = resolve_paths(input_directory, output_directory)
     namespace = get_namespace(input_directory)
-    file_contents = parse_bo4e_schemas(input_directory, namespace, pydantic_v1)
+    file_contents = parse_bo4e_schemas(input_directory, namespace, pydantic_v1, sql_model)
     file_contents[Path("__init__.py")] = bo4e_init_file_content(get_version(namespace))
     for relative_file_path, file_content in file_contents.items():
         file_path = output_directory / relative_file_path
@@ -60,13 +62,21 @@ def generate_bo4e_schemas(input_directory: Path, output_directory: Path, pydanti
     required=False,
     default=False,
 )
+@click.option(
+    "--sql-model",
+    "-sqlm",
+    is_flag=True,
+    help="Generate SQLModel classes.",
+    required=False,
+    default=False,
+)
 @click.help_option()
 @click.version_option(package_name="BO4E-Python-Generator")
-def main(input_dir: Path, output_dir: Path, pydantic_v1: bool):
+def main(input_dir: Path, output_dir: Path, pydantic_v1: bool, sql_model: bool):
     """
     CLI entry point for the bo4e-generator.
     """
-    generate_bo4e_schemas(input_dir, output_dir, pydantic_v1)
+    generate_bo4e_schemas(input_dir, output_dir, pydantic_v1, sql_model)
 
 
 if __name__ == "__main__":

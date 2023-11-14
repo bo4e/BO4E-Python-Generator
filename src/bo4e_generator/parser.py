@@ -2,7 +2,9 @@
 Contains code to generate pydantic v2 models from json schemas.
 Since the used tool doesn't support all features we need, we monkey patch some functions.
 """
+import json
 import re
+from collections import defaultdict
 from pathlib import Path
 from typing import Tuple
 
@@ -119,7 +121,7 @@ def remove_future_import(python_code: str) -> str:
 
 
 def parse_bo4e_schemas(
-    input_directory: Path, namespace: dict[str, SchemaMetadata], pydantic_v1: bool = False
+    input_directory: Path, namespace: dict[str, SchemaMetadata], pydantic_v1: bool = False, sql_model: bool = False
 ) -> dict[Path, str]:
     """
     Generate all BO4E schemas from the given input directory. Returns all file contents as dictionary:
@@ -132,9 +134,23 @@ def parse_bo4e_schemas(
     )
     monkey_patch_relative_import()
 
+    additional_arguments = {}
+
+    if sql_model:
+        additional_sql_data = defaultdict(dict)
+        for schema_metadata in namespace.values():
+            if schema_metadata.pkg != "enum":
+                additional_sql_data[schema_metadata.class_name]["SQL"] = {
+                    "primary": schema_metadata.class_name.lower()
+                    + "_id: Field( default_factory=uuid_pkg.uuid4, primary_key=True, index=True, nullable=False )"
+                }
+        additional_arguments["extra_template_data"] = additional_sql_data
+        additional_arguments["additional_imports"] = ["sqlmodel.Field"]
+        additional_arguments["base_class"] = "sqlmodel.SQLModel"
+        additional_arguments["custom_template_dir"] = Path.cwd() / Path(".\custom_templates")
+
     parser = JsonSchemaParser(
         input_directory,
-        base_class="sqlmodel.SQLModel",
         data_model_type=data_model_types.data_model,
         data_model_root_type=data_model_types.root_model,
         data_model_field_type=data_model_types.field_model,
@@ -153,7 +169,7 @@ def parse_bo4e_schemas(
         base_path=input_directory,
         remove_special_field_name_prefix=True,
         allow_extra_fields=False,
-        custom_template_dir=Path.cwd() / Path(".\custom_templates"),
+        **additional_arguments,
     )
     parse_result = parser.parse()
     if not isinstance(parse_result, dict):
