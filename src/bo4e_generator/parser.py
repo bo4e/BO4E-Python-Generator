@@ -2,6 +2,7 @@
 Contains code to generate pydantic v2 models from json schemas.
 Since the used tool doesn't support all features we need, we monkey patch some functions.
 """
+import json
 import re
 from collections import defaultdict
 from pathlib import Path
@@ -13,8 +14,9 @@ from datamodel_code_generator import DataModelType, PythonVersion
 from datamodel_code_generator.model import DataModelSet, get_data_model_types
 from datamodel_code_generator.model.enum import Enum as _Enum
 from datamodel_code_generator.parser.jsonschema import JsonSchemaParser
+from pydantic.v1.fields import FieldInfo
 
-from bo4e_generator.schema import SchemaMetadata
+from bo4e_generator.schema import SchemaMetadata, SchemaType
 
 
 def get_bo4e_data_model_types(
@@ -112,10 +114,14 @@ def bo4e_init_file_content(version: str) -> str:
     return f'""" Contains information about the bo4e version """\n\n__version__ = "{version}"\n'
 
 
-def remove_future_import(python_code: str) -> str:
+def remove_future_import(python_code: str, sql_model: bool) -> str:
     """
     Remove the future import from the generated code.
     """
+    if sql_model:
+        python_code = re.sub(r"from pydantic import (.*?)Field(.*?)\n", r"from pydantic import \1\2\n", python_code)
+        python_code = re.sub(r"from pydantic import (.*?)(,|\n)", r"from pydantic import \1\n", python_code)
+        python_code = re.sub(r",,", "", python_code)
     return re.sub(r"from __future__ import annotations\n\n", "", python_code)
 
 
@@ -137,16 +143,37 @@ def parse_bo4e_schemas(
 
     if sql_model:
         additional_sql_data: DefaultDict[str, Any] = defaultdict(dict)
+        add_relation: Dict[str, Dict[str, dict[str, SchemaType]]] = {}
+        back_relation: Dict[str, List[str]] = {}
         for schema_metadata in namespace.values():
             if schema_metadata.pkg != "enum":
+                del_prop = []
+                for prop, val in schema_metadata.schema_parsed["properties"].items():
+                    if "$ref" in str(val):
+                        del_prop.append(prop)
+                for prop in del_prop:
+                    if schema_metadata.class_name not in add_relation:
+                        add_relation[schema_metadata.class_name] = {}
+                    add_relation[schema_metadata.class_name][prop] = schema_metadata.schema_parsed["properties"][prop]
+                    if schema_metadata.class_name not in back_relation:
+                        back_relation[schema_metadata.class_name] = {}
+                    del schema_metadata.schema_parsed["properties"][prop]
+                schema_metadata.schema_text = json.dumps(schema_metadata.schema_parsed, indent=2)
                 additional_sql_data[schema_metadata.class_name]["SQL"] = {
                     "primary": schema_metadata.class_name.lower()
-                    + "_id: Field( default_factory=uuid_pkg.uuid4, primary_key=True, index=True, nullable=False )"
+                    + "_id: UUID = Field( default_factory=UUID.uuid4, primary_key=True, index=True, nullable=False )"
                 }
         additional_arguments["extra_template_data"] = additional_sql_data
-        additional_arguments["additional_imports"] = ["sqlmodel.Field"]
+        additional_arguments["additional_imports"] = ["sqlmodel.Field", "uuid.UUID"]
         additional_arguments["base_class"] = "sqlmodel.SQLModel"
         additional_arguments["custom_template_dir"] = Path.cwd() / Path("custom_templates")
+
+        # save intermediate jsons
+        for schema in namespace.values():
+            file_path = input_directory / Path("intermediate") / schema.output_file
+            file_path.parent.mkdir(parents=True, exist_ok=True)
+            file_path.write_text(schema.schema_text)
+        input_directory = input_directory / Path("intermediate")
 
     parser = JsonSchemaParser(
         input_directory,
@@ -189,7 +216,7 @@ def parse_bo4e_schemas(
                 # Somehow, mypy is not good enough to understand the instance-check above
             )
 
-        file_contents[schema_metadata.output_file] = remove_future_import(parse_result.pop(module_path).body)
+        file_contents[schema_metadata.output_file] = remove_future_import(parse_result.pop(module_path).body, sql_model)
 
     file_contents.update({Path(*module_path): result.body for module_path, result in parse_result.items()})
 
