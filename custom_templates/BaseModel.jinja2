@@ -42,3 +42,9 @@ class {{ class_name }}({% if base_class %}{{ base_class }}{% endif %}{% if SQL %
 {%- endfor -%}
 {%- if SQL and SQL['primary'] %}
     {{ SQL['primary'] }}{%- endif %}
+{%- if SQL and SQL['relations'] %}
+{%- for field_name, field_str in SQL['relations'].items() %}
+    {{ field_name }}: {{ field_str }}
+
+{%- endfor -%}
+{%- endif %}

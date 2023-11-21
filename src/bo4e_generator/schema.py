@@ -67,7 +67,7 @@ def get_namespace(input_directory: Path) -> dict[str, SchemaMetadata]:
 
     namespace: dict[str, SchemaMetadata] = {}
     for file_path in input_directory.rglob("*.json"):
-        schema_text = file_path.read_text()
+        schema_text = file_path.read_text(encoding="utf-8")
         schema_parsed = json.loads(schema_text)
         class_name = schema_parsed["title"].replace(" ", "_")
         module_name = camel_to_snake(class_name)
