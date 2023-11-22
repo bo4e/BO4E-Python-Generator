@@ -147,7 +147,7 @@ def parse_bo4e_schemas(
     if sql_model:
         additional_sql_data: DefaultDict[str, Any] = defaultdict(dict)
         add_relation: Dict[str, Dict[str, str]] = {}
-        relation_imports: Dict[str, List[str]] = {}
+        relation_imports: Dict[str, Dict[str, str]] = defaultdict(dict)
         for schema_metadata in namespace.values():
             if schema_metadata.pkg != "enum":
                 del_prop = []
@@ -164,6 +164,10 @@ def parse_bo4e_schemas(
                     add_relation[ref][
                         f"{schema_metadata.class_name.lower()}_{prop.lower()}"
                     ] = f'List["{schema_metadata.class_name}"] = Relationship(back_populates="{prop.lower()}")'
+                    relation_imports[schema_metadata.class_name][ref] = f"{namespace[ref].pkg}.{ref.lower()}"
+                    relation_imports[ref][
+                        schema_metadata.class_name
+                    ] = f"{schema_metadata.pkg}.{schema_metadata.class_name.lower()}"
                     del schema_metadata.schema_parsed["properties"][prop]
                 schema_metadata.schema_text = json.dumps(schema_metadata.schema_parsed, indent=2, ensure_ascii=False)
                 additional_sql_data[schema_metadata.class_name]["SQL"] = {
@@ -175,9 +179,17 @@ def parse_bo4e_schemas(
                 additional_sql_data[schema_metadata.class_name]["SQL"]["relations"] = add_relation[
                     schema_metadata.class_name
                 ]
-                # additional_sql_data[schema_metadata.class_name]["SQL"]["backrelations"] = back_relation[schema_metadata.class_name]
+            if schema_metadata.class_name in relation_imports:
+                additional_sql_data[schema_metadata.class_name]["SQL"]["relationimports"] = relation_imports[
+                    schema_metadata.class_name
+                ]
         additional_arguments["extra_template_data"] = additional_sql_data
-        additional_arguments["additional_imports"] = ["sqlmodel.Field", "uuid as uuid_pkg", "sqlmodel.Relationship"]
+        additional_arguments["additional_imports"] = [
+            "sqlmodel.Field",
+            "uuid as uuid_pkg",
+            "sqlmodel.Relationship",
+            "typing.Optional",
+        ]
         additional_arguments["base_class"] = "sqlmodel.SQLModel"
         additional_arguments["custom_template_dir"] = Path.cwd() / Path("custom_templates")
 

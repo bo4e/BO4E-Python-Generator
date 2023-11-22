@@ -1,5 +1,9 @@
-{%- if SQL%}
-
+{%- if SQL and SQL['relationimports']%}
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+{%- for class_name, module_path in SQL['relationimports'].items() %}
+    from borm.models.{{ module_path }} import {{ class_name }}
+{%- endfor -%}
 {%- endif %}
 {% for decorator in decorators -%}
 {{ decorator }}
