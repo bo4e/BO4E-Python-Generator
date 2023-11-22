@@ -146,28 +146,31 @@ def parse_bo4e_schemas(
 
     if sql_model:
         additional_sql_data: DefaultDict[str, Any] = defaultdict(dict)
-        add_relation: Dict[str, Dict[str, str]] = {}
+        add_relation: Dict[str, Dict[str, str]] = defaultdict(dict)
         relation_imports: Dict[str, Dict[str, str]] = defaultdict(dict)
         for schema_metadata in namespace.values():
             if schema_metadata.pkg != "enum":
                 del_prop = []
                 for prop, val in schema_metadata.schema_parsed["properties"].items():
-                    if "$ref" in str(val) and "enum" not in str(val):
+                    if "$ref" in str(val):  # and "enum" not in str(val):
                         del_prop.append(prop)
                 for prop in del_prop:
-                    if schema_metadata.class_name not in add_relation:
-                        add_relation[schema_metadata.class_name] = {}
-                    ref, relation_dict = transform_schema_dict_sql(prop, schema_metadata)
-                    add_relation[schema_metadata.class_name].update(relation_dict)
-                    if ref not in add_relation:
-                        add_relation[ref] = {}
-                    add_relation[ref][
-                        f"{schema_metadata.class_name.lower()}_{prop.lower()}"
-                    ] = f'List["{schema_metadata.class_name}"] = Relationship(back_populates="{prop.lower()}")'
-                    relation_imports[schema_metadata.class_name][ref] = f"{namespace[ref].pkg}.{ref.lower()}"
-                    relation_imports[ref][
-                        schema_metadata.class_name
-                    ] = f"{schema_metadata.pkg}.{schema_metadata.class_name.lower()}"
+                    add_relation, relation_imports = create_sql_field(
+                        prop, schema_metadata.class_name, namespace, add_relation, relation_imports
+                    )
+                    # if schema_metadata.class_name not in add_relation:
+                    #     add_relation[schema_metadata.class_name] = {}
+                    # ref, relation_dict = transform_schema_dict_sql(prop, schema_metadata)
+                    # add_relation[schema_metadata.class_name].update(relation_dict)
+                    # if ref not in add_relation:
+                    #     add_relation[ref] = {}
+                    # add_relation[ref][
+                    #     f"{schema_metadata.class_name.lower()}_{prop.lower()}"
+                    # ] = f'List["{schema_metadata.class_name}"] = Relationship(back_populates="{prop.lower()}")'
+                    # relation_imports[schema_metadata.class_name][ref] = f"{namespace[ref].pkg}.{ref.lower()}"
+                    # relation_imports[ref][
+                    #     schema_metadata.class_name
+                    # ] = f"{schema_metadata.pkg}.{schema_metadata.class_name.lower()}"
                     del schema_metadata.schema_parsed["properties"][prop]
                 schema_metadata.schema_text = json.dumps(schema_metadata.schema_parsed, indent=2, ensure_ascii=False)
                 additional_sql_data[schema_metadata.class_name]["SQL"] = {
@@ -183,13 +186,12 @@ def parse_bo4e_schemas(
                 additional_sql_data[schema_metadata.class_name]["SQL"]["relationimports"] = relation_imports[
                     schema_metadata.class_name
                 ]
+            if schema_metadata.class_name + "ENUM" in relation_imports:
+                additional_sql_data[schema_metadata.class_name]["SQL"]["imports"] = relation_imports[
+                    schema_metadata.class_name + "ENUM"
+                ]
         additional_arguments["extra_template_data"] = additional_sql_data
-        additional_arguments["additional_imports"] = [
-            "sqlmodel.Field",
-            "uuid as uuid_pkg",
-            "sqlmodel.Relationship",
-            "typing.Optional",
-        ]
+        additional_arguments["additional_imports"] = ["sqlmodel.Field", "uuid as uuid_pkg", "sqlmodel.Relationship"]
         additional_arguments["base_class"] = "sqlmodel.SQLModel"
         additional_arguments["custom_template_dir"] = Path.cwd() / Path("custom_templates")
 
@@ -287,3 +289,94 @@ def return_ref(dictionary: Dict[str, Union[str, Dict]], target_key: str) -> str:
                 if isinstance(item, dict):
                     return return_ref(item, target_key)
     return ""
+
+
+def create_sql_field(
+    field_name: str,
+    class_name: str,
+    namespace: dict[str, SchemaMetadata],
+    add_fields: DefaultDict[str, Dict[str, str]],
+    add_imports: DefaultDict[str, Dict[str, str]],
+) -> Tuple[DefaultDict[str, Dict[str, str]], DefaultDict[str, Dict[str, str]]]:
+    schema = namespace[class_name]
+    field_from_json = schema.schema_parsed["properties"][field_name]
+    reference = return_ref(field_from_json, "$ref")
+    reference_name = (reference.split("/")[-1]).split(".json")[0]
+    default = None
+    is_optional = False
+    is_list = False
+    if "default" in field_from_json:
+        default = field_from_json["default"]
+    if "anyOf" in field_from_json:
+        for item in field_from_json["anyOf"]:
+            if "type" in item:
+                if item["type"] == "null":
+                    is_optional = True
+                if item["type"] == "array":
+                    is_list = True
+    reference_is_enum = namespace[reference_name].pkg == "enum"
+    if default is not None:
+        default = f"{reference_name}.{default}"
+    if reference_is_enum:
+        if is_optional:
+            if is_list:
+                add_fields[class_name][
+                    f"{field_name}"
+                ] = f'List[{reference_name}] | None = Field({default}, sa_column=Column( ARRAY( Enum( {reference_name}, name="{reference_name.lower()}"))))'
+            else:
+                add_fields[class_name][f"{field_name}"] = f"{reference_name} | None = Field({default})"
+        else:
+            if is_list:
+                add_fields[class_name][
+                    f"{field_name}"
+                ] = f'List[{reference_name}] = Field({default}, sa_column=Column( ARRAY( Enum( {reference_name}, name="{reference_name.lower()}"))))'
+            else:
+                add_fields[class_name][f"{field_name}"] = f"{reference_name} = Field({default})"
+        # import enums
+        if is_list:
+            add_imports[class_name + "ENUM"]["Column, ARRAY, Enum"] = f"sqlalchemy"
+            add_imports[class_name + "ENUM"]["List"] = f"typing"
+        add_imports[class_name + "ENUM"][reference_name] = f"{namespace[reference_name].pkg}.{reference_name.lower()}"
+    else:
+        add_imports[class_name + "ENUM"]["List"] = f"typing"
+        add_imports[reference_name + "ENUM"]["List"] = f"typing"
+        if is_optional:
+            if is_list:
+                add_fields[class_name][
+                    f"{field_name}_id"
+                ] = f'uuid_pkg.UUID | None = Field(default=None, foreign_key="{reference_name.lower()}.{reference_name.lower()}_sqlid")'
+                add_fields[class_name][
+                    f"{field_name}"
+                ] = f'List["{reference_name}"] = Relationship(back_populates="{class_name.lower()}_{field_name.lower()}")'
+                add_imports[class_name + "ENUM"]["Optional"] = f"typing"
+            else:
+                add_fields[class_name][
+                    f"{field_name}_id"
+                ] = f'uuid_pkg.UUID | None = Field(default=None, foreign_key="{reference_name.lower()}.{reference_name.lower()}_sqlid")'
+                add_fields[class_name][
+                    f"{field_name}"
+                ] = f'Optional["{reference_name}"] = Relationship(back_populates="{class_name.lower()}_{field_name.lower()}")'
+                add_imports[class_name + "ENUM"]["Optional"] = f"typing"
+        else:
+            if is_list:
+                add_fields[class_name][
+                    f"{field_name}_id"
+                ] = f'uuid_pkg.UUID = Field(default=None, foreign_key="{reference_name.lower()}.{reference_name.lower()}_sqlid")'
+                add_fields[class_name][
+                    f"{field_name}"
+                ] = f'List["{reference_name}"] = Relationship(back_populates="{class_name.lower()}_{field_name.lower()}")'
+            else:
+                add_fields[class_name][
+                    f"{field_name}_id"
+                ] = f'uuid_pkg.UUID = Field(default=None, foreign_key="{reference_name.lower()}.{reference_name.lower()}_sqlid")'
+                add_fields[class_name][
+                    f"{field_name}"
+                ] = f'"{reference_name}" = Relationship(back_populates="{class_name.lower()}_{field_name.lower()}")'
+        add_fields[reference_name][
+            f"{class_name.lower()}_{field_name.lower()}"
+        ] = f'List["{class_name}"] = Relationship(back_populates="{field_name.lower()}")'
+        # add_relation_import
+        add_imports[class_name][reference_name] = f"{namespace[reference_name].pkg}.{reference_name.lower()}"
+        add_imports[reference_name][class_name] = f"{schema.pkg}.{class_name.lower()}"
+
+    return add_fields, add_imports

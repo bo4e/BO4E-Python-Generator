@@ -70,7 +70,7 @@ def get_namespace(input_directory: Path) -> dict[str, SchemaMetadata]:
         schema_text = file_path.read_text(encoding="utf-8")
         schema_parsed = json.loads(schema_text)
         class_name = schema_parsed["title"].replace(" ", "_")
-        module_name = camel_to_snake(class_name)
+        module_name = schema_parsed["title"].lower()  # camel_to_snake(class_name)
 
         namespace[class_name] = SchemaMetadata(
             pkg=file_path.parent.name,
