@@ -352,7 +352,8 @@ def create_sql_field(
                 )
                 add_fields[class_name][f"{field_name}"] = (
                     f'List["{reference_name}"] ='
-                    f' Relationship(back_populates="{class_name.lower()}_{field_name.lower()}")'
+                    f' Relationship(back_populates="{class_name.lower()}_{field_name}",'
+                    f' sa_relationship_kwargs=dict( foreign_keys="[{class_name}.{field_name}_id]"))'
                 )
             else:
                 add_fields[class_name][f"{field_name}_id"] = (
@@ -361,14 +362,19 @@ def create_sql_field(
                     + f' = Field(default=None, foreign_key="{reference_name.lower()}.{reference_name.lower()}_sqlid")'
                 )
                 add_fields[class_name][f"{field_name}"] = (
-                    f'Optional["{reference_name}"] ='
-                    f' Relationship(back_populates="{class_name.lower()}_{field_name.lower()}")'
+                    f'List["{reference_name}"] ='
+                    f' Relationship(back_populates="{class_name.lower()}_{field_name}",'
+                    f' sa_relationship_kwargs=dict( foreign_keys="[{class_name}.{field_name}_id]"))'
                 )
                 add_imports[class_name + "ADD"]["Optional"] = "typing"
 
-            add_fields[reference_name][
-                f"{class_name.lower()}_{field_name.lower()}"
-            ] = f'List["{class_name}"] = Relationship(back_populates="{field_name.lower()}")'
+            add_fields[reference_name][f"{class_name.lower()}_{field_name.lower()}"] = (
+                f'List["{class_name}"] = Relationship(back_populates="{field_name}",'
+                f"sa_relationship_kwargs="
+                f'{{"primaryjoin":'
+                f' "{class_name}.{field_name}_id=={reference_name}.{reference_name.lower()}_sqlid",'
+                f' "lazy": "joined" }})'
+            )
             # add_relation_import
             add_imports[class_name][
                 reference_name
