@@ -249,7 +249,7 @@ def adapt_parse_for_sql(
     additional_arguments["extra_template_data"] = additional_sql_data
     additional_arguments["additional_imports"] = ["sqlmodel.Field", "uuid as uuid_pkg", "sqlmodel.Relationship"]
     additional_arguments["base_class"] = "sqlmodel.SQLModel"
-    additional_arguments["custom_template_dir"] = Path.cwd() / Path("custom_templates")
+    additional_arguments["custom_template_dir"] = Path("custom_templates")
 
     # save intermediate jsons
     for schema in namespace.values():
