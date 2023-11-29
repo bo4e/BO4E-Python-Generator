@@ -295,7 +295,7 @@ def create_sql_field(
     is_list = False
     list_type = None
     typing_dict: dict[str, str] = {"string": "str", "integer": "int"}
-    if "default" in field_from_json and field_from_json["default"] != "null":
+    if "default" in field_from_json and field_from_json["default"] != "null" and field_from_json["default"] is not None:
         default = f'{reference_name}.{field_from_json["default"]}'
     if "anyOf" in field_from_json:
         for item in field_from_json["anyOf"]:
