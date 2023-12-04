@@ -35,6 +35,7 @@ def generate_bo4e_schemas(
     file_contents[Path("__init__.py")] = bo4e_init_file_content(namespace, version)
     if clear_output and output_directory.exists():
         shutil.rmtree(output_directory)
+
     for relative_file_path, file_content in file_contents.items():
         file_path = output_directory / relative_file_path
         file_path.parent.mkdir(parents=True, exist_ok=True)
