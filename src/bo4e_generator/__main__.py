@@ -5,7 +5,7 @@ from pathlib import Path
 
 import click
 
-from bo4e_generator.parser import bo4e_init_file_content, parse_bo4e_schemas
+from bo4e_generator.parser import bo4e_init_file_content, bo4e_version_file_content, parse_bo4e_schemas
 from bo4e_generator.schema import get_namespace, get_version
 
 
@@ -27,7 +27,9 @@ def generate_bo4e_schemas(input_directory: Path, output_directory: Path, pydanti
     input_directory, output_directory = resolve_paths(input_directory, output_directory)
     namespace = get_namespace(input_directory)
     file_contents = parse_bo4e_schemas(input_directory, namespace, pydantic_v1)
-    file_contents[Path("__init__.py")] = bo4e_init_file_content(get_version(namespace))
+    version = get_version(namespace)
+    file_contents[Path("__version__.py")] = bo4e_version_file_content(version)
+    file_contents[Path("__init__.py")] = bo4e_init_file_content(namespace, version)
     for relative_file_path, file_content in file_contents.items():
         file_path = output_directory / relative_file_path
         file_path.parent.mkdir(parents=True, exist_ok=True)
