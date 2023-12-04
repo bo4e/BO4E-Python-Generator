@@ -75,4 +75,7 @@ def get_version(namespace: dict[str, SchemaMetadata]) -> str:
     Get the version of the bo4e schemas.
     """
     # The chosen class is arbitrary. All bo's and com's should contain the same version information.
-    return namespace["Angebot"].schema_parsed["properties"]["_version"]["default"]
+    try:
+        return namespace["Angebot"].schema_parsed["properties"]["_version"]["default"]
+    except KeyError:
+        return "unknown"
