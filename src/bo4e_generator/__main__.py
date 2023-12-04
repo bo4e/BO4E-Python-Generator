@@ -70,7 +70,9 @@ def generate_bo4e_schemas(
 )
 @click.option(
     "--clear-output",
-    help="Clear the output directory before saving the schemas",
+    help="Clear the output directory before saving the schemas. "
+    "Otherwise, if e.g. schemas got deleted, they will not be removed from the output directory. "
+    "Note: Generated output files will always overwrite existing files.",
     is_flag=True,
     default=False,
 )
