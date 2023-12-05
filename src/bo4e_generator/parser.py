@@ -121,7 +121,9 @@ def remove_future_import(python_code: str, sql_model: bool) -> str:
     """
     if sql_model:
         python_code = re.sub(r"from pydantic import (.*?)Field(.*?)\n", r"from pydantic import \1\2\n", python_code)
-        python_code = re.sub(r"from pydantic import (.*?)(,|\n)", r"from pydantic import \1\n", python_code)
+        python_code = re.sub(r"from pydantic import (.*?)(,.\n)", r"from pydantic import \1\n", python_code)
+        python_code = re.sub(r"AwareDateTime", r"DateTime", python_code)
+        python_code = re.sub(r"_(.*?):(.*?)[\n]", r"\1:\2\n", python_code)
         python_code = re.sub(r",,", "", python_code)
         python_code = re.sub(r"\.\.", "borm.models.", python_code)
         python_code = re.sub(r"float \| str \| None", "str | None", python_code)
