@@ -16,7 +16,9 @@ class TestMain:
     def test_main(self):
         os.chdir(BASE_DIR)
         runner = CliRunner()
-        result = runner.invoke(main, ["--input-dir", str(INPUT_DIR), "--output-dir", str(OUTPUT_DIR), "-p2"])
+        result = runner.invoke(
+            main, ["--input-dir", str(INPUT_DIR), "--output-dir", str(OUTPUT_DIR), "-p2", "--clear-output"]
+        )
 
         assert (
             result.exit_code == 0

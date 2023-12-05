@@ -133,6 +133,6 @@ dmypy.json
 # vscode settings
 .vscode/
 
-src/_bo4e_python_generator_version.py
+src/_bo4e_generator_version.py
 
 unittests/output

@@ -107,14 +107,47 @@ def monkey_patch_relative_import():
     datamodel_code_generator.parser.base.relative = relative
 
 
-def bo4e_init_file_content(version: str) -> str:
+def bo4e_version_file_content(version: str) -> str:
     """
     Create __init__.py files in all subdirectories of the given output directory and in the directory itself.
     """
     return f'""" Contains information about the bo4e version """\n\n__version__ = "{version}"\n'
 
 
-def remove_future_import(python_code: str, sql_model: bool) -> str:
+INIT_FILE_COMMENT = '''
+"""
+BO4E v{version} - Generated Python implementation of the BO4E standard
+
+BO4E is a standard for the exchange of business objects in the energy industry.
+All our software used to generate this BO4E-implementation is open-source and released under the Apache-2.0 license.
+
+The BO4E version can be queried using `bo4e.__version__`.
+"""
+'''
+
+
+def bo4e_init_file_content(namespace: dict[str, SchemaMetadata], version: str) -> str:
+    """
+    Create __init__.py files in all subdirectories of the given output directory and in the directory itself.
+    """
+    init_file_content = INIT_FILE_COMMENT.strip().format(version=version)
+
+    init_file_content += "\n\n__all__ = [\n"
+    for class_name in namespace:
+        init_file_content += f'    "{class_name}",\n'
+    init_file_content += '    "__version__",\n'
+    init_file_content += "]\n\n"
+
+    for schema_metadata in namespace.values():
+        init_file_content += (
+            f"from .{schema_metadata.pkg}.{schema_metadata.module_name} import {schema_metadata.class_name}\n"
+        )
+    init_file_content += "\nfrom .__version__ import __version__\n"
+
+    return init_file_content
+
+
+def remove_future_import(python_code: str) -> str:
     """
     Remove the future import from the generated code.
     If sql_model adapt SQLModel specific imports
