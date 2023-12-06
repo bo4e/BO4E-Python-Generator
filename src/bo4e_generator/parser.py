@@ -163,7 +163,7 @@ def bo4e_init_file_content(namespace: dict[str, SchemaMetadata], version: str) -
     return init_file_content
 
 
-def remove_future_import(python_code: str) -> str:
+def remove_future_import(python_code: str, sql_model: bool = False) -> str:
     """
     Remove the future import from the generated code.
     If sql_model adapt SQLModel specific imports
@@ -171,10 +171,7 @@ def remove_future_import(python_code: str) -> str:
     if sql_model:
         python_code = re.sub(r"from pydantic import (.*?)Field(.*?)\n", r"from pydantic import \1\2\n", python_code)
         python_code = re.sub(r"from pydantic import (.*?)(,.\n)", r"from pydantic import \1\n", python_code)
-        python_code = re.sub(r"AwareDateTime", r"DateTime", python_code)
-        python_code = re.sub(r"_(.*?):(.*?)[\n]", r"\1:\2\n", python_code)
         python_code = re.sub(r",,", "", python_code)
-        python_code = re.sub(r"\.\.", "borm.models.", python_code)
         python_code = re.sub(r"float \| str \| None", "str | None", python_code)
     return re.sub(r"from __future__ import annotations\n\n", "", python_code)
 
@@ -357,6 +354,8 @@ def create_sql_field(
                     is_list = True
                     if "type" in item["items"]:
                         list_type = item["items"]["type"]
+    # get rid of underscore in fieldname
+    field_name = field_name.lstrip("_")
     # transform lists to sqlalchemy arrays
     if reference_name == "":
         if list_type not in typing_dict:
@@ -419,7 +418,7 @@ def create_sql_field(
                 )
                 add_imports[class_name + "ADD"]["Optional"] = "typing"
 
-            add_fields[reference_name][f"{class_name.lower()}_{field_name.lower()}"] = (
+            add_fields[reference_name][f"{class_name.lower()}_{field_name}"] = (
                 f'List["{class_name}"] = Relationship(back_populates="{field_name}",'
                 f"sa_relationship_kwargs="
                 f'{{"primaryjoin":'
