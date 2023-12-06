@@ -4,14 +4,16 @@ Since the used tool doesn't support all features we need, we monkey patch some f
 """
 import re
 from pathlib import Path
-from typing import Tuple
+from typing import Sequence, Tuple, Type
 
 import datamodel_code_generator.parser.base
 import datamodel_code_generator.reference
 from datamodel_code_generator import DataModelType, PythonVersion
+from datamodel_code_generator.imports import IMPORT_DATETIME
 from datamodel_code_generator.model import DataModelSet, get_data_model_types
 from datamodel_code_generator.model.enum import Enum as _Enum
 from datamodel_code_generator.parser.jsonschema import JsonSchemaParser
+from datamodel_code_generator.types import DataType, StrictTypes, Types
 
 from bo4e_generator.schema import SchemaMetadata
 
@@ -52,11 +54,24 @@ def get_bo4e_data_model_types(
         setattr(_Enum, "module_path", _module_path)
         setattr(_Enum, "module_name", _module_name)
 
+    class BO4EDataTypeManager(data_model_types.data_type_manager):  # type: ignore[name-defined]
+        """Override the data type manager to use create the namespace. -> ensures desired date-time type"""
+
+        def type_map_factory(
+            self,
+            data_type: Type[DataType],
+            strict_types: Sequence[StrictTypes],
+            pattern_key: str,
+        ) -> dict[Types, DataType]:
+            result = super().type_map_factory(data_type, strict_types, pattern_key)
+            result[Types.date_time] = data_type.from_import(IMPORT_DATETIME)
+            return result
+
     return DataModelSet(
         data_model=BO4EDataModel,
         root_model=data_model_types.root_model,
         field_model=data_model_types.field_model,
-        data_type_manager=data_model_types.data_type_manager,
+        data_type_manager=BO4EDataTypeManager,
         dump_resolve_reference_action=data_model_types.dump_resolve_reference_action,
         known_third_party=data_model_types.known_third_party,
     )
