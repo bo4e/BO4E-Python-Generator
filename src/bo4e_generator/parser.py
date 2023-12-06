@@ -63,6 +63,7 @@ def get_bo4e_data_model_types(
             strict_types: Sequence[StrictTypes],
             pattern_key: str,
         ) -> dict[Types, DataType]:
+            """overwrite the AwareDatetime import"""
             result = super().type_map_factory(data_type, strict_types, pattern_key)
             result[Types.date_time] = data_type.from_import(IMPORT_DATETIME)
             return result
@@ -179,7 +180,6 @@ def parse_bo4e_schemas(
         namespace=namespace,
     )
     monkey_patch_relative_import()
-
     parser = JsonSchemaParser(
         input_directory,
         data_model_type=data_model_types.data_model,
