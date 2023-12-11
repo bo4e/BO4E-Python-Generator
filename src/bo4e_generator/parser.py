@@ -55,7 +55,10 @@ def get_bo4e_data_model_types(
         setattr(_Enum, "module_name", _module_name)
 
     class BO4EDataTypeManager(data_model_types.data_type_manager):  # type: ignore[name-defined]
-        """Override the data type manager to use create the namespace. -> ensures desired date-time type"""
+        """
+        Override the data type manager to prevent the code generator from using the `AwareDateTime` type
+        featured in pydantic v2. Instead, the standard datetime type will be used.
+        """
 
         def type_map_factory(
             self,
