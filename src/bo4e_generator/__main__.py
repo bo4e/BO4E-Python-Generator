@@ -1,19 +1,12 @@
 """
 This module is the entry point for the CLI bo4e-generator.
 """
-from enum import Enum
 from pathlib import Path
 
 import click
 
-from bo4e_generator.parser import bo4e_init_file_content, bo4e_version_file_content, parse_bo4e_schemas
+from bo4e_generator.parser import OutputType, bo4e_init_file_content, parse_bo4e_schemas
 from bo4e_generator.schema import get_namespace, get_version
-
-
-class OutputType(str, Enum):
-    PYDANTIC_V2 = "pydantic_v2"
-    PYDANTIC_V1 = "pydantic_v1"
-    SQL_MODEL = "sql_model"
 
 
 def resolve_paths(input_directory: Path, output_directory: Path) -> tuple[Path, Path]:

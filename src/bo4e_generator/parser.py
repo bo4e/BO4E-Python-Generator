@@ -6,6 +6,7 @@ import json
 import re
 import shutil
 from collections import defaultdict
+from enum import Enum
 from pathlib import Path
 from typing import Any, DefaultDict, Sequence, Tuple, Type, Union
 
@@ -19,6 +20,12 @@ from datamodel_code_generator.parser.jsonschema import JsonSchemaParser
 from datamodel_code_generator.types import DataType, StrictTypes, Types
 
 from bo4e_generator.schema import SchemaMetadata
+
+
+class OutputType(str, Enum):
+    PYDANTIC_V2 = "pydantic_v2"
+    PYDANTIC_V1 = "pydantic_v1"
+    SQL_MODEL = "sql_model"
 
 
 def get_bo4e_data_model_types(
@@ -58,7 +65,10 @@ def get_bo4e_data_model_types(
         setattr(_Enum, "module_name", _module_name)
 
     class BO4EDataTypeManager(data_model_types.data_type_manager):  # type: ignore[name-defined]
-        """Override the data type manager to use create the namespace. -> ensures desired date-time type"""
+        """
+        Override the data type manager to prevent the code generator from using the `AwareDateTime` type
+        featured in pydantic v2. Instead, the standard datetime type will be used.
+        """
 
         def type_map_factory(
             self,
@@ -163,12 +173,12 @@ def bo4e_init_file_content(namespace: dict[str, SchemaMetadata], version: str) -
     return init_file_content
 
 
-def remove_future_import(python_code: str, sql_model: bool = False) -> str:
+def remove_future_import(python_code: str, output_type: OutputType) -> str:
     """
     Remove the future import from the generated code.
     If sql_model adapt SQLModel specific imports
     """
-    if sql_model:
+    if output_type is OutputType.SQL_MODEL:
         python_code = re.sub(r"from pydantic import (.*?)Field(.*?)\n", r"from pydantic import \1\2\n", python_code)
         python_code = re.sub(r"from pydantic import (.*?)(,.\n)", r"from pydantic import \1\n", python_code)
         python_code = re.sub(r",,", "", python_code)
@@ -177,14 +187,14 @@ def remove_future_import(python_code: str, sql_model: bool = False) -> str:
 
 
 def parse_bo4e_schemas(
-    input_directory: Path, namespace: dict[str, SchemaMetadata], pydantic_v1: bool = False, sql_model: bool = False
+    input_directory: Path, namespace: dict[str, SchemaMetadata], output_type: OutputType
 ) -> dict[Path, str]:
     """
     Generate all BO4E schemas from the given input directory. Returns all file contents as dictionary:
     file path (relative to arbitrary output directory) => file content.
     """
     data_model_types = get_bo4e_data_model_types(
-        DataModelType.PydanticBaseModel if pydantic_v1 else DataModelType.PydanticV2BaseModel,
+        DataModelType.PydanticBaseModel if output_type is OutputType.PYDANTIC_V1 else DataModelType.PydanticV2BaseModel,
         target_python_version=PythonVersion.PY_311,
         namespace=namespace,
     )
@@ -192,7 +202,7 @@ def parse_bo4e_schemas(
 
     additional_arguments: dict[str, Any] = {}
 
-    if sql_model:
+    if output_type is OutputType.SQL_MODEL:
         namespace, additional_arguments, input_directory = adapt_parse_for_sql(input_directory, namespace)
 
     parser = JsonSchemaParser(
@@ -202,7 +212,7 @@ def parse_bo4e_schemas(
         data_model_field_type=data_model_types.field_model,
         data_type_manager_type=data_model_types.data_type_manager,
         dump_resolve_reference_action=data_model_types.dump_resolve_reference_action,
-        use_annotated=not pydantic_v1,
+        use_annotated=not OutputType is OutputType.PYDANTIC_V1,
         use_double_quotes=True,
         use_schema_description=True,
         use_subclass_enum=True,
@@ -236,11 +246,13 @@ def parse_bo4e_schemas(
                 # Somehow, mypy is not good enough to understand the instance-check above
             )
 
-        file_contents[schema_metadata.output_file] = remove_future_import(parse_result.pop(module_path).body, sql_model)
+        file_contents[schema_metadata.output_file] = remove_future_import(
+            parse_result.pop(module_path).body, output_type
+        )
 
     file_contents.update({Path(*module_path): result.body for module_path, result in parse_result.items()})
 
-    if sql_model:
+    if output_type is OutputType.SQL_MODEL:
         shutil.rmtree(input_directory)
 
     return file_contents
