@@ -34,20 +34,6 @@ class SchemaMetadata(BaseModel):
         self.output_file.parent.mkdir(parents=True, exist_ok=True)
         self.output_file.write_text(content)
 
-    def add_uuid(self):
-        """
-        add UUID field classname_id for usage with sqlmodel
-        """
-        self.schema_parsed["properties"][self.class_name.lower() + "_id"] = {
-            "pydantic_field": {
-                "default_factory": "uuid_pkg.uuid4",
-                "primary_key": True,
-                "index": True,
-                "nullable": False,
-            },
-            "type": "uuid.UUID",
-        }
-
     def __str__(self):
         return f"{self.pkg}.{self.class_name}"
 

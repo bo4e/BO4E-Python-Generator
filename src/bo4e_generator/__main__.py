@@ -78,7 +78,7 @@ def generate_bo4e_schemas(
     default=False,
 )
 @click.version_option(package_name="BO4E-Python-Generator")
-def main(input_dir: Path, output_dir: Path, pydantic_v1: bool, clear_output: bool, output_type: OutputType):
+def main(input_dir: Path, output_dir: Path, clear_output: bool, output_type: OutputType):
     """
     CLI entry point for the bo4e-generator.
     """

@@ -8,7 +8,7 @@ import shutil
 from collections import defaultdict
 from enum import Enum
 from pathlib import Path
-from typing import Any, DefaultDict, Sequence, Tuple, Type, Union
+from typing import Any, DefaultDict, Sequence, Type, Union
 
 import datamodel_code_generator.parser.base
 import datamodel_code_generator.reference
