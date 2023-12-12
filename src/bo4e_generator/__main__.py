@@ -6,7 +6,7 @@ from pathlib import Path
 
 import click
 
-from bo4e_generator.parser import bo4e_init_file_content, bo4e_version_file_content, parse_bo4e_schemas
+from bo4e_generator.parser import OutputType, bo4e_init_file_content, bo4e_version_file_content, parse_bo4e_schemas
 from bo4e_generator.schema import get_namespace, get_version
 
 
@@ -22,14 +22,14 @@ def resolve_paths(input_directory: Path, output_directory: Path) -> tuple[Path, 
 
 
 def generate_bo4e_schemas(
-    input_directory: Path, output_directory: Path, pydantic_v1: bool = False, clear_output: bool = False
+    input_directory: Path, output_directory: Path, output_type: OutputType, clear_output: bool = False
 ):
     """
     Generate all BO4E schemas from the given input directory and save them in the given output directory.
     """
     input_directory, output_directory = resolve_paths(input_directory, output_directory)
     namespace = get_namespace(input_directory)
-    file_contents = parse_bo4e_schemas(input_directory, namespace, pydantic_v1)
+    file_contents = parse_bo4e_schemas(input_directory, namespace, output_type)
     version = get_version(namespace)
     file_contents[Path("__version__.py")] = bo4e_version_file_content(version)
     file_contents[Path("__init__.py")] = bo4e_init_file_content(namespace, version)
@@ -39,7 +39,7 @@ def generate_bo4e_schemas(
     for relative_file_path, file_content in file_contents.items():
         file_path = output_directory / relative_file_path
         file_path.parent.mkdir(parents=True, exist_ok=True)
-        file_path.write_text(file_content)
+        file_path.write_text(file_content, encoding="utf-8")
         print(f"Created {file_path}")
 
     print("Done.")
@@ -61,12 +61,13 @@ def generate_bo4e_schemas(
     required=True,
 )
 @click.option(
-    "--pydantic-v1/--pydantic-v2",
-    "-p1/-p2",
-    is_flag=True,
-    help="Generate pydantic v1 models instead of pydantic v2 models.",
+    "--output-type",
+    "-ot",
+    type=click.Choice(list(map(lambda x: x.name, OutputType)), case_sensitive=False),
+    # Taken from https://github.com/pallets/click/issues/605#issuecomment-889462570
+    help="Output type for the generated python files.",
     required=False,
-    default=False,
+    default=OutputType.PYDANTIC_V2,
 )
 @click.option(
     "--clear-output",
@@ -77,11 +78,11 @@ def generate_bo4e_schemas(
     default=False,
 )
 @click.version_option(package_name="BO4E-Python-Generator")
-def main(input_dir: Path, output_dir: Path, pydantic_v1: bool, clear_output: bool):
+def main(input_dir: Path, output_dir: Path, clear_output: bool, output_type: OutputType):
     """
     CLI entry point for the bo4e-generator.
     """
-    generate_bo4e_schemas(input_dir, output_dir, pydantic_v1, clear_output)
+    generate_bo4e_schemas(input_dir, output_dir, output_type, clear_output)
 
 
 if __name__ == "__main__":

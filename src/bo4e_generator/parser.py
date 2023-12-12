@@ -2,18 +2,34 @@
 Contains code to generate pydantic v2 models from json schemas.
 Since the used tool doesn't support all features we need, we monkey patch some functions.
 """
+import json
 import re
+import shutil
+from collections import defaultdict
+from enum import Enum
 from pathlib import Path
-from typing import Tuple
+from typing import Any, DefaultDict, Sequence, Type, Union
 
 import datamodel_code_generator.parser.base
 import datamodel_code_generator.reference
 from datamodel_code_generator import DataModelType, PythonVersion
+from datamodel_code_generator.imports import IMPORT_DATETIME
 from datamodel_code_generator.model import DataModelSet, get_data_model_types
 from datamodel_code_generator.model.enum import Enum as _Enum
 from datamodel_code_generator.parser.jsonschema import JsonSchemaParser
+from datamodel_code_generator.types import DataType, StrictTypes, Types
 
 from bo4e_generator.schema import SchemaMetadata
+
+
+class OutputType(str, Enum):
+    """
+    enum to specify the output type
+    """
+
+    PYDANTIC_V2 = "pydantic_v2"
+    PYDANTIC_V1 = "pydantic_v1"
+    SQL_MODEL = "sql_model"
 
 
 def get_bo4e_data_model_types(
@@ -52,11 +68,28 @@ def get_bo4e_data_model_types(
         setattr(_Enum, "module_path", _module_path)
         setattr(_Enum, "module_name", _module_name)
 
+    class BO4EDataTypeManager(data_model_types.data_type_manager):  # type: ignore[name-defined]
+        """
+        Override the data type manager to prevent the code generator from using the `AwareDateTime` type
+        featured in pydantic v2. Instead, the standard datetime type will be used.
+        """
+
+        def type_map_factory(
+            self,
+            data_type: Type[DataType],
+            strict_types: Sequence[StrictTypes],
+            pattern_key: str,
+        ) -> dict[Types, DataType]:
+            """overwrite the AwareDatetime import"""
+            result = super().type_map_factory(data_type, strict_types, pattern_key)
+            result[Types.date_time] = data_type.from_import(IMPORT_DATETIME)
+            return result
+
     return DataModelSet(
         data_model=BO4EDataModel,
         root_model=data_model_types.root_model,
         field_model=data_model_types.field_model,
-        data_type_manager=data_model_types.data_type_manager,
+        data_type_manager=BO4EDataTypeManager,
         dump_resolve_reference_action=data_model_types.dump_resolve_reference_action,
         known_third_party=data_model_types.known_third_party,
     )
@@ -73,7 +106,7 @@ def monkey_patch_relative_import():
     Anyway, this monkey patch changes the imports to "from ..enum.typ import Typ" which resolves the issue.
     """
 
-    def relative(current_module: str, reference: str) -> Tuple[str, str]:
+    def relative(current_module: str, reference: str) -> tuple[str, str]:
         """Find relative module path."""
 
         current_module_path = current_module.split(".") if current_module else []
@@ -144,26 +177,37 @@ def bo4e_init_file_content(namespace: dict[str, SchemaMetadata], version: str) -
     return init_file_content
 
 
-def remove_future_import(python_code: str) -> str:
+def remove_future_import(python_code: str, output_type: OutputType) -> str:
     """
     Remove the future import from the generated code.
+    If sql_model adapt SQLModel specific imports
     """
+    if output_type is OutputType.SQL_MODEL:
+        python_code = re.sub(r"from pydantic import (.*?)Field(.*?)\n", r"from pydantic import \1\2\n", python_code)
+        python_code = re.sub(r"from pydantic import (.*?)(,.\n)", r"from pydantic import \1\n", python_code)
+        python_code = re.sub(r",,", "", python_code)
+        python_code = re.sub(r"float \| str \| None", "str | None", python_code)
     return re.sub(r"from __future__ import annotations\n\n", "", python_code)
 
 
 def parse_bo4e_schemas(
-    input_directory: Path, namespace: dict[str, SchemaMetadata], pydantic_v1: bool = False
+    input_directory: Path, namespace: dict[str, SchemaMetadata], output_type: OutputType
 ) -> dict[Path, str]:
     """
     Generate all BO4E schemas from the given input directory. Returns all file contents as dictionary:
     file path (relative to arbitrary output directory) => file content.
     """
     data_model_types = get_bo4e_data_model_types(
-        DataModelType.PydanticBaseModel if pydantic_v1 else DataModelType.PydanticV2BaseModel,
+        DataModelType.PydanticBaseModel if output_type is OutputType.PYDANTIC_V1 else DataModelType.PydanticV2BaseModel,
         target_python_version=PythonVersion.PY_311,
         namespace=namespace,
     )
     monkey_patch_relative_import()
+
+    additional_arguments: dict[str, Any] = {}
+
+    if output_type is OutputType.SQL_MODEL:
+        namespace, additional_arguments, input_directory = adapt_parse_for_sql(input_directory, namespace)
 
     parser = JsonSchemaParser(
         input_directory,
@@ -172,7 +216,7 @@ def parse_bo4e_schemas(
         data_model_field_type=data_model_types.field_model,
         data_type_manager_type=data_model_types.data_type_manager,
         dump_resolve_reference_action=data_model_types.dump_resolve_reference_action,
-        use_annotated=not pydantic_v1,
+        use_annotated=OutputType is not OutputType.PYDANTIC_V1,
         use_double_quotes=True,
         use_schema_description=True,
         use_subclass_enum=True,
@@ -185,6 +229,7 @@ def parse_bo4e_schemas(
         base_path=input_directory,
         remove_special_field_name_prefix=True,
         allow_extra_fields=False,
+        **additional_arguments,
     )
     parse_result = parser.parse()
     if not isinstance(parse_result, dict):
@@ -205,8 +250,201 @@ def parse_bo4e_schemas(
                 # Somehow, mypy is not good enough to understand the instance-check above
             )
 
-        file_contents[schema_metadata.output_file] = remove_future_import(parse_result.pop(module_path).body)
+        file_contents[schema_metadata.output_file] = remove_future_import(
+            parse_result.pop(module_path).body, output_type
+        )
 
     file_contents.update({Path(*module_path): result.body for module_path, result in parse_result.items()})
 
+    if output_type is OutputType.SQL_MODEL:
+        shutil.rmtree(input_directory)
+
     return file_contents
+
+
+def adapt_parse_for_sql(
+    input_directory: Path, namespace: dict[str, SchemaMetadata]
+) -> tuple[dict[str, SchemaMetadata], dict[str, Any], Path]:
+    """
+    Scans fields of parsed classes to modify them to meet the SQLModel specifics and to introduce relationships.
+    Returns additional information, an input path with modified json schemas and arguments for the parser
+    """
+    additional_arguments: dict[str, Any] = {}
+    additional_sql_data: DefaultDict[str, Any] = defaultdict(dict)
+    add_relation: DefaultDict[str, dict[str, str]] = defaultdict(dict)
+    relation_imports: DefaultDict[str, dict[str, str]] = defaultdict(dict)
+
+    for schema_metadata in namespace.values():
+        if schema_metadata.pkg != "enum":
+            # list of fields which will be replaced by modified versions
+            del_fields = []
+            for field, val in schema_metadata.schema_parsed["properties"].items():
+                if "$ref" in str(val) or "array" in str(val):
+                    del_fields.append(field)
+            for field in del_fields:
+                add_relation, relation_imports = create_sql_field(
+                    field, schema_metadata.class_name, namespace, add_relation, relation_imports
+                )
+
+                del schema_metadata.schema_parsed["properties"][field]
+            # store the reduced version. The modified fields will be added in the BaseModel.jinja2 schema
+            schema_metadata.schema_text = json.dumps(schema_metadata.schema_parsed, indent=2, ensure_ascii=False)
+
+            # add primary key
+            additional_sql_data[schema_metadata.class_name]["SQL"] = {
+                "primary": schema_metadata.class_name.lower()
+                + "_sqlid: uuid_pkg.UUID = Field( default_factory=uuid_pkg.uuid4, primary_key=True, index=True, "
+                "nullable=False )"
+            }
+    # pass additional fields and imports to dictionary for parser
+    for schema_metadata in namespace.values():
+        if schema_metadata.class_name in add_relation:
+            additional_sql_data[schema_metadata.class_name]["SQL"]["relations"] = add_relation[
+                schema_metadata.class_name
+            ]
+        if schema_metadata.class_name in relation_imports:
+            additional_sql_data[schema_metadata.class_name]["SQL"]["relationimports"] = relation_imports[
+                schema_metadata.class_name
+            ]
+        if schema_metadata.class_name + "ADD" in relation_imports:
+            additional_sql_data[schema_metadata.class_name]["SQL"]["imports"] = relation_imports[
+                schema_metadata.class_name + "ADD"
+            ]
+    additional_arguments["extra_template_data"] = additional_sql_data
+    additional_arguments["additional_imports"] = ["sqlmodel.Field", "uuid as uuid_pkg", "sqlmodel.Relationship"]
+    additional_arguments["base_class"] = "sqlmodel.SQLModel"
+    additional_arguments["custom_template_dir"] = Path(__file__).resolve().parent / Path("custom_templates")
+
+    # save intermediate jsons
+    for schema in namespace.values():
+        file_path = input_directory / Path("intermediate") / Path(schema.pkg) / Path(schema.class_name + ".json")
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+        file_path.write_text(schema.schema_text, encoding="utf-8")
+    input_directory = input_directory / Path("intermediate")
+
+    return namespace, additional_arguments, input_directory
+
+
+def return_ref(dictionary: dict[str, Union[str, dict]], target_key: str) -> str:
+    """
+    returns name of class which is referenced
+    """
+    for key, value in dictionary.items():
+        if key == target_key and isinstance(value, str):
+            return (value.split("/")[-1]).split(".json")[0]
+        if isinstance(value, dict):
+            return return_ref(value, target_key)
+        if isinstance(value, list):
+            for item in value:
+                if isinstance(item, dict):
+                    return return_ref(item, target_key)
+    return ""
+
+
+# pylint: disable=too-many-branches
+def create_sql_field(
+    field_name: str,
+    class_name: str,
+    namespace: dict[str, SchemaMetadata],
+    add_fields: DefaultDict[str, dict[str, str]],
+    add_imports: DefaultDict[str, dict[str, str]],
+) -> tuple[DefaultDict[str, dict[str, str]], DefaultDict[str, dict[str, str]]]:
+    """
+    Parses field with references to other classes, enums and lists, and converts it to SQLModel field.
+    """
+    field_from_json = namespace[class_name].schema_parsed["properties"][field_name]
+    reference_name = return_ref(field_from_json, "$ref")
+    default = None
+    is_optional = ""
+    is_list = False
+    list_type = None
+    typing_dict: dict[str, str] = {"string": "str", "integer": "int"}
+    if "default" in field_from_json and field_from_json["default"] != "null" and field_from_json["default"] is not None:
+        default = f'{reference_name}.{field_from_json["default"]}'
+    if "anyOf" in field_from_json:
+        for item in field_from_json["anyOf"]:
+            if "type" in item:
+                if item["type"] == "null":
+                    is_optional = "| None"
+                if item["type"] == "array":
+                    is_list = True
+                    if "type" in item["items"]:
+                        list_type = item["items"]["type"]
+    # get rid of underscore in fieldname
+    field_name = field_name.lstrip("_")
+    # transform lists to sqlalchemy arrays
+    if reference_name == "":
+        if list_type not in typing_dict:
+            raise KeyError(f"transforming SQL list: {list_type} not known")
+        type_hint = typing_dict[list_type]
+        sa_type = list_type.capitalize()
+        add_imports[class_name + "ADD"]["Column, ARRAY, " + sa_type] = "sqlalchemy"
+
+        add_fields[class_name][f"{field_name}"] = (
+            f"List[{type_hint}] "
+            + is_optional
+            + f' = Field({default}, title="{field_name}", sa_column=Column( ARRAY( {sa_type} )))'
+        )
+
+    # transform references
+    else:
+        if namespace[reference_name].pkg == "enum":
+            if is_list:
+                add_fields[class_name][f"{field_name}"] = (
+                    f"List[{reference_name}]" + is_optional + f" = Field({default},"
+                    f' sa_column=Column( ARRAY( Enum( {reference_name}, name="{reference_name.lower()}"))))'
+                )
+            else:
+                add_fields[class_name][f"{field_name}"] = f"{reference_name}" + is_optional + f"= Field({default})"
+
+            # import enums
+            if is_list:
+                add_imports[class_name + "ADD"]["Column, ARRAY, Enum"] = "sqlalchemy"
+                add_imports[class_name + "ADD"]["List"] = "typing"
+            add_imports[class_name + "ADD"][
+                reference_name
+            ] = f"{namespace[reference_name].pkg}.{namespace[reference_name].module_name}"
+        else:
+            add_imports[class_name + "ADD"]["List"] = "typing"
+            add_imports[reference_name + "ADD"]["List"] = "typing"
+
+            if is_list:
+                # pylint: disable=fixme
+                # todo: relation ->list!
+                add_fields[class_name][f"{field_name}_id"] = (
+                    "uuid_pkg.UUID"
+                    + is_optional
+                    + f' = Field(default=None, foreign_key="{reference_name.lower()}.{reference_name.lower()}_sqlid")'
+                )
+                add_fields[class_name][f"{field_name}"] = (
+                    f'List["{reference_name}"] ='
+                    f' Relationship(back_populates="{class_name.lower()}_{field_name}",'
+                    f' sa_relationship_kwargs=dict( foreign_keys="[{class_name}.{field_name}_id]"))'
+                )
+            else:
+                add_fields[class_name][f"{field_name}_id"] = (
+                    "uuid_pkg.UUID "
+                    + is_optional
+                    + f' = Field(default=None, foreign_key="{reference_name.lower()}.{reference_name.lower()}_sqlid")'
+                )
+                add_fields[class_name][f"{field_name}"] = (
+                    f'List["{reference_name}"] ='
+                    f' Relationship(back_populates="{class_name.lower()}_{field_name}",'
+                    f' sa_relationship_kwargs=dict( foreign_keys="[{class_name}.{field_name}_id]"))'
+                )
+                add_imports[class_name + "ADD"]["Optional"] = "typing"
+
+            add_fields[reference_name][f"{class_name.lower()}_{field_name}"] = (
+                f'List["{class_name}"] = Relationship(back_populates="{field_name}",'
+                f"sa_relationship_kwargs="
+                f'{{"primaryjoin":'
+                f' "{class_name}.{field_name}_id=={reference_name}.{reference_name.lower()}_sqlid",'
+                f' "lazy": "joined" }})'
+            )
+            # add_relation_import
+            add_imports[class_name][
+                reference_name
+            ] = f"{namespace[reference_name].pkg}.{namespace[reference_name].module_name}"
+            add_imports[reference_name][class_name] = f"{namespace[class_name].pkg}.{namespace[class_name].module_name}"
+
+    return add_fields, add_imports
