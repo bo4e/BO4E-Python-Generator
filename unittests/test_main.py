@@ -33,6 +33,7 @@ class TestMain:
 
         assert issubclass(Angebot, BaseModel)
         assert "typ" in Angebot.model_fields
+        assert "datetime.datetime" in str(Angebot.model_fields["angebotsdatum"].annotation)
 
         from .output.bo4e import __version__  # type: ignore[import-not-found]
 

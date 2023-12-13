@@ -39,7 +39,7 @@ def generate_bo4e_schemas(
     for relative_file_path, file_content in file_contents.items():
         file_path = output_directory / relative_file_path
         file_path.parent.mkdir(parents=True, exist_ok=True)
-        file_path.write_text(file_content)
+        file_path.write_text(file_content, "utf-8")
         print(f"Created {file_path}")
 
     print("Done.")
