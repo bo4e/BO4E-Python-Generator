@@ -10,14 +10,17 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, DefaultDict, Sequence, Type, Union
 
+import black
 import datamodel_code_generator.parser.base
 import datamodel_code_generator.reference
+import isort
 from datamodel_code_generator import DataModelType, PythonVersion
 from datamodel_code_generator.imports import IMPORT_DATETIME
 from datamodel_code_generator.model import DataModelSet, get_data_model_types
 from datamodel_code_generator.model.enum import Enum as _Enum
 from datamodel_code_generator.parser.jsonschema import JsonSchemaParser
 from datamodel_code_generator.types import DataType, StrictTypes, Types
+from jinja2 import Environment, FileSystemLoader
 
 from bo4e_generator.schema import SchemaMetadata
 
@@ -182,7 +185,7 @@ def remove_future_import(python_code: str, output_type: OutputType) -> str:
     Remove the future import from the generated code.
     If sql_model adapt SQLModel specific imports
     """
-    if output_type is OutputType.SQL_MODEL:
+    if output_type is OutputType.SQL_MODEL.name:
         python_code = re.sub(r"from pydantic import (.*?)Field(.*?)\n", r"from pydantic import \1\2\n", python_code)
         python_code = re.sub(r"from pydantic import (.*?)(,.\n)", r"from pydantic import \1\n", python_code)
         python_code = re.sub(r",,", "", python_code)
@@ -198,7 +201,9 @@ def parse_bo4e_schemas(
     file path (relative to arbitrary output directory) => file content.
     """
     data_model_types = get_bo4e_data_model_types(
-        DataModelType.PydanticBaseModel if output_type is OutputType.PYDANTIC_V1 else DataModelType.PydanticV2BaseModel,
+        DataModelType.PydanticBaseModel
+        if output_type is OutputType.PYDANTIC_V1.name
+        else DataModelType.PydanticV2BaseModel,
         target_python_version=PythonVersion.PY_311,
         namespace=namespace,
     )
@@ -206,7 +211,7 @@ def parse_bo4e_schemas(
 
     additional_arguments: dict[str, Any] = {}
 
-    if output_type is OutputType.SQL_MODEL:
+    if output_type is OutputType.SQL_MODEL.name:
         namespace, additional_arguments, input_directory = adapt_parse_for_sql(input_directory, namespace)
 
     parser = JsonSchemaParser(
@@ -216,7 +221,7 @@ def parse_bo4e_schemas(
         data_model_field_type=data_model_types.field_model,
         data_type_manager_type=data_model_types.data_type_manager,
         dump_resolve_reference_action=data_model_types.dump_resolve_reference_action,
-        use_annotated=OutputType is not OutputType.PYDANTIC_V1,
+        use_annotated=OutputType is not OutputType.PYDANTIC_V1.name,
         use_double_quotes=True,
         use_schema_description=True,
         use_subclass_enum=True,
@@ -256,7 +261,7 @@ def parse_bo4e_schemas(
 
     file_contents.update({Path(*module_path): result.body for module_path, result in parse_result.items()})
 
-    if output_type is OutputType.SQL_MODEL:
+    if output_type is OutputType.SQL_MODEL.name:
         shutil.rmtree(input_directory)
 
     return file_contents
@@ -321,6 +326,12 @@ def adapt_parse_for_sql(
         file_path.parent.mkdir(parents=True, exist_ok=True)
         file_path.write_text(schema.schema_text, encoding="utf-8")
     input_directory = input_directory / Path("intermediate")
+
+    # write linking classes for SQLModel
+    if "MANY" in add_relation:
+        many_path = input_directory / Path("../many")
+        many_path.mkdir(parents=True, exist_ok=True)
+        write_many_many_links(add_relation["MANY"], many_path)
 
     return namespace, additional_arguments, input_directory
 
@@ -411,15 +422,21 @@ def create_sql_field(
             if is_list:
                 # pylint: disable=fixme
                 # todo: relation ->list!
-                add_fields[class_name][f"{field_name}_id"] = (
-                    "uuid_pkg.UUID"
-                    + is_optional
-                    + f' = Field(default=None, foreign_key="{reference_name.lower()}.{reference_name.lower()}_sqlid")'
-                )
+                # add_fields[class_name][f"{field_name}_id"] = (
+                #    "uuid_pkg.UUID"
+                #    + is_optional
+                #    + f' = Field(default=None, foreign_key="{reference_name.lower()}.{reference_name.lower()}_sqlid")'
+                # )
+                add_fields["MANY"][class_name] = reference_name
                 add_fields[class_name][f"{field_name}"] = (
                     f'List["{reference_name}"] ='
-                    f' Relationship(back_populates="{class_name.lower()}_{field_name}",'
-                    f' sa_relationship_kwargs=dict( foreign_keys="[{class_name}.{field_name}_id]"))'
+                    f' Relationship(back_populates="{class_name.lower()}_{field_name}", '
+                    f'link_model="{class_name}{reference_name}Link")'
+                )
+                add_fields[reference_name][f"{class_name.lower()}_link"] = (
+                    f'List["{class_name}"] ='
+                    f' Relationship(back_populates="{reference_name.lower()}_{class_name.lower()}_link", '
+                    f'link_model="{class_name}{reference_name}Link")'
                 )
             else:
                 add_fields[class_name][f"{field_name}_id"] = (
@@ -448,3 +465,15 @@ def create_sql_field(
             add_imports[reference_name][class_name] = f"{namespace[class_name].pkg}.{namespace[class_name].module_name}"
 
     return add_fields, add_imports
+
+
+def write_many_many_links(links: dict[str, str], output_dir: Path) -> None:
+    template_path = Path(__file__).resolve().parent / Path("custom_templates")
+    environment = Environment(loader=FileSystemLoader(template_path))
+    template = environment.get_template("ManyLinks.jinja2")
+    python_code = template.render({"class": links})
+    python_code = black.format_str(python_code, mode=black.Mode())
+    python_code = isort.code(python_code)
+
+    with open(output_dir / Path("Many.py"), mode="w", encoding="utf-8") as output:
+        output.write(python_code)
