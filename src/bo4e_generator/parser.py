@@ -203,6 +203,7 @@ def parse_bo4e_schemas(
         base_path=input_directory,
         remove_special_field_name_prefix=True,
         allow_extra_fields=False,
+        allow_population_by_field_name=True,
     )
     parse_result = parser.parse()
     if not isinstance(parse_result, dict):
