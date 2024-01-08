@@ -2,6 +2,8 @@
 {%- for class_name, module_path in SQL['imports'].items() %}
 {%- if module_path[:4] == 'enum'%}
 from borm.models.{{ module_path }} import {{ class_name }}
+{%- elif module_path == 'Link'%}
+from borm.models.many import {{ class_name }}
 {%- else %}
 from {{ module_path }} import {{ class_name }}
 {%- endif %}

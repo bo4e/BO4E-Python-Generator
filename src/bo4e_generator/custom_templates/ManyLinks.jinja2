@@ -1,5 +1,5 @@
 """
-File containg all linking classes for many-many relations in the BO4E version
+File containing all linking classes for many-many relations in the BO4E version
 """
 
 from typing import Optional
@@ -8,7 +8,8 @@ import uuid as uuid_pkg
 
 from sqlmodel import Field, SQLModel
 
-{%- for class1, class2 in class.items() %}
+{%- for class1, class_list in class.items() %}
+{%- for class2 in class_list %}
 class {{class1}}{{class2}}Link(SQLModel, table=True):
     """
     class linking m-n relation of tables {{class1}} and {{class2}}.
@@ -16,4 +17,5 @@ class {{class1}}{{class2}}Link(SQLModel, table=True):
     {{class1.lower()}}_id: Optional[uuid_pkg.UUID] = Field(default_factory=uuid_pkg.uuid4, foreign_key="{{class1}}.{{class1.lower()}}_sqlid", primary_key=True)
     {{class2.lower()}}_id: Optional[uuid_pkg.UUID] = Field(default_factory=uuid_pkg.uuid4, foreign_key="{{class2}}.{{class2.lower()}}_sqlid", primary_key=True)
 
+{%- endfor -%}
 {%- endfor -%}

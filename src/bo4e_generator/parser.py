@@ -260,6 +260,6 @@ def parse_bo4e_schemas(
     if output_type is OutputType.SQL_MODEL.name:
         shutil.rmtree(input_directory)
         if links:
-            file_contents["many.py"] = write_many_many_links(links)
+            file_contents[Path("many.py")] = write_many_many_links(links)
 
     return file_contents

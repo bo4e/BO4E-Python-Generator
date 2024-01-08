@@ -16,14 +16,14 @@ from bo4e_generator.schema import SchemaMetadata
 
 def adapt_parse_for_sql(
     input_directory: Path, namespace: dict[str, SchemaMetadata]
-) -> tuple[dict[str, SchemaMetadata], dict[str, Any], Path]:
+) -> tuple[dict[str, SchemaMetadata], dict[str, Any], Path, dict[str, str]]:
     """
     Scans fields of parsed classes to modify them to meet the SQLModel specifics and to introduce relationships.
     Returns additional information, an input path with modified json schemas and arguments for the parser
     """
     additional_arguments: dict[str, Any] = {}
     additional_sql_data: DefaultDict[str, Any] = defaultdict(dict)
-    add_relation: DefaultDict[str, dict[str, str]] = defaultdict(dict)
+    add_relation: DefaultDict[str, dict[str, Any]] = defaultdict(dict)
     relation_imports: DefaultDict[str, dict[str, str]] = defaultdict(dict)
 
     for schema_metadata in namespace.values():
@@ -74,7 +74,7 @@ def adapt_parse_for_sql(
         file_path.write_text(schema.schema_text, encoding="utf-8")
     input_directory = input_directory / Path("intermediate")
 
-    links: dict[str, str] = None
+    links: dict[str, str] = {}
     # write linking classes for SQLModel
     if "MANY" in add_relation:
         links = add_relation["MANY"]
@@ -99,13 +99,14 @@ def return_ref(dictionary: dict[str, Union[str, dict]], target_key: str) -> str:
 
 
 # pylint: disable=too-many-branches
+# pylint: disable=too-many-statements
 def create_sql_field(
     field_name: str,
     class_name: str,
     namespace: dict[str, SchemaMetadata],
-    add_fields: DefaultDict[str, dict[str, str]],
+    add_fields: DefaultDict[str, dict[str, Any]],
     add_imports: DefaultDict[str, dict[str, str]],
-) -> tuple[DefaultDict[str, dict[str, str]], DefaultDict[str, dict[str, str]]]:
+) -> tuple[DefaultDict[str, dict[str, Any]], DefaultDict[str, dict[str, str]]]:
     """
     Parses field with references to other classes, enums and lists, and converts it to SQLModel field.
     """
@@ -164,26 +165,23 @@ def create_sql_field(
         else:
             add_imports[class_name + "ADD"]["List"] = "typing"
             add_imports[reference_name + "ADD"]["List"] = "typing"
-
             if is_list:
-                # pylint: disable=fixme
-                # todo: relation ->list!
-                # add_fields[class_name][f"{field_name}_id"] = (
-                #    "uuid_pkg.UUID"
-                #    + is_optional
-                #    + f' = Field(default=None, foreign_key="{reference_name.lower()}.{reference_name.lower()}_sqlid")'
-                # )
-                add_fields["MANY"][class_name] = reference_name
+                if class_name not in add_fields["MANY"]:
+                    add_fields["MANY"][class_name] = [reference_name]
+                else:
+                    add_fields["MANY"][class_name].append(reference_name)
                 add_fields[class_name][f"{field_name}"] = (
                     f'List["{reference_name}"] ='
                     f' Relationship(back_populates="{class_name.lower()}_{field_name}", '
-                    f'link_model="{class_name}{reference_name}Link")'
+                    f"link_model={class_name}{reference_name}Link)"
                 )
                 add_fields[reference_name][f"{class_name.lower()}_link"] = (
                     f'List["{class_name}"] ='
                     f' Relationship(back_populates="{reference_name.lower()}_{class_name.lower()}_link", '
-                    f'link_model="{class_name}{reference_name}Link")'
+                    f"link_model={class_name}{reference_name}Link)"
                 )
+                add_imports[class_name + "ADD"][f"{class_name}{reference_name}Link)"] = "Link"
+                add_imports[reference_name + "ADD"][f"{class_name}{reference_name}Link)"] = "Link"
             else:
                 add_fields[class_name][f"{field_name}_id"] = (
                     "uuid_pkg.UUID "
@@ -191,7 +189,7 @@ def create_sql_field(
                     + f' = Field(default=None, foreign_key="{reference_name.lower()}.{reference_name.lower()}_sqlid")'
                 )
                 add_fields[class_name][f"{field_name}"] = (
-                    f'List["{reference_name}"] ='
+                    f'"{reference_name}" ='
                     f' Relationship(back_populates="{class_name.lower()}_{field_name}",'
                     f' sa_relationship_kwargs=dict( foreign_keys="[{class_name}.{field_name}_id]"))'
                 )
@@ -214,6 +212,9 @@ def create_sql_field(
 
 
 def write_many_many_links(links: dict[str, str]) -> str:
+    """
+    use template to write many-to-many link classes to many.py file
+    """
     template_path = Path(__file__).resolve().parent / Path("custom_templates")
     environment = Environment(loader=FileSystemLoader(template_path))
     template = environment.get_template("ManyLinks.jinja2")
