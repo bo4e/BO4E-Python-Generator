@@ -168,16 +168,16 @@ def create_sql_field(
             if is_list:
                 if class_name not in add_fields["MANY"]:
                     add_fields["MANY"][class_name] = [reference_name]
-                else:
+                elif reference_name not in add_fields["MANY"][class_name]:
                     add_fields["MANY"][class_name].append(reference_name)
                 add_fields[class_name][f"{field_name}"] = (
                     f'List["{reference_name}"] ='
-                    f' Relationship(back_populates="{class_name.lower()}_{field_name}", '
+                    f' Relationship(back_populates="{class_name.lower()}_link", '  # f' Relationship(back_populates="{reference_name.lower()}.{class_name.lower()}_link", '
                     f"link_model={class_name}{reference_name}Link)"
                 )
                 add_fields[reference_name][f"{class_name.lower()}_link"] = (
                     f'List["{class_name}"] ='
-                    f' Relationship(back_populates="{reference_name.lower()}_{class_name.lower()}_link", '
+                    f' Relationship(back_populates="{field_name}", '  # f' Relationship(back_populates="{class_name.lower()}.{field_name}", '
                     f"link_model={class_name}{reference_name}Link)"
                 )
                 add_imports[class_name + "ADD"][f"{class_name}{reference_name}Link)"] = "Link"
@@ -195,13 +195,13 @@ def create_sql_field(
                 )
                 add_imports[class_name + "ADD"]["Optional"] = "typing"
 
-            add_fields[reference_name][f"{class_name.lower()}_{field_name}"] = (
-                f'List["{class_name}"] = Relationship(back_populates="{field_name}",'
-                f"sa_relationship_kwargs="
-                f'{{"primaryjoin":'
-                f' "{class_name}.{field_name}_id=={reference_name}.{reference_name.lower()}_sqlid",'
-                f' "lazy": "joined" }})'
-            )
+                add_fields[reference_name][f"{class_name.lower()}_{field_name}"] = (
+                    f'List["{class_name}"] = Relationship(back_populates="{field_name}",'
+                    f"sa_relationship_kwargs="
+                    f'{{"primaryjoin":'
+                    f' "{class_name}.{field_name}_id=={reference_name}.{reference_name.lower()}_sqlid",'
+                    f' "lazy": "joined" }})'
+                )
             # add_relation_import
             add_imports[class_name][
                 reference_name

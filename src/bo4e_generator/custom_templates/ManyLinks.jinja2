@@ -14,8 +14,8 @@ class {{class1}}{{class2}}Link(SQLModel, table=True):
     """
     class linking m-n relation of tables {{class1}} and {{class2}}.
     """
-    {{class1.lower()}}_id: Optional[uuid_pkg.UUID] = Field(default_factory=uuid_pkg.uuid4, foreign_key="{{class1}}.{{class1.lower()}}_sqlid", primary_key=True)
-    {{class2.lower()}}_id: Optional[uuid_pkg.UUID] = Field(default_factory=uuid_pkg.uuid4, foreign_key="{{class2}}.{{class2.lower()}}_sqlid", primary_key=True)
+    {{class1.lower()}}_id: Optional[uuid_pkg.UUID] = Field(default_factory=uuid_pkg.uuid4, foreign_key="{{class1.lower()}}.{{class1.lower()}}_sqlid", primary_key=True)
+    {{class2.lower()}}_id: Optional[uuid_pkg.UUID] = Field(default_factory=uuid_pkg.uuid4, foreign_key="{{class2.lower()}}.{{class2.lower()}}_sqlid", primary_key=True)
 
 {%- endfor -%}
 {%- endfor -%}
