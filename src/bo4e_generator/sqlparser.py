@@ -172,12 +172,12 @@ def create_sql_field(
                     add_fields["MANY"][class_name].append(reference_name)
                 add_fields[class_name][f"{field_name}"] = (
                     f'List["{reference_name}"] ='
-                    f' Relationship(back_populates="{class_name.lower()}_link", '  # f' Relationship(back_populates="{reference_name.lower()}.{class_name.lower()}_link", '
+                    f' Relationship(back_populates="{class_name.lower()}_link", '
                     f"link_model={class_name}{reference_name}Link)"
                 )
                 add_fields[reference_name][f"{class_name.lower()}_link"] = (
                     f'List["{class_name}"] ='
-                    f' Relationship(back_populates="{field_name}", '  # f' Relationship(back_populates="{class_name.lower()}.{field_name}", '
+                    f' Relationship(back_populates="{field_name}", '
                     f"link_model={class_name}{reference_name}Link)"
                 )
                 add_imports[class_name + "ADD"][f"{class_name}{reference_name}Link)"] = "Link"
