@@ -2,10 +2,10 @@
 
 <!--- you need to replace the `organization/repo_name` in the status badge URLs --->
 
-![Unittests status badge](https://github.com/Hochfrequenz/python_template_repository/workflows/Unittests/badge.svg)
-![Coverage status badge](https://github.com/Hochfrequenz/python_template_repository/workflows/Coverage/badge.svg)
-![Linting status badge](https://github.com/Hochfrequenz/python_template_repository/workflows/Linting/badge.svg)
-![Black status badge](https://github.com/Hochfrequenz/python_template_repository/workflows/Formatting/badge.svg)
+![Unittests status badge](https://github.com/bo4e/BO4E-Python-Generator/workflows/Unittests/badge.svg)
+![Coverage status badge](https://github.com/bo4e/BO4E-Python-Generator/workflows/Coverage/badge.svg)
+![Linting status badge](https://github.com/bo4e/BO4E-Python-Generator/workflows/Linting/badge.svg)
+![Black status badge](https://github.com/bo4e/BO4E-Python-Generator/workflows/Formatting/badge.svg)
 
 This is a template repository.
 It doesn't contain any useful code but only a minimal working setup for a Python project including:
