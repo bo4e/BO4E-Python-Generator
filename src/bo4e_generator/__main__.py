@@ -3,6 +3,7 @@ This module is the entry point for the CLI bo4e-generator.
 """
 import shutil
 from pathlib import Path
+from typing import Optional
 
 import click
 
@@ -22,7 +23,11 @@ def resolve_paths(input_directory: Path, output_directory: Path) -> tuple[Path, 
 
 
 def generate_bo4e_schemas(
-    input_directory: Path, output_directory: Path, pydantic_v1: bool = False, clear_output: bool = False
+    input_directory: Path,
+    output_directory: Path,
+    pydantic_v1: bool = False,
+    clear_output: bool = False,
+    target_version: Optional[str] = None,
 ):
     """
     Generate all BO4E schemas from the given input directory and save them in the given output directory.
@@ -30,7 +35,7 @@ def generate_bo4e_schemas(
     input_directory, output_directory = resolve_paths(input_directory, output_directory)
     namespace = get_namespace(input_directory)
     file_contents = parse_bo4e_schemas(input_directory, namespace, pydantic_v1)
-    version = get_version(namespace)
+    version = get_version(target_version, namespace)
     file_contents[Path("__version__.py")] = bo4e_version_file_content(version)
     file_contents[Path("__init__.py")] = bo4e_init_file_content(namespace, version)
     if clear_output and output_directory.exists():
@@ -76,12 +81,22 @@ def generate_bo4e_schemas(
     is_flag=True,
     default=False,
 )
+@click.option(
+    "--target-version",
+    "-t",
+    help="Optionally set the target BO4E version. If not defined, it tries to read it from `_version`. "
+    "If it can't be found, it will be set to 'unknown'.",
+    type=Optional[str],
+    default=None,
+)
 @click.version_option(package_name="BO4E-Python-Generator")
-def main(input_dir: Path, output_dir: Path, pydantic_v1: bool, clear_output: bool):
+def main(
+    input_dir: Path, output_dir: Path, pydantic_v1: bool, clear_output: bool, target_version: Optional[str] = None
+):
     """
     CLI entry point for the bo4e-generator.
     """
-    generate_bo4e_schemas(input_dir, output_dir, pydantic_v1, clear_output)
+    generate_bo4e_schemas(input_dir, output_dir, pydantic_v1, clear_output, target_version)
 
 
 if __name__ == "__main__":

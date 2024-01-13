@@ -4,7 +4,7 @@ This module contains functionality to retrieve information about the schemas.
 import json
 import re
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 from pydantic import BaseModel
 
@@ -70,10 +70,12 @@ def get_namespace(input_directory: Path) -> dict[str, SchemaMetadata]:
     return namespace
 
 
-def get_version(namespace: dict[str, SchemaMetadata]) -> str:
+def get_version(target_version: Optional[str], namespace: dict[str, SchemaMetadata]) -> str:
     """
     Get the version of the bo4e schemas.
     """
+    if target_version is not None:
+        return target_version
     # The chosen class is arbitrary. All bo's and com's should contain the same version information.
     try:
         return namespace["Angebot"].schema_parsed["properties"]["_version"]["default"]
