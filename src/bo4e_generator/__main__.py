@@ -86,7 +86,7 @@ def generate_bo4e_schemas(
     "-t",
     help="Optionally set the target BO4E version. If not defined, it tries to read it from `_version`. "
     "If it can't be found, it will be set to 'unknown'.",
-    type=Optional[str],
+    type=str,
     default=None,
 )
 @click.version_option(package_name="BO4E-Python-Generator")

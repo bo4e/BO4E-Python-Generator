@@ -17,7 +17,17 @@ class TestMain:
         os.chdir(BASE_DIR)
         runner = CliRunner()
         result = runner.invoke(
-            main, ["--input-dir", str(INPUT_DIR), "--output-dir", str(OUTPUT_DIR), "-p2", "--clear-output"]
+            main,
+            [
+                "--input-dir",
+                str(INPUT_DIR),
+                "--output-dir",
+                str(OUTPUT_DIR),
+                "-p2",
+                "--clear-output",
+                "-t",
+                "v0.6.1-rc13",
+            ],
         )
 
         assert (
@@ -37,4 +47,4 @@ class TestMain:
 
         from .output.bo4e import __version__  # type: ignore[import-not-found]
 
-        assert __version__ == "0.6.1rc13"
+        assert __version__ == "v0.6.1-rc13"
