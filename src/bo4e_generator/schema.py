@@ -75,6 +75,9 @@ def get_version(target_version: Optional[str], namespace: dict[str, SchemaMetada
     Get the version of the bo4e schemas.
     """
     if target_version is not None:
+        GH_VERSION_REGEX = re.compile(r"^v((?:\d+\.)*\d+)(?:-(rc\d+))?$")
+        if GH_VERSION_REGEX.match(target_version) is not None:
+            target_version = GH_VERSION_REGEX.sub(r"\1\2", target_version)
         return target_version
     # The chosen class is arbitrary. All bo's and com's should contain the same version information.
     try:
