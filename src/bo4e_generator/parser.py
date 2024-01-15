@@ -185,7 +185,7 @@ def remove_future_import(python_code: str, output_type: OutputType) -> str:
         python_code = re.sub(r"from pydantic import (.*?)Field(.*?)\n", r"from pydantic import \1\2\n", python_code)
         python_code = re.sub(r"from pydantic import (.*?)(,.\n)", r"from pydantic import \1\n", python_code)
         python_code = re.sub(r",,", "", python_code)
-        python_code = re.sub(r"float \| str \| None", "str | None", python_code)
+        python_code = re.sub(r"float \| str \| None", "str | None", python_code)  # union type not supported
     return re.sub(r"from __future__ import annotations\n\n", "", python_code)
 
 
@@ -208,6 +208,7 @@ def parse_bo4e_schemas(
     additional_arguments: dict[str, Any] = {}
 
     if output_type is OutputType.SQL_MODEL.name:
+        # adapt input for SQLModel classes
         namespace, additional_arguments, input_directory, links = adapt_parse_for_sql(input_directory, namespace)
 
     parser = JsonSchemaParser(
@@ -259,8 +260,9 @@ def parse_bo4e_schemas(
 
     file_contents.update({Path(*module_path): result.body for module_path, result in parse_result.items()})
 
+    # add SQLModel classes for many-to-many relationships in "many.py"
     if output_type is OutputType.SQL_MODEL.name:
-        shutil.rmtree(input_directory)
+        shutil.rmtree(input_directory)  # remove intermediate dir of schemas
         if links:
             file_contents[Path("many.py")] = write_many_many_links(links)
 

@@ -1,5 +1,5 @@
 """
-Contains code to generate pydantic v2 models from json schemas.
+Contains code to generate SQLModel classes from json schemas.
 Since the used tool doesn't support all features we need, we monkey patch some functions.
 """
 import json
@@ -21,10 +21,12 @@ def adapt_parse_for_sql(
     Scans fields of parsed classes to modify them to meet the SQLModel specifics and to introduce relationships.
     Returns additional information, an input path with modified json schemas and arguments for the parser
     """
-    additional_arguments: dict[str, Any] = {}
-    additional_sql_data: DefaultDict[str, Any] = defaultdict(dict)
-    add_relation: DefaultDict[str, dict[str, Any]] = defaultdict(dict)
-    relation_imports: DefaultDict[str, dict[str, str]] = defaultdict(dict)
+    additional_arguments: dict[str, Any] = {}  # additional arguments passed to the parser
+    additional_sql_data: DefaultDict[str, Any] = defaultdict(
+        dict
+    )  # additional fields for code generation using templates
+    add_relation: DefaultDict[str, dict[str, Any]] = defaultdict(dict)  # added relationship fields
+    relation_imports: DefaultDict[str, dict[str, str]] = defaultdict(dict)  # added imports for relationship fields
 
     for schema_metadata in namespace.values():
         if schema_metadata.pkg != "enum":
@@ -166,6 +168,7 @@ def create_sql_field(
             add_imports[class_name + "ADD"]["List"] = "typing"
             add_imports[reference_name + "ADD"]["List"] = "typing"
             if is_list:
+                # create many-to-many class
                 if class_name not in add_fields["MANY"]:
                     add_fields["MANY"][class_name] = [reference_name]
                 elif reference_name not in add_fields["MANY"][class_name]:
