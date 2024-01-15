@@ -23,7 +23,6 @@ class TestMain:
                 str(INPUT_DIR),
                 "--output-dir",
                 str(OUTPUT_DIR),
-                "-p2",
                 "--clear-output",
                 "-t",
                 "v0.6.1-rc13",
