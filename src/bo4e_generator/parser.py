@@ -190,7 +190,7 @@ def parse_bo4e_schemas(
         data_model_field_type=data_model_types.field_model,
         data_type_manager_type=data_model_types.data_type_manager,
         dump_resolve_reference_action=data_model_types.dump_resolve_reference_action,
-        use_annotated=not pydantic_v1,
+        # use_annotated=not pydantic_v1,
         use_double_quotes=True,
         use_schema_description=True,
         use_subclass_enum=True,
@@ -204,6 +204,7 @@ def parse_bo4e_schemas(
         remove_special_field_name_prefix=True,
         allow_extra_fields=False,
         allow_population_by_field_name=True,
+        use_default_kwarg=True,
     )
     parse_result = parser.parse()
     if not isinstance(parse_result, dict):
