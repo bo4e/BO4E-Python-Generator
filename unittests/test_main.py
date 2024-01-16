@@ -41,8 +41,9 @@ class TestMain:
         assert __version__ == "0.6.1rc13"
 
     def test_resolve_paths(self) -> None:
-        relative_path_input = Path(INPUT_DIR)
+        relative_path_input = INPUT_DIR
         absolute_path_input = relative_path_input.resolve()
-        relative_path_output = Path(OUTPUT_DIR)
+        relative_path_output = OUTPUT_DIR
         absolute_path_output = relative_path_output.resolve()
         assert (absolute_path_input, absolute_path_output) == resolve_paths(INPUT_DIR, OUTPUT_DIR)
+        assert (absolute_path_input, absolute_path_output) == resolve_paths(absolute_path_input, absolute_path_output)
