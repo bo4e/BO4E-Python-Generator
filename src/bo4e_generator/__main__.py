@@ -5,10 +5,13 @@ import shutil
 from pathlib import Path
 from typing import Optional
 
+import black
 import click
+import isort
 
 from bo4e_generator.parser import OutputType, bo4e_init_file_content, bo4e_version_file_content, parse_bo4e_schemas
 from bo4e_generator.schema import get_namespace, get_version
+from bo4e_generator.sqlparser import isort_directory
 
 
 def resolve_paths(input_directory: Path, output_directory: Path) -> tuple[Path, Path]:
@@ -44,9 +47,10 @@ def generate_bo4e_schemas(
     for relative_file_path, file_content in file_contents.items():
         file_path = output_directory / relative_file_path
         file_path.parent.mkdir(parents=True, exist_ok=True)
+        if output_type is OutputType.SQL_MODEL.name:
+            file_content = isort_directory(file_content)
         file_path.write_text(file_content, encoding="utf-8")
         print(f"Created {file_path}")
-
     print("Done.")
 
 

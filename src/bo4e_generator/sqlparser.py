@@ -196,7 +196,7 @@ def create_sql_field(
                     f' Relationship(back_populates="{class_name.lower()}_{field_name}",'
                     f' sa_relationship_kwargs=dict( foreign_keys="[{class_name}.{field_name}_id]"))'
                 )
-                add_imports[class_name + "ADD"]["Optional"] = "typing"
+                # add_imports[class_name + "ADD"]["Optional"] = "typing"
 
                 add_fields[reference_name][f"{class_name.lower()}_{field_name}"] = (
                     f'List["{class_name}"] = Relationship(back_populates="{field_name}",'
@@ -225,3 +225,10 @@ def write_many_many_links(links: dict[str, str]) -> str:
     python_code = black.format_str(python_code, mode=black.Mode())
     python_code = isort.code(python_code)
     return python_code
+
+
+def isort_directory(code: str) -> str:
+    """
+    perform isort on the output dir
+    """
+    return isort.code(code, known_local_folder=["borm"])
