@@ -5,9 +5,7 @@ import shutil
 from pathlib import Path
 from typing import Optional
 
-import black
 import click
-import isort
 
 from bo4e_generator.parser import OutputType, bo4e_init_file_content, bo4e_version_file_content, parse_bo4e_schemas
 from bo4e_generator.schema import get_namespace, get_version

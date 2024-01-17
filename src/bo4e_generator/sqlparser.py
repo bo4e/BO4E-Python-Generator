@@ -194,7 +194,7 @@ def create_sql_field(
                 add_fields[class_name][f"{field_name}"] = (
                     f'"{reference_name}" ='
                     f' Relationship(back_populates="{class_name.lower()}_{field_name}",'
-                    f' sa_relationship_kwargs=dict( foreign_keys="[{class_name}.{field_name}_id]"))'
+                    f' sa_relationship_kwargs= {{ "foreign_keys":"[{class_name}.{field_name}_id]" }})'
                 )
                 # add_imports[class_name + "ADD"]["Optional"] = "typing"
 
@@ -231,4 +231,5 @@ def isort_directory(code: str) -> str:
     """
     perform isort on the output dir
     """
+    code = black.format_str(code, mode=black.Mode())
     return isort.code(code, known_local_folder=["borm"])
