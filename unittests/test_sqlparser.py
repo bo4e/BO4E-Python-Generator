@@ -1,16 +1,33 @@
+import os
+import shutil
 from collections import defaultdict
 from pathlib import Path
 from typing import Any, DefaultDict
 
 from bo4e_generator.schema import get_namespace
-from bo4e_generator.sqlparser import create_sql_field, return_ref, write_many_many_links
+from bo4e_generator.sqlparser import adapt_parse_for_sql, create_sql_field, return_ref, write_many_many_links
 
 INPUT_DIR = Path("unittests/test_data/bo4e_schemas")
 CLASSNAME = "Angebot"
 FIELDNAME = "_typ"
+BASE_DIR = Path(__file__).parents[1]
 
 
 class TestSQLParser:
+    def test_adapt_parse_for_sql(self):
+        os.chdir(BASE_DIR)
+        namespace = get_namespace(INPUT_DIR)
+        additional_arguments: dict[str, Any] = {}
+        links: dict[str, str] = {}
+        namespace, additional_arguments, input_directory, links = adapt_parse_for_sql(INPUT_DIR, namespace)
+        assert input_directory == (INPUT_DIR.joinpath("intermediate"))
+        os.chdir(BASE_DIR)
+        shutil.rmtree(input_directory)
+        keywords = ["extra_template_data", "additional_imports", "base_class", "custom_template_dir"]
+        assert all(any(substring in key for key in additional_arguments) for substring in keywords)
+        keywords = ["Kosten", "Rechnung", "Zaehler"]
+        assert all(any(substring in key for key in links) for substring in keywords)
+
     def test_return_ref(self):
         namespace = get_namespace(INPUT_DIR)
         field_from_json = namespace[CLASSNAME].schema_parsed["properties"][FIELDNAME]
