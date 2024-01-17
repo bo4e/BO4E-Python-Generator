@@ -22,5 +22,5 @@ class TestSchema:
     def test_get_version(self):
         os.chdir(BASE_DIR)
         namespace = get_namespace(INPUT_DIR)
-        version = get_version(namespace)
+        version = get_version(None, namespace)
         assert version == "0.6.1rc13"
