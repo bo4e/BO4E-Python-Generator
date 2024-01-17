@@ -18,7 +18,15 @@ class TestMain:
         runner = CliRunner()
         result = runner.invoke(
             main,
-            ["--input-dir", str(INPUT_DIR), "--output-dir", str(OUTPUT_DIR), "-ot", "pydantic_v2", "--clear-output"],
+            [
+                "--input-dir",
+                str(INPUT_DIR),
+                "--output-dir",
+                str(OUTPUT_DIR),
+                "--clear-output",
+                "-t",
+                "v0.6.1-rc13",
+            ],
         )
 
         assert (
