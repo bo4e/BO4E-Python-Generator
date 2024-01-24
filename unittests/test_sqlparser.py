@@ -5,7 +5,13 @@ from pathlib import Path
 from typing import Any, DefaultDict
 
 from bo4e_generator.schema import get_namespace
-from bo4e_generator.sqlparser import adapt_parse_for_sql, create_sql_field, return_ref, write_many_many_links
+from bo4e_generator.sqlparser import (
+    adapt_parse_for_sql,
+    create_sql_field,
+    format_code,
+    return_ref,
+    write_many_many_links,
+)
 
 INPUT_DIR = Path("unittests/test_data/bo4e_schemas")
 CLASSNAME = "Angebot"
@@ -60,3 +66,16 @@ class TestSQLParser:
         file_contents = write_many_many_links(links)
         keywords = ["AngebotExterneReferenzLink", "angebot_id", "externereferenz_id"]
         assert all(substring in file_contents for substring in keywords)
+
+    def test_format_code(self):
+        unsorted = (
+            "from sqlmodel import Field, Relationship, SQLModel\n"
+            "from typing import TYPE_CHECKING, List\n"
+            "from borm.models.enum.anrede import Anrede"
+        )
+        sorted = (
+            "from typing import TYPE_CHECKING, List\n\n"
+            "from sqlmodel import Field, Relationship, SQLModel\n\n"
+            "from borm.models.enum.anrede import Anrede\n"
+        )
+        assert sorted == format_code(unsorted)
