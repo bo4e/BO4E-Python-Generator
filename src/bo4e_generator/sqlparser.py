@@ -227,14 +227,13 @@ def write_many_many_links(links: dict[str, str]) -> str:
     environment = Environment(loader=FileSystemLoader(template_path))
     template = environment.get_template("ManyLinks.jinja2")
     python_code = template.render({"class": links})
-    python_code = black.format_str(python_code, mode=black.Mode())
-    python_code = isort.code(python_code)
+    python_code = format_code(python_code)
     return python_code
 
 
-def isort_directory(code: str) -> str:
+def format_code(code: str) -> str:
     """
-    perform isort on the output dir
+    perform isort and black on code
     """
     code = black.format_str(code, mode=black.Mode())
     return isort.code(code, known_local_folder=["borm"])
