@@ -18,7 +18,7 @@ from datamodel_code_generator.parser.jsonschema import JsonSchemaParser
 from datamodel_code_generator.types import DataType, StrictTypes, Types
 
 from bo4e_generator.schema import SchemaMetadata
-from bo4e_generator.sqlparser import adapt_parse_for_sql, write_many_many_links
+from bo4e_generator.sqlparser import adapt_parse_for_sql, remove_pydantic_field_import, write_many_many_links
 
 
 class OutputType(str, Enum):
@@ -176,16 +176,10 @@ def bo4e_init_file_content(namespace: dict[str, SchemaMetadata], version: str) -
     return init_file_content
 
 
-def remove_future_import(python_code: str, output_type: OutputType) -> str:
+def remove_future_import(python_code: str) -> str:
     """
     Remove the future import from the generated code.
-    If sql_model adapt SQLModel specific imports
     """
-    if output_type is OutputType.SQL_MODEL.name:
-        python_code = re.sub(r"from pydantic import (.*?)Field(.*?)\n", r"from pydantic import \1\2\n", python_code)
-        python_code = re.sub(r"from pydantic import (.*?)(,.\n)", r"from pydantic import \1\n", python_code)
-        python_code = re.sub(r",,", "", python_code)
-        python_code = re.sub(r"float \| str \| None", "str | None", python_code)  # union type not supported
     return re.sub(r"from __future__ import annotations\n\n", "", python_code)
 
 
@@ -254,9 +248,12 @@ def parse_bo4e_schemas(
                 # Somehow, mypy is not good enough to understand the instance-check above
             )
 
-        file_contents[schema_metadata.output_file] = remove_future_import(
-            parse_result.pop(module_path).body, output_type
-        )
+        python_code = remove_future_import(parse_result.pop(module_path).body)
+        if output_type is OutputType.SQL_MODEL.name:
+            # remove pydantic field
+            python_code = remove_pydantic_field_import(python_code)
+
+        file_contents[schema_metadata.output_file] = python_code
 
     file_contents.update({Path(*module_path): result.body for module_path, result in parse_result.items()})
 

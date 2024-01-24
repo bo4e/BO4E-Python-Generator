@@ -13,13 +13,13 @@ class TestSchema:
         snakecasestring = "lastgang_kompakt"
         assert snakecasestring == camel_to_snake(camelcasestring)
 
-    def test_get_namespace(self):
+    def test_get_namespace(self) -> None:
         os.chdir(BASE_DIR)
         namespace = get_namespace(INPUT_DIR)
         keywords = ["Kosten", "Rechnung", "Zaehler"]
         assert all(any(substring in key for key in namespace) for substring in keywords)
 
-    def test_get_version(self):
+    def test_get_version(self) -> None:
         os.chdir(BASE_DIR)
         namespace = get_namespace(INPUT_DIR)
         version = get_version(None, namespace)

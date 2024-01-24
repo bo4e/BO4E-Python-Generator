@@ -9,6 +9,7 @@ from bo4e_generator.sqlparser import (
     adapt_parse_for_sql,
     create_sql_field,
     format_code,
+    remove_pydantic_field_import,
     return_ref,
     write_many_many_links,
 )
@@ -20,7 +21,16 @@ BASE_DIR = Path(__file__).parents[1]
 
 
 class TestSQLParser:
-    def test_adapt_parse_for_sql(self):
+    def test_remove_pydantic_field_import(self) -> None:
+        assert "from pydantic import BaseModel\n" == remove_pydantic_field_import(
+            "from pydantic import BaseModel, Field\n"
+        )
+        assert "from pydantic import BaseModel\n" == remove_pydantic_field_import(
+            "from pydantic import Field, BaseModel\n"
+        )
+        assert "" == remove_pydantic_field_import("from pydantic import Field\n")
+
+    def test_adapt_parse_for_sql(self) -> None:
         os.chdir(BASE_DIR)
         namespace = get_namespace(INPUT_DIR)
         additional_arguments: dict[str, Any] = {}
@@ -34,13 +44,13 @@ class TestSQLParser:
         keywords = ["Kosten", "Rechnung", "Zaehler"]
         assert all(any(substring in key for key in links) for substring in keywords)
 
-    def test_return_ref(self):
+    def test_return_ref(self) -> None:
         namespace = get_namespace(INPUT_DIR)
         field_from_json = namespace[CLASSNAME].schema_parsed["properties"][FIELDNAME]
         reference_name = return_ref(field_from_json, "$ref")
         assert reference_name == "Typ"
 
-    def test_create_sql_field(self):
+    def test_create_sql_field(self) -> None:
         namespace = get_namespace(INPUT_DIR)
         add_relation: DefaultDict[str, dict[str, Any]] = defaultdict(dict)
         relation_imports: DefaultDict[str, dict[str, str]] = defaultdict(dict)
@@ -54,7 +64,7 @@ class TestSQLParser:
         assert add_relation == add_relation_comp
         assert relation_imports == relation_imports_comp
 
-    def test_write_many_many_links(self):
+    def test_write_many_many_links(self) -> None:
         links: dict[str, str] = {}
         namespace = get_namespace(INPUT_DIR)
         add_relation: DefaultDict[str, dict[str, Any]] = defaultdict(dict)
@@ -67,15 +77,15 @@ class TestSQLParser:
         keywords = ["AngebotExterneReferenzLink", "angebot_id", "externereferenz_id"]
         assert all(substring in file_contents for substring in keywords)
 
-    def test_format_code(self):
+    def test_format_code(self) -> None:
         unsorted = (
             "from sqlmodel import Field, Relationship, SQLModel\n"
             "from typing import TYPE_CHECKING, List\n"
             "from borm.models.enum.anrede import Anrede"
         )
-        sorted = (
+        resorted = (
             "from typing import TYPE_CHECKING, List\n\n"
             "from sqlmodel import Field, Relationship, SQLModel\n\n"
             "from borm.models.enum.anrede import Anrede\n"
         )
-        assert sorted == format_code(unsorted)
+        assert resorted == format_code(unsorted)

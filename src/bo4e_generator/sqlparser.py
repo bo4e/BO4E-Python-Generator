@@ -3,6 +3,7 @@ Contains code to generate SQLModel classes from json schemas.
 Since the used tool doesn't support all features we need, we monkey patch some functions.
 """
 import json
+import re
 from collections import defaultdict
 from pathlib import Path
 from typing import Any, DefaultDict, Union
@@ -12,6 +13,18 @@ import isort
 from jinja2 import Environment, FileSystemLoader
 
 from bo4e_generator.schema import SchemaMetadata
+
+
+def remove_pydantic_field_import(python_code: str) -> str:
+    """
+    Remove the future import from the generated code.
+    If sql_model adapt SQLModel specific imports
+    """
+    python_code = re.sub(r"from pydantic import (.*?)Field(.*?)\n", r"from pydantic import \1\2\n", python_code)
+    python_code = python_code.replace(",,", "").replace(", \n", "\n").replace(" , ", " ")
+    python_code = python_code.replace("from pydantic import \n", "")
+    python_code = re.sub(r"float \| str \| None", "str | None", python_code)  # union type not supported
+    return python_code
 
 
 def adapt_parse_for_sql(
