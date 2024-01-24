@@ -5,7 +5,7 @@ from traceback import format_tb
 from click.testing import CliRunner
 from pydantic import BaseModel
 
-from bo4e_generator.__main__ import main
+from bo4e_generator.__main__ import main, resolve_paths
 
 BASE_DIR = Path(__file__).parents[1]
 OUTPUT_DIR = Path("unittests/output/bo4e")
@@ -47,3 +47,11 @@ class TestMain:
         from .output.bo4e import __version__  # type: ignore[import-not-found]
 
         assert __version__ == "0.6.1rc13"
+
+    def test_resolve_paths(self) -> None:
+        relative_path_input = INPUT_DIR
+        absolute_path_input = relative_path_input.resolve()
+        relative_path_output = OUTPUT_DIR
+        absolute_path_output = relative_path_output.resolve()
+        assert (absolute_path_input, absolute_path_output) == resolve_paths(INPUT_DIR, OUTPUT_DIR)
+        assert (absolute_path_input, absolute_path_output) == resolve_paths(absolute_path_input, absolute_path_output)
