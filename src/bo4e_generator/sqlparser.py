@@ -65,7 +65,12 @@ def adapt_parse_for_sql(
                 schema_metadata.class_name + "ADD"
             ]
     additional_arguments["extra_template_data"] = additional_sql_data
-    additional_arguments["additional_imports"] = ["sqlmodel.Field", "uuid as uuid_pkg", "sqlmodel.Relationship"]
+    additional_arguments["additional_imports"] = [
+        "sqlmodel.Field",
+        "uuid as uuid_pkg",
+        "sqlmodel.Relationship",
+        "sqlmodel._compat.SQLModelConfig",
+    ]
     additional_arguments["base_class"] = "sqlmodel.SQLModel"
     additional_arguments["custom_template_dir"] = Path(__file__).resolve().parent / Path("custom_templates")
 
