@@ -20,10 +20,13 @@ def remove_pydantic_field_import(python_code: str) -> str:
     Remove the future import from the generated code.
     If sql_model adapt SQLModel specific imports
     """
+    # remove Field from pydantic imports
     python_code = re.sub(r"from pydantic import (.*?)Field(.*?)\n", r"from pydantic import \1\2\n", python_code)
+    # clean up imports after removing Field, e.g. from pydantic import Something, \n -> from pydantic import Something\n
     python_code = python_code.replace(",,", "").replace(", \n", "\n").replace(" , ", " ")
     python_code = python_code.replace("from pydantic import \n", "")
-    python_code = re.sub(r"float \| str \| None", "str | None", python_code)  # union type not supported
+    # union type is not supported, newer versions do have decimal type.
+    python_code = re.sub(r"float \| str \| None", "str | None", python_code)
     return python_code
 
 
@@ -34,10 +37,6 @@ def adapt_parse_for_sql(
     Scans fields of parsed classes to modify them to meet the SQLModel specifics and to introduce relationships.
     Returns additional information, an input path with modified json schemas and arguments for the parser
     """
-    additional_arguments: dict[str, Any] = {}  # additional arguments passed to the parser
-    additional_sql_data: DefaultDict[str, Any] = defaultdict(
-        dict
-    )  # additional fields for code generation using templates
     add_relation: DefaultDict[str, dict[str, Any]] = defaultdict(dict)  # added relationship fields
     relation_imports: DefaultDict[str, dict[str, str]] = defaultdict(dict)  # added imports for relationship fields
 
@@ -57,14 +56,44 @@ def adapt_parse_for_sql(
             # store the reduced version. The modified fields will be added in the BaseModel.jinja2 schema
             schema_metadata.schema_text = json.dumps(schema_metadata.schema_parsed, indent=2, ensure_ascii=False)
 
+    additional_arguments = additional_sql_arguments(namespace, add_relation, relation_imports)
+    # save intermediate jsons
+    for schema in namespace.values():
+        file_path = input_directory / Path("intermediate") / Path(schema.pkg) / Path(schema.class_name + ".json")
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+        file_path.write_text(schema.schema_text, encoding="utf-8")
+    input_directory = input_directory / Path("intermediate")
+
+    links: dict[str, str] = {}
+    # write linking classes for SQLModel
+    if "MANY" in add_relation:
+        links = add_relation["MANY"]
+
+    return namespace, additional_arguments, input_directory, links
+
+
+def additional_sql_arguments(
+    namespace: dict[str, SchemaMetadata],
+    add_relation: DefaultDict[str, dict[str, Any]],
+    relation_imports: DefaultDict[str, dict[str, str]],
+) -> dict[str, Any]:
+    """
+    returns addition and sql specific arguments to be processed by the standard code generator parser
+    """
+    additional_arguments: dict[str, Any] = {}  # additional arguments passed to the parser
+    additional_sql_data: DefaultDict[str, Any] = defaultdict(
+        dict
+    )  # additional fields for code generation using templates
+
+    # pass additional fields and imports to dictionary for parser
+    for schema_metadata in namespace.values():
+        if schema_metadata.pkg != "enum":
             # add primary key
             additional_sql_data[schema_metadata.class_name]["SQL"] = {
                 "primary": schema_metadata.class_name.lower()
                 + "_sqlid: uuid_pkg.UUID = Field( default_factory=uuid_pkg.uuid4, primary_key=True, index=True, "
                 "nullable=False )"
             }
-    # pass additional fields and imports to dictionary for parser
-    for schema_metadata in namespace.values():
         if schema_metadata.class_name in add_relation:
             additional_sql_data[schema_metadata.class_name]["SQL"]["relations"] = add_relation[
                 schema_metadata.class_name
@@ -87,19 +116,7 @@ def adapt_parse_for_sql(
     additional_arguments["base_class"] = "sqlmodel.SQLModel"
     additional_arguments["custom_template_dir"] = Path(__file__).resolve().parent / Path("custom_templates")
 
-    # save intermediate jsons
-    for schema in namespace.values():
-        file_path = input_directory / Path("intermediate") / Path(schema.pkg) / Path(schema.class_name + ".json")
-        file_path.parent.mkdir(parents=True, exist_ok=True)
-        file_path.write_text(schema.schema_text, encoding="utf-8")
-    input_directory = input_directory / Path("intermediate")
-
-    links: dict[str, str] = {}
-    # write linking classes for SQLModel
-    if "MANY" in add_relation:
-        links = add_relation["MANY"]
-
-    return namespace, additional_arguments, input_directory, links
+    return additional_arguments
 
 
 def return_ref(dictionary: dict[str, Union[str, dict]], target_key: str) -> str:
