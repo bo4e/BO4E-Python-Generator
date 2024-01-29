@@ -9,6 +9,7 @@ from bo4e_generator.sqlparser import (
     adapt_parse_for_sql,
     create_sql_field,
     format_code,
+    make_decimal,
     remove_pydantic_field_import,
     return_ref,
     write_many_many_links,
@@ -89,3 +90,10 @@ class TestSQLParser:
             "from borm.models.enum.anrede import Anrede\n"
         )
         assert resorted == format_code(unsorted)
+
+    def test_make_decimal(self) -> None:
+        string_in = 'zaehlerkonstante: float | str | None = Field(default=None, title="Zaehlerkonstante")'
+        assert (
+            make_decimal(string_in)
+            == 'zaehlerkonstante: Decimal | None = Field(default=None, title="Zaehlerkonstante")'
+        )

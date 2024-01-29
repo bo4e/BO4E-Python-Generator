@@ -25,9 +25,14 @@ def remove_pydantic_field_import(python_code: str) -> str:
     # clean up imports after removing Field, e.g. from pydantic import Something, \n -> from pydantic import Something\n
     python_code = python_code.replace(",,", "").replace(", \n", "\n").replace(" , ", " ")
     python_code = python_code.replace("from pydantic import \n", "")
-    # union type is not supported, newer versions do have decimal type.
-    python_code = re.sub(r"float \| str \| None", "str | None", python_code)
     return python_code
+
+
+def make_decimal(field: str) -> str:
+    """
+    turns Union type float or str into Decimal type
+    """
+    return re.sub(r"float \| str", "Decimal", field)
 
 
 def adapt_parse_for_sql(
@@ -45,6 +50,8 @@ def adapt_parse_for_sql(
             # list of fields which will be replaced by modified versions
             del_fields = []
             for field, val in schema_metadata.schema_parsed["properties"].items():
+                if "number" in str(val) and "string" in str(val):
+                    relation_imports[schema_metadata.class_name + "ADD"]["Decimal"] = "decimal"
                 if "$ref" in str(val) or "array" in str(val):
                     del_fields.append(field)
             for field in del_fields:
