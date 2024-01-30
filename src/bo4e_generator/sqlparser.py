@@ -50,14 +50,23 @@ def adapt_parse_for_sql(
             # list of fields which will be replaced by modified versions
             del_fields = []
             for field, val in schema_metadata.schema_parsed["properties"].items():
+                # modify decimal fields
                 if "number" in str(val) and "string" in str(val):
                     relation_imports[schema_metadata.class_name + "ADD"]["Decimal"] = "decimal"
-                if "$ref" in str(val) or "array" in str(val):
+                if "array" in str(val) and "$ref" not in str(val):
+                    add_relation, relation_imports = create_sql_list(
+                        field, schema_metadata.class_name, namespace, add_relation, relation_imports
+                    )
+                    del_fields.append(field)
+                if "$ref" in str(val):  # or "array" in str(val):
+                    add_relation, relation_imports = create_sql_field(
+                        field, schema_metadata.class_name, namespace, add_relation, relation_imports
+                    )
                     del_fields.append(field)
             for field in del_fields:
-                add_relation, relation_imports = create_sql_field(
-                    field, schema_metadata.class_name, namespace, add_relation, relation_imports
-                )
+                # add_relation, relation_imports = create_sql_field(
+                #    field, schema_metadata.class_name, namespace, add_relation, relation_imports
+                # )
 
                 del schema_metadata.schema_parsed["properties"][field]
             # store the reduced version. The modified fields will be added in the BaseModel.jinja2 schema
@@ -142,8 +151,84 @@ def return_ref(dictionary: dict[str, Union[str, dict]], target_key: str) -> str:
     return ""
 
 
-# pylint: disable=too-many-branches
-# pylint: disable=too-many-statements
+def create_sql_list(
+    field_name: str,
+    class_name: str,
+    namespace: dict[str, SchemaMetadata],
+    add_fields: DefaultDict[str, dict[str, Any]],
+    add_imports: DefaultDict[str, dict[str, str]],
+) -> tuple[DefaultDict[str, dict[str, Any]], DefaultDict[str, dict[str, str]]]:
+    """
+    Parses and recreates field which contains a list but no reference.
+    """
+    field_from_json = namespace[class_name].schema_parsed["properties"][field_name]
+    default = None
+    is_optional = ""
+    list_type = None
+    typing_dict: dict[str, str] = {"string": "str", "integer": "int"}
+    if "default" in field_from_json and field_from_json["default"] != "null" and field_from_json["default"] is not None:
+        default = f'{field_from_json["default"]}'
+    if "anyOf" in field_from_json:
+        for item in field_from_json["anyOf"]:
+            if "type" in item:
+                if item["type"] == "null":
+                    is_optional = "| None"
+                if item["type"] == "array":
+                    if "type" in item["items"]:
+                        list_type = item["items"]["type"]
+    # get rid of underscore in fieldname
+    field_name = field_name.lstrip("_")
+    # transform lists to sqlalchemy arrays
+    if list_type not in typing_dict:
+        raise KeyError(f"transforming SQL list: {list_type} not known")
+    type_hint = typing_dict[list_type]
+    sa_type = list_type.capitalize()
+    add_imports[class_name + "ADD"]["Column, ARRAY"] = "sqlalchemy"
+    add_imports[class_name + "ADD"][sa_type] = "sqlalchemy"
+
+    add_fields[class_name][f"{field_name}"] = (
+        f"List[{type_hint}] "
+        + is_optional
+        + f' = Field({default}, title="{field_name}", sa_column=Column( ARRAY( {sa_type} )))'
+    )
+
+    return add_fields, add_imports
+
+
+# pylint: disable=too-many-arguments
+def sql_reference_enum(
+    is_list: bool,
+    class_name: str,
+    field_name: str,
+    reference_name: str,
+    is_optional: str,
+    default: str,
+    namespace: dict[str, SchemaMetadata],
+    add_fields: DefaultDict[str, dict[str, Any]],
+    add_imports: DefaultDict[str, dict[str, str]],
+) -> tuple[DefaultDict[str, dict[str, Any]], DefaultDict[str, dict[str, str]]]:
+    """
+    returns field which references enums.
+    """
+    if is_list:
+        add_fields[class_name][f"{field_name}"] = (
+            f"List[{reference_name}]" + is_optional + f" = Field({default},"
+            f' sa_column=Column( ARRAY( Enum( {reference_name}, name="{reference_name.lower()}"))))'
+        )
+    else:
+        add_fields[class_name][f"{field_name}"] = f"{reference_name}" + is_optional + f"= Field({default})"
+
+    # import enums
+    if is_list:
+        add_imports[class_name + "ADD"]["Column, ARRAY, Enum"] = "sqlalchemy"
+        add_imports[class_name + "ADD"]["List"] = "typing"
+    add_imports[class_name + "ADD"][
+        reference_name
+    ] = f"{namespace[reference_name].pkg}.{namespace[reference_name].module_name}"
+
+    return add_fields, add_imports
+
+
 def create_sql_field(
     field_name: str,
     class_name: str,
@@ -154,13 +239,12 @@ def create_sql_field(
     """
     Parses field with references to other classes, enums and lists, and converts it to SQLModel field.
     """
+
     field_from_json = namespace[class_name].schema_parsed["properties"][field_name]
     reference_name = return_ref(field_from_json, "$ref")
     default = None
     is_optional = ""
     is_list = False
-    list_type = None
-    typing_dict: dict[str, str] = {"string": "str", "integer": "int"}
     if "default" in field_from_json and field_from_json["default"] != "null" and field_from_json["default"] is not None:
         default = f'{reference_name}.{field_from_json["default"]}'
     if "anyOf" in field_from_json:
@@ -170,88 +254,55 @@ def create_sql_field(
                     is_optional = "| None"
                 if item["type"] == "array":
                     is_list = True
-                    if "type" in item["items"]:
-                        list_type = item["items"]["type"]
     # get rid of underscore in fieldname
     field_name = field_name.lstrip("_")
-    # transform lists to sqlalchemy arrays
-    if reference_name == "":
-        if list_type not in typing_dict:
-            raise KeyError(f"transforming SQL list: {list_type} not known")
-        type_hint = typing_dict[list_type]
-        sa_type = list_type.capitalize()
-        add_imports[class_name + "ADD"]["Column, ARRAY, " + sa_type] = "sqlalchemy"
 
+    if namespace[reference_name].pkg == "enum":
+        return sql_reference_enum(
+            is_list, class_name, field_name, reference_name, is_optional, default, namespace, add_fields, add_imports
+        )
+    add_imports[class_name + "ADD"]["List"] = "typing"
+    add_imports[reference_name + "ADD"]["List"] = "typing"
+    if is_list:
+        # create many-to-many class
+        if class_name not in add_fields["MANY"]:
+            add_fields["MANY"][class_name] = [reference_name]
+        elif reference_name not in add_fields["MANY"][class_name]:
+            add_fields["MANY"][class_name].append(reference_name)
         add_fields[class_name][f"{field_name}"] = (
-            f"List[{type_hint}] "
+            f'List["{reference_name}"] ='
+            f' Relationship(back_populates="{class_name.lower()}_link", '
+            f"link_model={class_name}{reference_name}Link)"
+        )
+        add_fields[reference_name][f"{class_name.lower()}_link"] = (
+            f'List["{class_name}"] ='
+            f' Relationship(back_populates="{field_name}", '
+            f"link_model={class_name}{reference_name}Link)"
+        )
+        add_imports[class_name + "ADD"][f"{class_name}{reference_name}Link)"] = "Link"
+        add_imports[reference_name + "ADD"][f"{class_name}{reference_name}Link)"] = "Link"
+    else:
+        add_fields[class_name][f"{field_name}_id"] = (
+            "uuid_pkg.UUID "
             + is_optional
-            + f' = Field({default}, title="{field_name}", sa_column=Column( ARRAY( {sa_type} )))'
+            + f' = Field(default=None, foreign_key="{reference_name.lower()}.{reference_name.lower()}_sqlid")'
+        )
+        add_fields[class_name][f"{field_name}"] = (
+            f'"{reference_name}" ='
+            f' Relationship(back_populates="{class_name.lower()}_{field_name}",'
+            f' sa_relationship_kwargs= {{ "foreign_keys":"[{class_name}.{field_name}_id]" }})'
         )
 
-    # transform references
-    else:
-        if namespace[reference_name].pkg == "enum":
-            if is_list:
-                add_fields[class_name][f"{field_name}"] = (
-                    f"List[{reference_name}]" + is_optional + f" = Field({default},"
-                    f' sa_column=Column( ARRAY( Enum( {reference_name}, name="{reference_name.lower()}"))))'
-                )
-            else:
-                add_fields[class_name][f"{field_name}"] = f"{reference_name}" + is_optional + f"= Field({default})"
-
-            # import enums
-            if is_list:
-                add_imports[class_name + "ADD"]["Column, ARRAY, Enum"] = "sqlalchemy"
-                add_imports[class_name + "ADD"]["List"] = "typing"
-            add_imports[class_name + "ADD"][
-                reference_name
-            ] = f"{namespace[reference_name].pkg}.{namespace[reference_name].module_name}"
-        else:
-            add_imports[class_name + "ADD"]["List"] = "typing"
-            add_imports[reference_name + "ADD"]["List"] = "typing"
-            if is_list:
-                # create many-to-many class
-                if class_name not in add_fields["MANY"]:
-                    add_fields["MANY"][class_name] = [reference_name]
-                elif reference_name not in add_fields["MANY"][class_name]:
-                    add_fields["MANY"][class_name].append(reference_name)
-                add_fields[class_name][f"{field_name}"] = (
-                    f'List["{reference_name}"] ='
-                    f' Relationship(back_populates="{class_name.lower()}_link", '
-                    f"link_model={class_name}{reference_name}Link)"
-                )
-                add_fields[reference_name][f"{class_name.lower()}_link"] = (
-                    f'List["{class_name}"] ='
-                    f' Relationship(back_populates="{field_name}", '
-                    f"link_model={class_name}{reference_name}Link)"
-                )
-                add_imports[class_name + "ADD"][f"{class_name}{reference_name}Link)"] = "Link"
-                add_imports[reference_name + "ADD"][f"{class_name}{reference_name}Link)"] = "Link"
-            else:
-                add_fields[class_name][f"{field_name}_id"] = (
-                    "uuid_pkg.UUID "
-                    + is_optional
-                    + f' = Field(default=None, foreign_key="{reference_name.lower()}.{reference_name.lower()}_sqlid")'
-                )
-                add_fields[class_name][f"{field_name}"] = (
-                    f'"{reference_name}" ='
-                    f' Relationship(back_populates="{class_name.lower()}_{field_name}",'
-                    f' sa_relationship_kwargs= {{ "foreign_keys":"[{class_name}.{field_name}_id]" }})'
-                )
-                # add_imports[class_name + "ADD"]["Optional"] = "typing"
-
-                add_fields[reference_name][f"{class_name.lower()}_{field_name}"] = (
-                    f'List["{class_name}"] = Relationship(back_populates="{field_name}",'
-                    f"sa_relationship_kwargs="
-                    f'{{"primaryjoin":'
-                    f' "{class_name}.{field_name}_id=={reference_name}.{reference_name.lower()}_sqlid",'
-                    f' "lazy": "joined" }})'
-                )
-            # add_relation_import
-            add_imports[class_name][
-                reference_name
-            ] = f"{namespace[reference_name].pkg}.{namespace[reference_name].module_name}"
-            add_imports[reference_name][class_name] = f"{namespace[class_name].pkg}.{namespace[class_name].module_name}"
+        add_fields[reference_name][f"{class_name.lower()}_{field_name}"] = (
+            f'List["{class_name}"] = Relationship(back_populates="{field_name}",'
+            f"sa_relationship_kwargs="
+            f'{{"primaryjoin":'
+            f' "{class_name}.{field_name}_id=={reference_name}.{reference_name.lower()}_sqlid",'
+            f' "lazy": "joined" }})'
+        )
+    # add_relation_import
+    add_imports[class_name][reference_name] = f"{namespace[reference_name].pkg}.{namespace[reference_name].module_name}"
+    add_imports[reference_name][class_name] = f"{namespace[class_name].pkg}.{namespace[class_name].module_name}"
 
     return add_fields, add_imports
 
