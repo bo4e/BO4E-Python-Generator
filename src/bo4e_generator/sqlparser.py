@@ -202,7 +202,7 @@ def sql_reference_enum(
     field_name: str,
     reference_name: str,
     is_optional: str,
-    default: str,
+    default: str | None,
     namespace: dict[str, SchemaMetadata],
     add_fields: DefaultDict[str, dict[str, Any]],
     add_imports: DefaultDict[str, dict[str, str]],
