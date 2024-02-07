@@ -8,7 +8,7 @@ annotated-types==0.6.0
     # via pydantic
 argcomplete==3.1.2
     # via datamodel-code-generator
-black==23.12.1
+black==24.1.1
     # via datamodel-code-generator
 click==8.1.7
     # via
@@ -16,7 +16,7 @@ click==8.1.7
     #   black
 colorama==0.4.6
     # via click
-datamodel-code-generator==0.25.2
+datamodel-code-generator==0.25.3
     # via -r requirements.in
 dnspython==2.4.2
     # via email-validator

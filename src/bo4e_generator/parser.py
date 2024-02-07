@@ -2,6 +2,7 @@
 Contains code to generate pydantic v2 models from json schemas.
 Since the used tool doesn't support all features we need, we monkey patch some functions.
 """
+import itertools
 import re
 import shutil
 from enum import Enum
@@ -167,9 +168,8 @@ def bo4e_init_file_content(namespace: dict[str, SchemaMetadata], version: str) -
     init_file_content = INIT_FILE_COMMENT.strip().format(version=version)
 
     init_file_content += "\n\n__all__ = [\n"
-    for class_name in namespace:
+    for class_name in sorted(itertools.chain(namespace, ["__version__"])):
         init_file_content += f'    "{class_name}",\n'
-    init_file_content += '    "__version__",\n'
     init_file_content += "]\n\n"
 
     for schema_metadata in namespace.values():
