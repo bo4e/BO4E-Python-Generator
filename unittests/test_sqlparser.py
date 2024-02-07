@@ -75,7 +75,7 @@ class TestSQLParser:
         )
         links = add_relation["MANY"]
         file_contents = write_many_many_links(links)
-        keywords = ["AngebotExterneReferenzLink", "angebot_id", "externereferenz_id"]
+        keywords = ["AngebotexterneReferenzenLink", "angebot_id", "externereferenz_id"]
         assert all(substring in file_contents for substring in keywords)
 
     def test_format_code(self) -> None:

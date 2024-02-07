@@ -266,39 +266,50 @@ def create_sql_field(
     if is_list:
         # create many-to-many class
         if class_name not in add_fields["MANY"]:
-            add_fields["MANY"][class_name] = [reference_name]
+            add_fields["MANY"][class_name] = [[reference_name, field_name]]
         elif reference_name not in add_fields["MANY"][class_name]:
-            add_fields["MANY"][class_name].append(reference_name)
+            add_fields["MANY"][class_name].append([reference_name, field_name])
         add_fields[class_name][f"{field_name}"] = (
             f'List["{reference_name}"] ='
-            f' Relationship(back_populates="{class_name.lower()}_link", '
-            f"link_model={class_name}{reference_name}Link)"
+            f' Relationship(back_populates="{class_name.lower()}_{field_name.lower()}_link", '
+            f"link_model={class_name}{field_name}Link)"
         )
-        add_fields[reference_name][f"{class_name.lower()}_link"] = (
+        add_fields[reference_name][f"{class_name.lower()}_{field_name.lower()}_link"] = (
             f'List["{class_name}"] ='
             f' Relationship(back_populates="{field_name}", '
-            f"link_model={class_name}{reference_name}Link)"
+            f"link_model={class_name}{field_name}Link)"
         )
-        add_imports[class_name + "ADD"][f"{class_name}{reference_name}Link)"] = "Link"
-        add_imports[reference_name + "ADD"][f"{class_name}{reference_name}Link)"] = "Link"
+        add_imports[class_name + "ADD"][f"{class_name}{field_name}Link)"] = "Link"
+        add_imports[reference_name + "ADD"][f"{class_name}{field_name}Link)"] = "Link"
     else:
+        # cf. https://github.com/tiangolo/sqlmodel/pull/610
         add_fields[class_name][f"{field_name}_id"] = (
-            "uuid_pkg.UUID "
-            + is_optional
-            + f' = Field(default=None, foreign_key="{reference_name.lower()}.{reference_name.lower()}_sqlid")'
+            "uuid_pkg.UUID " + is_optional + f" = Field(sa_column=Column(UUID(as_uuid=True),"
+            f' ForeignKey("{reference_name.lower()}.{reference_name.lower()}_sqlid"'
+            f', ondelete="SET NULL")))'
         )
+        add_imports[class_name + "ADD"]["Column"] = "sqlalchemy"
+        add_imports[class_name + "ADD"]["ForeignKey"] = "sqlalchemy"
+        add_imports[class_name + "ADD"]["UUID"] = "sqlalchemy.dialects.postgresql"
+
+        # pylint: disable= fixme
+        # todo: check default
+
         add_fields[class_name][f"{field_name}"] = (
             f'"{reference_name}" ='
             f' Relationship(back_populates="{class_name.lower()}_{field_name}",'
             f' sa_relationship_kwargs= {{ "foreign_keys":"[{class_name}.{field_name}_id]" }})'
         )
 
+        # cf. https://github.com/tiangolo/sqlmodel/issues/10
+        # https://github.com/tiangolo/sqlmodel/issues/213
+        # https://dev.to/whchi/disable-sqlmodel-foreign-key-constraint-55kp
         add_fields[reference_name][f"{class_name.lower()}_{field_name}"] = (
             f'List["{class_name}"] = Relationship(back_populates="{field_name}",'
             f"sa_relationship_kwargs="
             f'{{"primaryjoin":'
             f' "{class_name}.{field_name}_id=={reference_name}.{reference_name.lower()}_sqlid",'
-            f' "lazy": "joined" }})'
+            f' "lazy": "joined"}})'
         )
     # add_relation_import
     add_imports[class_name][reference_name] = f"{namespace[reference_name].pkg}.{namespace[reference_name].module_name}"
