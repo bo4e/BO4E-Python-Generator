@@ -2,6 +2,7 @@
 Contains code to generate pydantic v2 models from json schemas.
 Since the used tool doesn't support all features we need, we monkey patch some functions.
 """
+
 import itertools
 import re
 from pathlib import Path
