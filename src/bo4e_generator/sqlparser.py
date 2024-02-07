@@ -2,6 +2,7 @@
 Contains code to generate SQLModel classes from json schemas.
 Since the used tool doesn't support all features we need, we monkey patch some functions.
 """
+
 import json
 import re
 from collections import defaultdict

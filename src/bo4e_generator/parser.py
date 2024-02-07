@@ -2,6 +2,7 @@
 Contains code to generate pydantic v2 models from json schemas.
 Since the used tool doesn't support all features we need, we monkey patch some functions.
 """
+
 import itertools
 import re
 import shutil
@@ -196,9 +197,11 @@ def parse_bo4e_schemas(
     file path (relative to arbitrary output directory) => file content.
     """
     data_model_types = get_bo4e_data_model_types(
-        DataModelType.PydanticBaseModel
-        if output_type is OutputType.PYDANTIC_V1.name
-        else DataModelType.PydanticV2BaseModel,
+        (
+            DataModelType.PydanticBaseModel
+            if output_type is OutputType.PYDANTIC_V1.name
+            else DataModelType.PydanticV2BaseModel
+        ),
         target_python_version=PythonVersion.PY_311,
         namespace=namespace,
     )

@@ -1,6 +1,7 @@
 """
 This module is the entry point for the CLI bo4e-generator.
 """
+
 import shutil
 from pathlib import Path
 from typing import Optional
