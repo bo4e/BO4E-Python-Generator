@@ -1,6 +1,7 @@
 """
 This module contains functionality to retrieve information about the schemas.
 """
+
 import json
 import re
 from pathlib import Path
