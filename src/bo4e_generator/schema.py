@@ -35,10 +35,12 @@ class SchemaMetadata(BaseModel):
 
     @property
     def module_name(self) -> str:
+        """e.g. 'preisblatt_netznutzung' or 'zusatz_attribut'"""
         return self.module_path[-1]
 
     @property
     def module_path_with_extension(self) -> tuple[str, ...]:
+        """e.g. ('bo', 'preisblatt_netznutzung.py') or ('zusatz_attribut.py')"""
         return *self.module_path[:-1], f"{self.module_path[-1]}.py"
 
     def __str__(self):
