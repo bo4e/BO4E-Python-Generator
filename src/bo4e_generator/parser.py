@@ -38,7 +38,7 @@ def get_bo4e_data_model_types(
     def _module_path(self) -> list[str]:
         if self.name not in namespace:
             raise ValueError(f"Model not in namespace: {self.name}")
-        return [namespace[self.name].pkg, namespace[self.name].module_name]
+        return list(namespace[self.name].module_path)
 
     @property  # type: ignore[misc]
     # "property" used with a non-method
@@ -156,9 +156,7 @@ def bo4e_init_file_content(namespace: dict[str, SchemaMetadata], version: str) -
     init_file_content += "]\n\n"
 
     for schema_metadata in namespace.values():
-        init_file_content += (
-            f"from .{schema_metadata.pkg}.{schema_metadata.module_name} import {schema_metadata.class_name}\n"
-        )
+        init_file_content += f"from .{'.'.join(schema_metadata.module_path)} import {schema_metadata.class_name}\n"
     init_file_content += "\nfrom .__version__ import __version__\n"
 
     return init_file_content
@@ -212,11 +210,10 @@ def parse_bo4e_schemas(
         raise ValueError(f"Unexpected type of parse result: {type(parse_result)}")
     file_contents = {}
     for schema_metadata in namespace.values():
+        module_path = schema_metadata.module_path_with_extension
         if schema_metadata.module_name.startswith("_"):
             # Because somehow the generator uses the prefix also on the module name. Don't know why.
-            module_path = (schema_metadata.pkg, f"field{schema_metadata.module_name}.py")
-        else:
-            module_path = (schema_metadata.pkg, f"{schema_metadata.module_name}.py")
+            module_path = *module_path[:-1], f"field{module_path[-1]}"
 
         if module_path not in parse_result:
             raise KeyError(
