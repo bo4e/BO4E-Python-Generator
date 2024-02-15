@@ -213,7 +213,7 @@ def parse_bo4e_schemas(
         module_path = schema_metadata.module_path_with_extension
         if schema_metadata.module_name.startswith("_"):
             # Because somehow the generator uses the prefix also on the module name. Don't know why.
-            module_path = module_path[:-1], f"field{module_path[-1]}"
+            module_path = *module_path[:-1], f"field{module_path[-1]}"
 
         if module_path not in parse_result:
             raise KeyError(
