@@ -20,13 +20,11 @@ class SchemaMetadata(BaseModel):
     schema_text: str
     schema_parsed: SchemaType
     class_name: str
-    pkg: str
-    "e.g. 'bo'"
     input_file: Path
     output_file: Path
     "The output file will be a relative path"
-    module_name: str
-    "e.g. 'preisblatt_netznutzung"
+    module_path: tuple[str, ...]
+    "e.g. ('bo', 'preisblatt_netznutzung') or ('zusatz_attribut')"
 
     def save(self, content: str):
         """
@@ -35,8 +33,18 @@ class SchemaMetadata(BaseModel):
         self.output_file.parent.mkdir(parents=True, exist_ok=True)
         self.output_file.write_text(content)
 
+    @property
+    def module_name(self) -> str:
+        """e.g. 'preisblatt_netznutzung' or 'zusatz_attribut'"""
+        return self.module_path[-1]
+
+    @property
+    def module_path_with_extension(self) -> tuple[str, ...]:
+        """e.g. ('bo', 'preisblatt_netznutzung.py') or ('zusatz_attribut.py')"""
+        return *self.module_path[:-1], f"{self.module_path[-1]}.py"
+
     def __str__(self):
-        return f"{self.pkg}.{self.class_name}"
+        return ".".join(self.module_path)
 
 
 def camel_to_snake(name: str) -> str:
@@ -54,16 +62,16 @@ def get_namespace(input_directory: Path) -> dict[str, SchemaMetadata]:
 
     namespace: dict[str, SchemaMetadata] = {}
     for file_path in input_directory.rglob("*.json"):
+        relative_path = file_path.relative_to(input_directory)
+        module_path = tuple(camel_to_snake(part) for part in relative_path.with_suffix("").parts)
         schema_text = file_path.read_text(encoding="utf-8")
         schema_parsed = json.loads(schema_text)
         class_name = schema_parsed["title"].replace(" ", "_")
-        module_name = camel_to_snake(class_name)
 
         namespace[class_name] = SchemaMetadata(
-            pkg=file_path.parent.name,
-            module_name=module_name,
+            module_path=module_path,
             input_file=file_path,
-            output_file=file_path.relative_to(input_directory).with_name(f"{module_name}.py"),
+            output_file=Path(*module_path).with_suffix(".py"),
             schema_text=schema_text,
             schema_parsed=schema_parsed,
             class_name=class_name,
