@@ -1,7 +1,6 @@
 {
-  "description": "Mit dieser Komponente können Tarifpreise verschiedener Typen im Zusammenhang mit regionalen Gültigkeiten abgebildet\nwerden.\n\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/com/RegionaleTarifpreisposition.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `RegionaleTarifpreisposition JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/Hochfrequenz/BO4E-python/main/json_schemas/com/RegionaleTarifpreisposition.json>`_",
+  "description": "Mit dieser Komponente können Tarifpreise verschiedener Typen im Zusammenhang mit regionalen Gültigkeiten abgebildet\nwerden.\n\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/com/RegionaleTarifpreisposition.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `RegionaleTarifpreisposition JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/Hochfrequenz/BO4E-Schemas/v202401.0.1-/src/bo4e_schemas/com/RegionaleTarifpreisposition.json>`_",
   "title": "RegionaleTarifpreisposition",
-  "type": "object",
   "additionalProperties": true,
   "properties": {
     "_id": {
@@ -18,7 +17,7 @@
     },
     "_version": {
       "title": " Version",
-      "default": "0.6.1rc13",
+      "default": "v202401.0.1",
       "anyOf": [
         {
           "type": "string"
@@ -66,10 +65,10 @@
       "default": null,
       "anyOf": [
         {
-          "type": "array",
           "items": {
             "$ref": "RegionalePreisstaffel.json#"
-          }
+          },
+          "type": "array"
         },
         {
           "type": "null"
@@ -86,6 +85,22 @@
           "type": "null"
         }
       ]
+    },
+    "zusatzAttribute": {
+      "title": "Zusatzattribute",
+      "default": null,
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "../ZusatzAttribut.json#"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ]
     }
-  }
+  },
+  "type": "object"
 }

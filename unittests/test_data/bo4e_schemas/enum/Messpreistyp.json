@@ -1,7 +1,6 @@
 {
   "description": "Festlegung, welcher Typ von Messung mit einem Preis belegt wird",
   "title": "Messpreistyp",
-  "type": "string",
   "enum": [
     "MESSPREIS_G2_5",
     "MESSPREIS_G4",
@@ -27,5 +26,6 @@
     "VERRECHNUNGSPREIS_SM",
     "AUFSCHLAG_WANDLER",
     "AUFSCHLAG_TARIFSCHALTUNG"
-  ]
+  ],
+  "type": "string"
 }

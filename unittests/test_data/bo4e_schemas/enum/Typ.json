@@ -1,11 +1,10 @@
 {
   "description": "Auflistung sämtlicher existierender Geschäftsobjekte.",
   "title": "Typ",
-  "type": "string",
   "enum": [
     "ANGEBOT",
     "ANSPRECHPARTNER",
-    "AUSSCHREIUNG",
+    "AUSSCHREIBUNG",
     "BUENDELVERTRAG",
     "ENERGIEMENGE",
     "FREMDKOSTEN",
@@ -14,7 +13,6 @@
     "GESCHAEFTSPARTNER",
     "KOSTEN",
     "LASTGANG",
-    "LASTGANG_KOMPAKT",
     "MARKTLOKATION",
     "MESSLOKATION",
     "MARKTTEILNEHMER",
@@ -37,5 +35,6 @@
     "VERTRAG",
     "ZAEHLER",
     "ZEITREIHE"
-  ]
+  ],
+  "type": "string"
 }

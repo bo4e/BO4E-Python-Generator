@@ -1,7 +1,6 @@
 {
   "description": "Zur Abbildung von Messgrössen und zur Verwendung in energiewirtschaftlichen Berechnungen.",
   "title": "Bemessungsgroesse",
-  "type": "string",
   "enum": [
     "WIRKARBEIT_EL",
     "LEISTUNG_EL",
@@ -15,5 +14,6 @@
     "VOLUMENSTROM",
     "BENUTZUNGSDAUER",
     "ANZAHL"
-  ]
+  ],
+  "type": "string"
 }

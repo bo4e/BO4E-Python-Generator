@@ -1,7 +1,6 @@
 {
   "description": "BDEW Artikelnummern",
   "title": "BDEWArtikelnummer",
-  "type": "string",
   "enum": [
     "LEISTUNG",
     "LEISTUNG_PAUSCHAL",
@@ -49,5 +48,6 @@
     "STEUERBOX",
     "MSB_INKL_MESSUNG",
     "AUSGLEICHSENERGIE_UNTERDECKUNG"
-  ]
+  ],
+  "type": "string"
 }

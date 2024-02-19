@@ -1,7 +1,6 @@
 {
   "description": "Zertifikate für Ökostrom von verschiedenen Herausgebern.",
   "title": "Oekozertifikat",
-  "type": "string",
   "enum": [
     "CMS_EE01",
     "CMS_EE02",
@@ -20,5 +19,6 @@
     "TUEV_SUED",
     "TUEV_SUED_EE01",
     "TUEV_SUED_EE02"
-  ]
+  ],
+  "type": "string"
 }

@@ -1,7 +1,6 @@
 {
   "description": "Abbildung verschiedener Rufnummerntypen.",
   "title": "Rufnummernart",
-  "type": "string",
   "enum": [
     "RUF_ZENTRALE",
     "FAX_ZENTRALE",
@@ -12,5 +11,6 @@
     "RUF_DURCHWAHL",
     "FAX_DURCHWAHL",
     "MOBIL_NUMMER"
-  ]
+  ],
+  "type": "string"
 }

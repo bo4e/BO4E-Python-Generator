@@ -1,7 +1,6 @@
 {
   "description": "Aufzählung der Labels für Öko-Strom von verschiedenen Herausgebern.",
   "title": "Oekolabel",
-  "type": "string",
   "enum": [
     "ENERGREEN",
     "GASGREEN_GRUENER_STROM",
@@ -15,5 +14,6 @@
     "RENEWABLE_PLUS",
     "WATERGREEN",
     "WATERGREEN_PLUS"
-  ]
+  ],
+  "type": "string"
 }

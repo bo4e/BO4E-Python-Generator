@@ -1,7 +1,6 @@
 {
   "description": "Auflistung möglicher Größen von Zählern",
   "title": "Zaehlergroesse",
-  "type": "string",
   "enum": [
     "G2KOMMA5",
     "G4",
@@ -24,5 +23,6 @@
     "G10000",
     "G12500",
     "G16000"
-  ]
+  ],
+  "type": "string"
 }

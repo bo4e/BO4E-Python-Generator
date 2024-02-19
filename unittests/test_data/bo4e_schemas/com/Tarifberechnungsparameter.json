@@ -1,7 +1,6 @@
 {
-  "description": "In dieser Komponente sind die Berechnungsparameter für die Ermittlung der Tarifkosten zusammengefasst.\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/com/Tarifberechnungsparameter.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `Tarifberechnungsparameter JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/Hochfrequenz/BO4E-python/main/json_schemas/com/Tarifberechnungsparameter.json>`_",
+  "description": "In dieser Komponente sind die Berechnungsparameter für die Ermittlung der Tarifkosten zusammengefasst.\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/com/Tarifberechnungsparameter.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `Tarifberechnungsparameter JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/Hochfrequenz/BO4E-Schemas/v202401.0.1-/src/bo4e_schemas/com/Tarifberechnungsparameter.json>`_",
   "title": "Tarifberechnungsparameter",
-  "type": "object",
   "additionalProperties": true,
   "properties": {
     "_id": {
@@ -18,7 +17,7 @@
     },
     "_version": {
       "title": " Version",
-      "default": "0.6.1rc13",
+      "default": "v202401.0.1",
       "anyOf": [
         {
           "type": "string"
@@ -90,10 +89,8 @@
       "default": null,
       "anyOf": [
         {
-          "type": "number"
-        },
-        {
-          "type": "string"
+          "type": "string",
+          "format": "decimal"
         },
         {
           "type": "null"
@@ -105,10 +102,8 @@
       "default": null,
       "anyOf": [
         {
-          "type": "number"
-        },
-        {
-          "type": "string"
+          "type": "string",
+          "format": "decimal"
         },
         {
           "type": "null"
@@ -137,20 +132,36 @@
         }
       ]
     },
+    "zusatzAttribute": {
+      "title": "Zusatzattribute",
+      "default": null,
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "../ZusatzAttribut.json#"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
     "zusatzpreise": {
       "title": "Zusatzpreise",
       "default": null,
       "anyOf": [
         {
-          "type": "array",
           "items": {
             "$ref": "Tarifpreis.json#"
-          }
+          },
+          "type": "array"
         },
         {
           "type": "null"
         }
       ]
     }
-  }
+  },
+  "type": "object"
 }

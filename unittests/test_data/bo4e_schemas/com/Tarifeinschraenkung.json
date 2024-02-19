@@ -1,7 +1,6 @@
 {
-  "description": "Mit dieser Komponente werden Einschränkungen für die Anwendung von Tarifen modelliert.\n\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/com/Tarifeinschraenkung.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `Tarifeinschraenkung JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/Hochfrequenz/BO4E-python/main/json_schemas/com/Tarifeinschraenkung.json>`_",
+  "description": "Mit dieser Komponente werden Einschränkungen für die Anwendung von Tarifen modelliert.\n\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/com/Tarifeinschraenkung.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `Tarifeinschraenkung JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/Hochfrequenz/BO4E-Schemas/v202401.0.1-/src/bo4e_schemas/com/Tarifeinschraenkung.json>`_",
   "title": "Tarifeinschraenkung",
-  "type": "object",
   "additionalProperties": true,
   "properties": {
     "_id": {
@@ -18,7 +17,7 @@
     },
     "_version": {
       "title": " Version",
-      "default": "0.6.1rc13",
+      "default": "v202401.0.1",
       "anyOf": [
         {
           "type": "string"
@@ -33,10 +32,10 @@
       "default": null,
       "anyOf": [
         {
-          "type": "array",
           "items": {
             "$ref": "Menge.json#"
-          }
+          },
+          "type": "array"
         },
         {
           "type": "null"
@@ -48,10 +47,10 @@
       "default": null,
       "anyOf": [
         {
-          "type": "array",
           "items": {
             "$ref": "../bo/Geraet.json#"
-          }
+          },
+          "type": "array"
         },
         {
           "type": "null"
@@ -63,10 +62,25 @@
       "default": null,
       "anyOf": [
         {
-          "type": "array",
           "items": {
             "$ref": "../enum/Voraussetzungen.json#"
-          }
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "zusatzAttribute": {
+      "title": "Zusatzattribute",
+      "default": null,
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "../ZusatzAttribut.json#"
+          },
+          "type": "array"
         },
         {
           "type": "null"
@@ -78,15 +92,16 @@
       "default": null,
       "anyOf": [
         {
-          "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "type": "array"
         },
         {
           "type": "null"
         }
       ]
     }
-  }
+  },
+  "type": "object"
 }

@@ -1,7 +1,6 @@
 {
-  "description": "Object containing information about a Ansprechpartner\n\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/bo/Ansprechpartner.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `Ansprechpartner JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/Hochfrequenz/BO4E-python/main/json_schemas/bo/Ansprechpartner.json>`_",
+  "description": "Object containing information about a Ansprechpartner\n\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/bo/Ansprechpartner.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `Ansprechpartner JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/Hochfrequenz/BO4E-Schemas/v202401.0.1-/src/bo4e_schemas/bo/Ansprechpartner.json>`_",
   "title": "Ansprechpartner",
-  "type": "object",
   "additionalProperties": true,
   "properties": {
     "_id": {
@@ -29,7 +28,7 @@
     },
     "_version": {
       "title": " Version",
-      "default": "0.6.1rc13",
+      "default": "v202401.0.1",
       "anyOf": [
         {
           "type": "string"
@@ -67,21 +66,6 @@
       "anyOf": [
         {
           "type": "string"
-        },
-        {
-          "type": "null"
-        }
-      ]
-    },
-    "externeReferenzen": {
-      "title": "Externereferenzen",
-      "default": null,
-      "anyOf": [
-        {
-          "type": "array",
-          "items": {
-            "$ref": "../com/ExterneReferenz.json#"
-          }
         },
         {
           "type": "null"
@@ -169,6 +153,21 @@
         }
       ]
     },
+    "zusatzAttribute": {
+      "title": "Zusatzattribute",
+      "default": null,
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "../ZusatzAttribut.json#"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
     "zustaendigkeit": {
       "default": null,
       "anyOf": [
@@ -180,5 +179,6 @@
         }
       ]
     }
-  }
+  },
+  "type": "object"
 }

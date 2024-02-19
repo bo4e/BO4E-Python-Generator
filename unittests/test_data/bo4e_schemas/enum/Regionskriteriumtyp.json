@@ -1,7 +1,6 @@
 {
   "description": "Klassifizierung der Kriterien für eine regionale Eingrenzung.",
   "title": "Regionskriteriumtyp",
-  "type": "string",
   "enum": [
     "BUNDESLANDKENNZIFFER",
     "BUNDESLAND_NAME",
@@ -36,5 +35,6 @@
     "KM_UMKREIS",
     "BUNDESWEIT",
     "PLZ_BEREICH"
-  ]
+  ],
+  "type": "string"
 }

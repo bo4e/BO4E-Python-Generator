@@ -1,7 +1,6 @@
 {
   "description": "Diese Rollen kann ein Marktteilnehmer einnehmen.",
   "title": "Marktrolle",
-  "type": "string",
   "enum": [
     "NB",
     "LF",
@@ -17,5 +16,6 @@
     "KUNDE",
     "INTERESSENT",
     "BTR"
-  ]
+  ],
+  "type": "string"
 }

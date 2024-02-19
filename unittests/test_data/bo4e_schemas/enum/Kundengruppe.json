@@ -1,7 +1,6 @@
 {
   "description": "Kundengruppe für eine Marktlokation (orientiert sich an den Standard-Lastprofilen).",
   "title": "Kundengruppe",
-  "type": "string",
   "enum": [
     "RLM",
     "RLM_KOMMUNAL",
@@ -38,5 +37,6 @@
     "SLP_G_HEF",
     "SLP_G_HMF",
     "SLP_G_HKO"
-  ]
+  ],
+  "type": "string"
 }

@@ -1,7 +1,6 @@
 {
   "description": "Abbildung verschiedener Rechnungstypen zur Kennzeichnung von Rechnungen",
   "title": "Rechnungstyp",
-  "type": "string",
   "enum": [
     "ENDKUNDENRECHNUNG",
     "NETZNUTZUNGSRECHNUNG",
@@ -9,5 +8,6 @@
     "MESSSTELLENBETRIEBSRECHNUNG",
     "BESCHAFFUNGSRECHNUNG",
     "AUSGLEICHSENERGIERECHNUNG"
-  ]
+  ],
+  "type": "string"
 }

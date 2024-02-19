@@ -1,7 +1,6 @@
 {
   "description": "Abbildung einer Statusinformation für Verträge.",
   "title": "Vertragsstatus",
-  "type": "string",
   "enum": [
     "IN_ARBEIT",
     "UEBERMITTELT",
@@ -12,5 +11,6 @@
     "STORNIERT",
     "GEKUENDIGT",
     "BEENDET"
-  ]
+  ],
+  "type": "string"
 }

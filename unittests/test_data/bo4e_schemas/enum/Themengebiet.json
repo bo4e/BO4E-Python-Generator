@@ -1,7 +1,6 @@
 {
   "description": "Über dieses ENUM kann eine thematische Zuordnung, beispielsweise eines Ansprechpartners, vorgenommen werden.",
   "title": "Themengebiet",
-  "type": "string",
   "enum": [
     "ALLGEMEINER_INFORMATIONSAUSTAUSCH",
     "AN_UND_ABMELDUNG",
@@ -62,5 +61,6 @@
     "ZAEHLERSTAENDE_SLP",
     "ZAHLUNGSVERKEHR",
     "ZUORDNUNGSVEREINBARUNG"
-  ]
+  ],
+  "type": "string"
 }

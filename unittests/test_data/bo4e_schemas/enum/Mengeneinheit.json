@@ -1,7 +1,6 @@
 {
   "description": "Einheit: Messgrößen, die per Messung oder Vorgabe ermittelt werden können.",
   "title": "Mengeneinheit",
-  "type": "string",
   "enum": [
     "W",
     "WH",
@@ -12,10 +11,18 @@
     "MWH",
     "STUECK",
     "KUBIKMETER",
+    "SEKUNDE",
+    "MINUTE",
     "STUNDE",
+    "VIERTEL_STUNDE",
     "TAG",
+    "WOCHE",
     "MONAT",
+    "QUARTAL",
+    "HALBJAHR",
     "JAHR",
-    "PROZENT"
-  ]
+    "PROZENT",
+    "KVAR"
+  ],
+  "type": "string"
 }

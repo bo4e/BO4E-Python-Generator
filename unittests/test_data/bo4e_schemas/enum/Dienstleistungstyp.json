@@ -1,7 +1,6 @@
 {
   "description": "Auflistung möglicher abzurechnender Dienstleistungen.",
   "title": "Dienstleistungstyp",
-  "type": "string",
   "enum": [
     "DATENBEREITSTELLUNG_TAEGLICH",
     "DATENBEREITSTELLUNG_WOECHENTLICH",
@@ -38,5 +37,6 @@
     "ENTSPERRUNG",
     "MAHNKOSTEN",
     "INKASSOKOSTEN"
-  ]
+  ],
+  "type": "string"
 }
