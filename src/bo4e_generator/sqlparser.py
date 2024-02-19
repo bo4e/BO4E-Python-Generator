@@ -47,7 +47,7 @@ def adapt_parse_for_sql(
     relation_imports: DefaultDict[str, dict[str, str]] = defaultdict(dict)  # added imports for relationship fields
 
     for schema_metadata in namespace.values():
-        if schema_metadata.pkg != "enum":
+        if "enum" not in schema_metadata.module_path:
             # list of fields which will be replaced by modified versions
             del_fields = []
             for field, val in schema_metadata.schema_parsed["properties"].items():
@@ -72,7 +72,9 @@ def adapt_parse_for_sql(
     additional_arguments = additional_sql_arguments(namespace, add_relation, relation_imports)
     # save intermediate jsons
     for schema in namespace.values():
-        file_path = input_directory / Path("intermediate") / Path(schema.pkg) / Path(schema.class_name + ".json")
+        file_path = (
+            input_directory / Path("intermediate") / Path(schema.module_path[0]) / Path(schema.class_name + ".json")
+        )
         file_path.parent.mkdir(parents=True, exist_ok=True)
         file_path.write_text(schema.schema_text, encoding="utf-8")
     input_directory = input_directory / Path("intermediate")
@@ -100,7 +102,7 @@ def additional_sql_arguments(
 
     # pass additional fields and imports to dictionary for parser
     for schema_metadata in namespace.values():
-        if schema_metadata.pkg != "enum":
+        if schema_metadata.module_path[0] != "enum":
             # add primary key
             additional_sql_data[schema_metadata.class_name]["SQL"] = {
                 "primary": schema_metadata.class_name.lower()
@@ -221,7 +223,7 @@ def sql_reference_enum(
         add_imports[class_name + "ADD"]["List"] = "typing"
     add_imports[class_name + "ADD"][
         reference_name
-    ] = f"{namespace[reference_name].pkg}.{namespace[reference_name].module_name}"
+    ] = f"{namespace[reference_name].module_path[0]}.{namespace[reference_name].module_name}"
 
     return add_fields, add_imports
 
@@ -254,7 +256,7 @@ def create_sql_field(
     # get rid of underscore in fieldname
     field_name = field_name.lstrip("_")
 
-    if namespace[reference_name].pkg == "enum":
+    if namespace[reference_name].module_path[0] == "enum":
         return sql_reference_enum(
             is_list, class_name, field_name, reference_name, is_optional, default, namespace, add_fields, add_imports
         )
@@ -309,8 +311,12 @@ def create_sql_field(
             f' "lazy": "joined"}})'
         )
     # add_relation_import
-    add_imports[class_name][reference_name] = f"{namespace[reference_name].pkg}.{namespace[reference_name].module_name}"
-    add_imports[reference_name][class_name] = f"{namespace[class_name].pkg}.{namespace[class_name].module_name}"
+    add_imports[class_name][
+        reference_name
+    ] = f"{namespace[reference_name].module_path[0]}.{namespace[reference_name].module_name}"
+    add_imports[reference_name][
+        class_name
+    ] = f"{namespace[class_name].module_path[0]}.{namespace[class_name].module_name}"
 
     return add_fields, add_imports
 
