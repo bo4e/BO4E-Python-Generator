@@ -31,7 +31,7 @@ def remove_pydantic_field_import(python_code: str) -> str:
 
 def make_decimal(field: str) -> str:
     """
-    turns Union type float or str into Decimal type
+    turns Union type float or str into Decimal type. For older Schema versions.
     """
     return re.sub(r"float \| str", "Decimal", field)
 
@@ -65,10 +65,6 @@ def adapt_parse_for_sql(
                     )
                     del_fields.append(field)
             for field in del_fields:
-                # add_relation, relation_imports = create_sql_field(
-                #    field, schema_metadata.class_name, namespace, add_relation, relation_imports
-                # )
-
                 del schema_metadata.schema_parsed["properties"][field]
             # store the reduced version. The modified fields will be added in the BaseModel.jinja2 schema
             schema_metadata.schema_text = json.dumps(schema_metadata.schema_parsed, indent=2, ensure_ascii=False)
