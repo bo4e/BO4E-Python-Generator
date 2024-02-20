@@ -313,10 +313,10 @@ def create_sql_field(
     # add_relation_import
     add_imports[class_name][
         reference_name
-    ] = f"{namespace[reference_name].module_path[0]}.{namespace[reference_name].module_name}"
+    ] = ".".join(namespace[reference_name].module_path)
     add_imports[reference_name][
         class_name
-    ] = f"{namespace[class_name].module_path[0]}.{namespace[class_name].module_name}"
+    ] = ".".join(namespace[class_name].module_path)
 
     return add_fields, add_imports
 
