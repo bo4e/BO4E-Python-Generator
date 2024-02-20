@@ -223,7 +223,7 @@ def sql_reference_enum(
         add_imports[class_name + "ADD"]["List"] = "typing"
     add_imports[class_name + "ADD"][
         reference_name
-    ] = f"{namespace[reference_name].module_path[0]}.{namespace[reference_name].module_name}"
+    ] = ".".join(namespace[reference_name].module_path)
 
     return add_fields, add_imports
 
