@@ -73,7 +73,7 @@ def adapt_parse_for_sql(
     # save intermediate jsons
     for schema in namespace.values():
         file_path = (
-            input_directory / Path("intermediate") / Path(schema.module_path[0]) / Path(schema.class_name + ".json")
+            input_directory / "intermediate" / Path(*schema.module_path[:-1]) / schema.module_path[-1] + ".json"
         )
         file_path.parent.mkdir(parents=True, exist_ok=True)
         file_path.write_text(schema.schema_text, encoding="utf-8")
