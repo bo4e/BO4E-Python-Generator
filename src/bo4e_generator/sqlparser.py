@@ -73,7 +73,7 @@ def adapt_parse_for_sql(
     # save intermediate jsons
     for schema in namespace.values():
         file_path = (
-            input_directory / "intermediate" / Path(*schema.module_path[:-1]) / schema.module_path[-1] + ".json"
+            input_directory / "intermediate" / Path(*schema.module_path[:-1]) / (schema.module_path[-1] + ".json")
         )
         file_path.parent.mkdir(parents=True, exist_ok=True)
         file_path.write_text(schema.schema_text, encoding="utf-8")
@@ -221,9 +221,7 @@ def sql_reference_enum(
     if is_list:
         add_imports[class_name + "ADD"]["Column, ARRAY, Enum"] = "sqlalchemy"
         add_imports[class_name + "ADD"]["List"] = "typing"
-    add_imports[class_name + "ADD"][
-        reference_name
-    ] = ".".join(namespace[reference_name].module_path)
+    add_imports[class_name + "ADD"][reference_name] = ".".join(namespace[reference_name].module_path)
 
     return add_fields, add_imports
 
@@ -311,12 +309,8 @@ def create_sql_field(
             f' "lazy": "joined"}})'
         )
     # add_relation_import
-    add_imports[class_name][
-        reference_name
-    ] = ".".join(namespace[reference_name].module_path)
-    add_imports[reference_name][
-        class_name
-    ] = ".".join(namespace[class_name].module_path)
+    add_imports[class_name][reference_name] = ".".join(namespace[reference_name].module_path)
+    add_imports[reference_name][class_name] = ".".join(namespace[class_name].module_path)
 
     return add_fields, add_imports
 
