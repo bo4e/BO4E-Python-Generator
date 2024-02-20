@@ -47,7 +47,7 @@ def adapt_parse_for_sql(
     relation_imports: DefaultDict[str, dict[str, str]] = defaultdict(dict)  # added imports for relationship fields
 
     for schema_metadata in namespace.values():
-        if "enum" not in schema_metadata.module_path:
+        if schema_metadata.module_path[0] != "enum":
             # list of fields which will be replaced by modified versions
             del_fields = []
             for field, val in schema_metadata.schema_parsed["properties"].items():
