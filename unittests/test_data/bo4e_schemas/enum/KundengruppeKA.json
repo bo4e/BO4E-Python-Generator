@@ -1,7 +1,6 @@
 {
   "description": "Eine Aufzählung zur Einordnung für die Höhe der Konzessionsabgabe.",
   "title": "KundengruppeKA",
-  "type": "string",
   "enum": [
     "S_SCHWACHLAST",
     "S_TARIF_25000",
@@ -23,5 +22,6 @@
     "SONDER_TAS",
     "SONDER_TKS",
     "SONDER_TSS"
-  ]
+  ],
+  "type": "string"
 }

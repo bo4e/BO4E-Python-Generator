@@ -1,7 +1,6 @@
 {
-  "description": "Abbildung eines Tarifs mit regionaler Zuordnung von Preisen und Auf- und Abschlägen\n\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/bo/Tarif.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `Tarif JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/Hochfrequenz/BO4E-python/main/json_schemas/bo/Tarif.json>`_",
+  "description": "Abbildung eines Tarifs mit regionaler Zuordnung von Preisen und Auf- und Abschlägen\n\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/bo/Tarif.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `Tarif JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/Hochfrequenz/BO4E-Schemas/v202401.0.1-/src/bo4e_schemas/bo/Tarif.json>`_",
   "title": "Tarif",
-  "type": "object",
   "additionalProperties": true,
   "properties": {
     "_id": {
@@ -29,7 +28,7 @@
     },
     "_version": {
       "title": " Version",
-      "default": "0.6.1rc13",
+      "default": "v202401.0.1",
       "anyOf": [
         {
           "type": "string"
@@ -121,30 +120,15 @@
         }
       ]
     },
-    "externeReferenzen": {
-      "title": "Externereferenzen",
-      "default": null,
-      "anyOf": [
-        {
-          "type": "array",
-          "items": {
-            "$ref": "../com/ExterneReferenz.json#"
-          }
-        },
-        {
-          "type": "null"
-        }
-      ]
-    },
     "kundentypen": {
       "title": "Kundentypen",
       "default": null,
       "anyOf": [
         {
-          "type": "array",
           "items": {
             "$ref": "../enum/Kundentyp.json#"
-          }
+          },
+          "type": "array"
         },
         {
           "type": "null"
@@ -202,10 +186,10 @@
       "default": null,
       "anyOf": [
         {
-          "type": "array",
           "items": {
             "$ref": "../com/AufAbschlagRegional.json#"
-          }
+          },
+          "type": "array"
         },
         {
           "type": "null"
@@ -228,10 +212,10 @@
       "default": null,
       "anyOf": [
         {
-          "type": "array",
           "items": {
             "$ref": "../enum/Tarifmerkmal.json#"
-          }
+          },
+          "type": "array"
         },
         {
           "type": "null"
@@ -243,10 +227,10 @@
       "default": null,
       "anyOf": [
         {
-          "type": "array",
           "items": {
             "$ref": "../com/TarifpreispositionProOrt.json#"
-          }
+          },
+          "type": "array"
         },
         {
           "type": "null"
@@ -297,6 +281,22 @@
           "type": "null"
         }
       ]
+    },
+    "zusatzAttribute": {
+      "title": "Zusatzattribute",
+      "default": null,
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "../ZusatzAttribut.json#"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ]
     }
-  }
+  },
+  "type": "object"
 }

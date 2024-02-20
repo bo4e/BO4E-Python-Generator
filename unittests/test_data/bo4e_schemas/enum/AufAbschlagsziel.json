@@ -1,7 +1,6 @@
 {
   "description": "Der Preis, auf den sich ein Auf- oder Abschlag bezieht.",
   "title": "AufAbschlagsziel",
-  "type": "string",
   "enum": [
     "ARBEITSPREIS_EINTARIF",
     "ARBEITSPREIS_HT",
@@ -9,5 +8,6 @@
     "ARBEITSPREIS_HT_NT",
     "GRUNDPREIS",
     "GESAMTPREIS"
-  ]
+  ],
+  "type": "string"
 }

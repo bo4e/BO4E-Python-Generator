@@ -1,7 +1,6 @@
 {
   "description": "Voraussetzungen, die erfüllt sein müssen, damit dieser Tarif zur Anwendung kommen kann.",
   "title": "Voraussetzungen",
-  "type": "string",
   "enum": [
     "EINZUGSERMAECHTIGUNG",
     "ZEITPUNKT",
@@ -42,5 +41,6 @@
     "ZUSATZMODALITAET",
     "NACHWEIS_ZAHLUNGSFAEHIGKEIT",
     "UMSTELLUNG_ENERGIEART"
-  ]
+  ],
+  "type": "string"
 }

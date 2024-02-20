@@ -1,7 +1,6 @@
 {
   "description": "Aufschlüsselung der Preistypen in Tarifen.",
   "title": "Preistyp",
-  "type": "string",
   "enum": [
     "GRUNDPREIS",
     "ARBEITSPREIS_EINTARIF",
@@ -13,5 +12,6 @@
     "ENTGELT_ABRECHNUNG",
     "ENTGELT_MSB",
     "PROVISION"
-  ]
+  ],
+  "type": "string"
 }

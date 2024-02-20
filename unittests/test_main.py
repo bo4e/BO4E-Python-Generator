@@ -26,7 +26,7 @@ class TestMain:
                 "-p2",
                 "--clear-output",
                 "-t",
-                "v0.6.1-rc13",
+                "v202401.0.1",
             ],
         )
 
@@ -47,4 +47,4 @@ class TestMain:
 
         from .output.bo4e import __version__  # type: ignore[import-not-found]
 
-        assert __version__ == "0.6.1rc13"
+        assert __version__ == "202401.0.1"

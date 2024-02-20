@@ -1,7 +1,6 @@
 {
-  "description": "Variante des Preisblattmodells zur Abbildung der Preise für wahlfreie Dienstleistungen\n\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/bo/PreisblattDienstleistung.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `PreisblattDienstleistung JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/Hochfrequenz/BO4E-python/main/json_schemas/bo/PreisblattDienstleistung.json>`_",
+  "description": "Variante des Preisblattmodells zur Abbildung der Preise für wahlfreie Dienstleistungen\n\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/bo/PreisblattDienstleistung.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `PreisblattDienstleistung JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/Hochfrequenz/BO4E-Schemas/v202401.0.1-/src/bo4e_schemas/bo/PreisblattDienstleistung.json>`_",
   "title": "PreisblattDienstleistung",
-  "type": "object",
   "additionalProperties": true,
   "properties": {
     "_id": {
@@ -29,7 +28,7 @@
     },
     "_version": {
       "title": " Version",
-      "default": "0.6.1rc13",
+      "default": "v202401.0.1",
       "anyOf": [
         {
           "type": "string"
@@ -67,21 +66,6 @@
       "anyOf": [
         {
           "$ref": "../enum/Bilanzierungsmethode.json#"
-        },
-        {
-          "type": "null"
-        }
-      ]
-    },
-    "externeReferenzen": {
-      "title": "Externereferenzen",
-      "default": null,
-      "anyOf": [
-        {
-          "type": "array",
-          "items": {
-            "$ref": "../com/ExterneReferenz.json#"
-          }
         },
         {
           "type": "null"
@@ -126,10 +110,10 @@
       "default": null,
       "anyOf": [
         {
-          "type": "array",
           "items": {
             "$ref": "../enum/Dienstleistungstyp.json#"
-          }
+          },
+          "type": "array"
         },
         {
           "type": "null"
@@ -141,10 +125,10 @@
       "default": null,
       "anyOf": [
         {
-          "type": "array",
           "items": {
             "$ref": "../com/Preisposition.json#"
-          }
+          },
+          "type": "array"
         },
         {
           "type": "null"
@@ -172,6 +156,22 @@
           "type": "null"
         }
       ]
+    },
+    "zusatzAttribute": {
+      "title": "Zusatzattribute",
+      "default": null,
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "../ZusatzAttribut.json#"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ]
     }
-  }
+  },
+  "type": "object"
 }
