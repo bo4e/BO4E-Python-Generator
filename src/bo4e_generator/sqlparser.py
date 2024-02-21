@@ -51,6 +51,12 @@ def adapt_parse_for_sql(
             # list of fields which will be replaced by modified versions
             del_fields = []
             for field, val in schema_metadata.schema_parsed["properties"].items():
+                # type Any field
+                if "type" not in str(val):
+                    add_relation, relation_imports = create_sql_any(
+                        field, schema_metadata.class_name, namespace, add_relation, relation_imports
+                    )
+                    del_fields.append(field)
                 # modify decimal fields
                 if "number" in str(val) and "string" in str(val):
                     relation_imports[schema_metadata.class_name + "ADD"]["Decimal"] = "decimal"
@@ -311,6 +317,49 @@ def create_sql_field(
     # add_relation_import
     add_imports[class_name][reference_name] = ".".join(namespace[reference_name].module_path)
     add_imports[reference_name][class_name] = ".".join(namespace[class_name].module_path)
+
+    return add_fields, add_imports
+
+
+def create_sql_any(
+    field_name: str,
+    class_name: str,
+    namespace: dict[str, SchemaMetadata],
+    add_fields: DefaultDict[str, dict[str, Any]],
+    add_imports: DefaultDict[str, dict[str, str]],
+) -> tuple[DefaultDict[str, dict[str, Any]], DefaultDict[str, dict[str, str]]]:
+    """
+    Parses field with type any, and converts it to SQLModel field., cf.
+    https://github.com/tiangolo/sqlmodel/issues/178
+    """
+    field_from_json = namespace[class_name].schema_parsed["properties"][field_name]
+    default = None
+    is_optional = ""
+    is_list = False
+    if "default" in field_from_json and field_from_json["default"] != "null" and field_from_json["default"] is not None:
+        default = f'{field_from_json["default"]}'
+    if "anyOf" in field_from_json:
+        for item in field_from_json["anyOf"]:
+            if "type" in item:
+                if item["type"] == "null":
+                    is_optional = "| None"
+                if item["type"] == "array":
+                    is_list = True
+    # get rid of underscore in fieldname
+    field_name = field_name.lstrip("_")
+
+    add_imports[class_name + "ADD"]["Any"] = "typing"
+    add_imports[class_name + "ADD"]["Column, PickleType"] = "sqlmodel"
+    if is_list:
+        add_imports[class_name + "ADD"]["List"] = "typing"
+        add_imports[class_name + "ADD"]["ARRAY"] = "sqlalchemy"
+        add_fields[class_name][f"{field_name}"] = (
+            f"List[Any]" + is_optional + f" = Field({default}," f" sa_column=Column( ARRAY( PickleType)))"
+        )
+    else:
+        add_fields[class_name][f"{field_name}"] = (
+            f"Any" + is_optional + f" = Field({default}," f" sa_column=Column(  PickleType))"
+        )
 
     return add_fields, add_imports
 
