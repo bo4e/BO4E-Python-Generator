@@ -354,11 +354,11 @@ def create_sql_any(
         add_imports[class_name + "ADD"]["List"] = "typing"
         add_imports[class_name + "ADD"]["ARRAY"] = "sqlalchemy"
         add_fields[class_name][f"{field_name}"] = (
-            f"List[Any]" + is_optional + f" = Field({default}," f" sa_column=Column( ARRAY( PickleType)))"
+            "List[Any]" + is_optional + f" = Field({default}," f" sa_column=Column( ARRAY( PickleType)))"
         )
     else:
         add_fields[class_name][f"{field_name}"] = (
-            f"Any" + is_optional + f" = Field({default}," f" sa_column=Column(  PickleType))"
+            "Any" + is_optional + f" = Field({default}," f" sa_column=Column(  PickleType))"
         )
 
     return add_fields, add_imports
