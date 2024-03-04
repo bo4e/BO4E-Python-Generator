@@ -6,7 +6,7 @@
 #
 bleach==6.0.0
     # via readme-renderer
-build==1.0.3
+build==1.1.1
     # via -r dev_requirements/requirements-packaging.in
 certifi==2023.7.22
     # via requests
@@ -21,9 +21,7 @@ docutils==0.20.1
 idna==3.4
     # via requests
 importlib-metadata==6.7.0
-    # via
-    #   keyring
-    #   twine
+    # via twine
 jaraco-classes==3.2.3
     # via keyring
 jeepney==0.8.0
