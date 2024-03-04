@@ -70,11 +70,11 @@ class TestSQLParser:
         add_relation: DefaultDict[str, dict[str, Any]] = defaultdict(dict)
         relation_imports: DefaultDict[str, dict[str, str]] = defaultdict(dict)
         add_relation, relation_imports = create_sql_field(
-            "externeReferenzen", CLASSNAME, namespace, add_relation, relation_imports
+            "zusatzAttribute", CLASSNAME, namespace, add_relation, relation_imports
         )
         links = add_relation["MANY"]
         file_contents = write_many_many_links(links)
-        keywords = ["AngebotexterneReferenzenLink", "angebot_id", "externereferenz_id"]
+        keywords = ["AngebotzusatzAttributeLink", "angebot_id", "zusatzattribut_id"]
         assert all(substring in file_contents for substring in keywords)
 
     def test_format_code(self) -> None:

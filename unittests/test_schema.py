@@ -23,4 +23,4 @@ class TestSchema:
         os.chdir(BASE_DIR)
         namespace = get_namespace(INPUT_DIR)
         version = get_version(None, namespace)
-        assert version == "0.6.1rc13"
+        assert version == "v202401.0.1"
