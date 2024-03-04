@@ -29,13 +29,6 @@ def remove_pydantic_field_import(python_code: str) -> str:
     return python_code
 
 
-def make_decimal(field: str) -> str:
-    """
-    turns Union type float or str into Decimal type. For older Schema versions.
-    """
-    return re.sub(r"float \| str", "Decimal", field)
-
-
 def adapt_parse_for_sql(
     input_directory: Path, namespace: dict[str, SchemaMetadata]
 ) -> tuple[dict[str, SchemaMetadata], dict[str, Any], Path, dict[str, str]]:

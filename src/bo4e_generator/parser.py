@@ -20,12 +20,7 @@ from datamodel_code_generator.parser.jsonschema import JsonSchemaParser
 from datamodel_code_generator.types import DataType, StrictTypes, Types
 
 from bo4e_generator.schema import SchemaMetadata
-from bo4e_generator.sqlparser import (
-    adapt_parse_for_sql,
-    make_decimal,
-    remove_pydantic_field_import,
-    write_many_many_links,
-)
+from bo4e_generator.sqlparser import adapt_parse_for_sql, remove_pydantic_field_import, write_many_many_links
 
 
 class OutputType(str, Enum):
@@ -257,7 +252,6 @@ def parse_bo4e_schemas(
         if output_type is OutputType.SQL_MODEL.name:
             # remove pydantic field
             python_code = remove_pydantic_field_import(python_code)
-            python_code = make_decimal(python_code)
 
         file_contents[schema_metadata.output_file] = python_code
 
