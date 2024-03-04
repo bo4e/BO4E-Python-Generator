@@ -1,7 +1,6 @@
 {
   "description": "Auflistung der Erzeugungsarten von Energie.",
   "title": "Erzeugungsart",
-  "type": "string",
   "enum": [
     "FOSSIL",
     "KWK",
@@ -17,5 +16,6 @@
     "SONSTIGE_EEG",
     "BIOGAS",
     "KLIMANEUTRALES_GAS"
-  ]
+  ],
+  "type": "string"
 }

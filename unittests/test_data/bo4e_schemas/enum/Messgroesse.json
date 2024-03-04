@@ -1,7 +1,6 @@
 {
   "description": "Gibt die physikalische Größe an, die gemessen wurde.",
   "title": "Messgroesse",
-  "type": "string",
   "enum": [
     "STROM",
     "SPANNUNG",
@@ -16,5 +15,6 @@
     "GRADTZAGSZAHLEN",
     "VOLUMENSTROM",
     "PREISE"
-  ]
+  ],
+  "type": "string"
 }

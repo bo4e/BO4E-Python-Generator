@@ -1,7 +1,6 @@
 {
   "description": "Gibt den Status eines Angebotes an.",
   "title": "Angebotsstatus",
-  "type": "string",
   "enum": [
     "KONZEPTION",
     "UNVERBINDLICH",
@@ -12,5 +11,6 @@
     "NACHGEFASST",
     "AUSSTEHEND",
     "ERLEDIGT"
-  ]
+  ],
+  "type": "string"
 }

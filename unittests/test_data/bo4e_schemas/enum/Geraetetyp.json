@@ -1,7 +1,6 @@
 {
   "description": "Auflistung möglicher abzurechnender Gerätetypen.",
   "title": "Geraetetyp",
-  "type": "string",
   "enum": [
     "MULTIPLEXANLAGE",
     "PAUSCHALANLAGE",
@@ -49,5 +48,6 @@
     "SYSTEM_MU",
     "TEMPERATUR_MU",
     "ZUSTANDS_MU"
-  ]
+  ],
+  "type": "string"
 }

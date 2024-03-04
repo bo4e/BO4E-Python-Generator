@@ -1,7 +1,6 @@
 {
   "description": "Auflistung möglicher übergreifenden Geräteklassen.",
   "title": "Geraeteklasse",
-  "type": "string",
   "enum": [
     "WANDLER",
     "KOMMUNIKATIONSEINRICHTUNG",
@@ -10,5 +9,6 @@
     "SMARTMETER_GATEWAY",
     "STEUERBOX",
     "ZAEHLEINRICHTUNG"
-  ]
+  ],
+  "type": "string"
 }

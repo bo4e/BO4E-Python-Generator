@@ -1,7 +1,6 @@
 {
   "description": "Auflistung der Typen von Endkunden. Daraus kann das Verbrauchsprofil abgeleitet werden.",
   "title": "Kundentyp",
-  "type": "string",
   "enum": [
     "GEWERBE",
     "PRIVAT",
@@ -18,5 +17,6 @@
     "SPEICHERHEIZUNG",
     "UNTERBR_EINRICHTUNG",
     "WAERMEPUMPE"
-  ]
+  ],
+  "type": "string"
 }

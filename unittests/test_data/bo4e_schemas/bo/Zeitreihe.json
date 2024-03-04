@@ -1,7 +1,6 @@
 {
-  "description": "Abbildung einer allgemeinen Zeitreihe mit einem Wertvektor.\nDie Werte können mit wahlfreier zeitlicher Distanz im Vektor abgelegt sein.\n\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/bo/Zeitreihe.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `Zeitreihe JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/Hochfrequenz/BO4E-python/main/json_schemas/bo/Zeitreihe.json>`_",
+  "description": "Abbildung einer allgemeinen Zeitreihe mit einem Wertvektor.\nDie Werte können mit wahlfreier zeitlicher Distanz im Vektor abgelegt sein.\n\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/bo/Zeitreihe.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `Zeitreihe JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/Hochfrequenz/BO4E-Schemas/v202401.0.1-/src/bo4e_schemas/bo/Zeitreihe.json>`_",
   "title": "Zeitreihe",
-  "type": "object",
   "additionalProperties": true,
   "properties": {
     "_id": {
@@ -62,21 +61,6 @@
         }
       ]
     },
-    "externeReferenzen": {
-      "title": "Externereferenzen",
-      "default": null,
-      "anyOf": [
-        {
-          "type": "array",
-          "items": {
-            "$ref": "../com/ExterneReferenz.json#"
-          }
-        },
-        {
-          "type": "null"
-        }
-      ]
-    },
     "medium": {
       "default": null,
       "anyOf": [
@@ -127,10 +111,10 @@
       "default": null,
       "anyOf": [
         {
-          "type": "array",
           "items": {
             "$ref": "../com/Zeitreihenwert.json#"
-          }
+          },
+          "type": "array"
         },
         {
           "type": "null"
@@ -147,6 +131,22 @@
           "type": "null"
         }
       ]
+    },
+    "zusatzAttribute": {
+      "title": "Zusatzattribute",
+      "default": null,
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "../ZusatzAttribut.json#"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ]
     }
-  }
+  },
+  "type": "object"
 }

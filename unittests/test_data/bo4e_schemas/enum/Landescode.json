@@ -1,6 +1,5 @@
 {
   "title": "Landescode",
-  "type": "string",
   "enum": [
     "AF",
     "AX",
@@ -252,5 +251,6 @@
     "YE",
     "ZM",
     "ZW"
-  ]
+  ],
+  "type": "string"
 }

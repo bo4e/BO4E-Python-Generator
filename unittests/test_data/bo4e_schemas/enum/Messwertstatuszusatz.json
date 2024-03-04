@@ -1,7 +1,6 @@
 {
   "description": "Aufzählung von zusätzlichen Informationen zum Status, beispielsweise in Lastgängen oder Zählwerkständen.",
   "title": "Messwertstatuszusatz",
-  "type": "string",
   "enum": [
     "Z84_LEERSTAND",
     "Z85_REALERZAEHLERUEBERLAUFGEPRUEFT",
@@ -42,5 +41,6 @@
     "ZB0_STOERUNG_DEFEKTMESSEINRICHTUNG",
     "ZB9_AENDERUNGTARIFSCHALTZEITEN",
     "ZG3_UMSTELLUNGGASQUALITAET"
-  ]
+  ],
+  "type": "string"
 }

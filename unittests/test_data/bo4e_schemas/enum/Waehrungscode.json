@@ -1,7 +1,6 @@
 {
   "description": "Aufzählung der Währungscodes.",
   "title": "Waehrungscode",
-  "type": "string",
   "enum": [
     "AED",
     "AFN",
@@ -185,5 +184,6 @@
     "ZAR",
     "ZMW",
     "ZWL"
-  ]
+  ],
+  "type": "string"
 }

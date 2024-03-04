@@ -1,7 +1,6 @@
 {
   "description": "",
   "title": "Leistungstyp",
-  "type": "string",
   "enum": [
     "ARBEITSPREIS_WIRKARBEIT",
     "LEISTUNGSPREIS_WIRKLEISTUNG",
@@ -35,5 +34,6 @@
     "MESSPREIS",
     "SONSTIGER_PREIS",
     "DIENSTLEISTUNG"
-  ]
+  ],
+  "type": "string"
 }

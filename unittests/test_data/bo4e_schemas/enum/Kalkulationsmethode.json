@@ -1,7 +1,6 @@
 {
   "description": "Auflistung der verschiedenen Berechnungsmethoden für ein Preisblatt.",
   "title": "Kalkulationsmethode",
-  "type": "string",
   "enum": [
     "STUFEN",
     "ZONEN",
@@ -19,5 +18,6 @@
     "LP_TRANSPORT_ODER_VERTEILNETZ_ORTSVERTEILNETZ_SIGMOID",
     "FUNKTIONEN",
     "VERBRAUCH_UEBER_SLP_GRENZE_FUNKTIONSBEZOGEN_WEITERE_BERECHNUNG_ALS_LGK"
-  ]
+  ],
+  "type": "string"
 }
