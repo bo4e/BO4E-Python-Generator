@@ -5,8 +5,10 @@ Since the used tool doesn't support all features we need, we monkey patch some f
 
 import itertools
 import re
+import shutil
+from enum import Enum
 from pathlib import Path
-from typing import Sequence, Tuple, Type
+from typing import Any, Sequence, Type
 
 import datamodel_code_generator.parser.base
 import datamodel_code_generator.reference
@@ -18,6 +20,17 @@ from datamodel_code_generator.parser.jsonschema import JsonSchemaParser
 from datamodel_code_generator.types import DataType, StrictTypes, Types
 
 from bo4e_generator.schema import SchemaMetadata
+from bo4e_generator.sqlparser import adapt_parse_for_sql, remove_pydantic_field_import, write_many_many_links
+
+
+class OutputType(str, Enum):
+    """
+    enum to specify the output type
+    """
+
+    PYDANTIC_V2 = "pydantic_v2"
+    PYDANTIC_V1 = "pydantic_v1"
+    SQL_MODEL = "sql_model"
 
 
 def get_bo4e_data_model_types(
@@ -94,7 +107,7 @@ def monkey_patch_relative_import():
     Anyway, this monkey patch changes the imports to "from ..enum.typ import Typ" which resolves the issue.
     """
 
-    def relative(current_module: str, reference: str) -> Tuple[str, str]:
+    def relative(current_module: str, reference: str) -> tuple[str, str]:
         """Find relative module path."""
 
         current_module_path = current_module.split(".") if current_module else []
@@ -170,18 +183,29 @@ def remove_future_import(python_code: str) -> str:
 
 
 def parse_bo4e_schemas(
-    input_directory: Path, namespace: dict[str, SchemaMetadata], pydantic_v1: bool = False
+    input_directory: Path, namespace: dict[str, SchemaMetadata], output_type: OutputType
 ) -> dict[Path, str]:
     """
     Generate all BO4E schemas from the given input directory. Returns all file contents as dictionary:
     file path (relative to arbitrary output directory) => file content.
     """
     data_model_types = get_bo4e_data_model_types(
-        DataModelType.PydanticBaseModel if pydantic_v1 else DataModelType.PydanticV2BaseModel,
+        (
+            DataModelType.PydanticBaseModel
+            if output_type is OutputType.PYDANTIC_V1.name
+            else DataModelType.PydanticV2BaseModel
+        ),
         target_python_version=PythonVersion.PY_311,
         namespace=namespace,
     )
     monkey_patch_relative_import()
+
+    additional_arguments: dict[str, Any] = {}
+
+    if output_type is OutputType.SQL_MODEL.name:
+        # adapt input for SQLModel classes
+        namespace, additional_arguments, input_directory, links = adapt_parse_for_sql(input_directory, namespace)
+
     parser = JsonSchemaParser(
         input_directory,
         data_model_type=data_model_types.data_model,
@@ -189,7 +213,7 @@ def parse_bo4e_schemas(
         data_model_field_type=data_model_types.field_model,
         data_type_manager_type=data_model_types.data_type_manager,
         dump_resolve_reference_action=data_model_types.dump_resolve_reference_action,
-        # use_annotated=not pydantic_v1,
+        # use_annotated=OutputType is not OutputType.PYDANTIC_V1.name,
         use_double_quotes=True,
         use_schema_description=True,
         use_subclass_enum=True,
@@ -204,6 +228,7 @@ def parse_bo4e_schemas(
         allow_extra_fields=False,
         allow_population_by_field_name=True,
         use_default_kwarg=True,
+        **additional_arguments,
     )
     parse_result = parser.parse()
     if not isinstance(parse_result, dict):
@@ -223,8 +248,19 @@ def parse_bo4e_schemas(
                 # Somehow, mypy is not good enough to understand the instance-check above
             )
 
-        file_contents[schema_metadata.output_file] = remove_future_import(parse_result.pop(module_path).body)
+        python_code = remove_future_import(parse_result.pop(module_path).body)
+        if output_type is OutputType.SQL_MODEL.name:
+            # remove pydantic field
+            python_code = remove_pydantic_field_import(python_code)
+
+        file_contents[schema_metadata.output_file] = python_code
 
     file_contents.update({Path(*module_path): result.body for module_path, result in parse_result.items()})
+
+    # add SQLModel classes for many-to-many relationships in "many.py"
+    if output_type is OutputType.SQL_MODEL.name:
+        shutil.rmtree(input_directory)  # remove intermediate dir of schemas
+        if links:
+            file_contents[Path("many.py")] = write_many_many_links(links)
 
     return file_contents

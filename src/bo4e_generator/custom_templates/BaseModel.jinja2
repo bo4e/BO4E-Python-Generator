@@ -1,0 +1,65 @@
+{%- if SQL and SQL['imports']%}
+{%- for class_name, module_path in SQL['imports'].items() %}
+{%- if module_path[:4] == 'enum'%}
+from borm.models.{{ module_path }} import {{ class_name }}
+{%- elif module_path == 'Link'%}
+from borm.models.many import {{ class_name }}
+{%- else %}
+from {{ module_path }} import {{ class_name }}
+{%- endif %}
+{%- endfor -%}
+{%- endif %}
+{%- if SQL and SQL['relationimports']%}
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+{%- for class_name, module_path in SQL['relationimports'].items() %}
+    from borm.models.{{ module_path }} import {{ class_name }}
+{%- endfor -%}
+{%- endif %}
+{% for decorator in decorators -%}
+{{ decorator }}
+{% endfor -%}
+class {{ class_name }}({% if base_class %}{{ base_class }}{% endif %}{% if SQL %}, table=True{% endif %}):{% if comment is defined %}  # {{ comment }}{% endif %}
+{%- if description %}
+    """
+    {{ description | indent(4) }}
+    """
+{%- endif %}
+{%- if not fields and not description %}
+    pass
+{%- endif %}
+{%- if config %}
+{%- filter indent(4) %}
+{% include 'Config.jinja2' %}
+{%- endfilter %}
+{%- endif %}
+{%- for field in fields -%}
+    {%- if not field.annotated and field.field %}
+    {{ field.name }}: {{ field.type_hint }} = {{ field.field }}
+    {%- else %}
+    {%- if field.annotated %}
+    {{ field.name }}: {{ field.annotated }}
+    {%- else %}
+    {{ field.name }}: {{ field.type_hint }}
+    {%- endif %}
+    {%- if not (field.required or (field.represented_default == 'None' and field.strip_default_none))
+            %} = {{ field.represented_default }}
+    {%- endif -%}
+    {%- endif %}
+    {%- if field.docstring %}
+    """
+    {{ field.docstring | indent(4) }}
+    """
+    {%- endif %}
+{%- for method in methods -%}
+    {{ method }}
+{%- endfor -%}
+{%- endfor -%}
+{%- if SQL and SQL['primary'] %}
+    {{ SQL['primary'] }}{%- endif %}
+{%- if SQL and SQL['relations'] %}
+{%- for field_name, field_str in SQL['relations'].items() %}
+    {{ field_name }}: {{ field_str }}
+
+{%- endfor -%}
+{%- endif %}
