@@ -219,6 +219,7 @@ def parse_bo4e_schemas(
         use_subclass_enum=True,
         use_standard_collections=True,
         use_union_operator=True,
+        use_field_description=True,
         set_default_enum_member=True,
         snake_case_field=True,
         field_constraints=True,
