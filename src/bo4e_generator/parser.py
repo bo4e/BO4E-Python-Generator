@@ -229,6 +229,7 @@ def parse_bo4e_schemas(
         allow_extra_fields=False,
         allow_population_by_field_name=True,
         use_default_kwarg=True,
+        strict_nullable=True,
         **additional_arguments,
     )
     parse_result = parser.parse()
