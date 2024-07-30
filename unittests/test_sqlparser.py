@@ -81,11 +81,11 @@ class TestSQLParser:
         unsorted = (
             "from sqlmodel import Field, Relationship, SQLModel\n"
             "from typing import TYPE_CHECKING, List\n"
-            "from borm.models.enum.anrede import Anrede"
+            "from ibims.models.enum.anrede import Anrede"
         )
         resorted = (
             "from typing import TYPE_CHECKING, List\n\n"
             "from sqlmodel import Field, Relationship, SQLModel\n\n"
-            "from borm.models.enum.anrede import Anrede\n"
+            "from ibims.models.enum.anrede import Anrede\n"
         )
         assert resorted == format_code(unsorted)
