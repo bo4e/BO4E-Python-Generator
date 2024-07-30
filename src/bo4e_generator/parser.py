@@ -91,7 +91,7 @@ def get_bo4e_data_model_types(
                 def type_hint(self) -> str:
                     """Return the type hint for the data type."""
                     type_ = super().type_hint
-                    if self.reference and type_ in namespace:
+                    if self.reference and type_ in namespace and namespace[type_].module_path[0] != "enum":
                         type_ = f'"{type_}"'
                     return type_
 
