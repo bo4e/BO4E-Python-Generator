@@ -42,14 +42,14 @@ def adapt_parse_for_sql(
     for schema_metadata in namespace.values():
         if schema_metadata.module_path[0] != "enum":
             # list of fields which will be replaced by modified versions
-            del_fields = []
+            del_fields = set()
             for field, val in schema_metadata.schema_parsed["properties"].items():
                 # type Any field
                 if "type" not in str(val):
                     add_relation, relation_imports = create_sql_any(
                         field, schema_metadata.class_name, namespace, add_relation, relation_imports
                     )
-                    del_fields.append(field)
+                    del_fields.add(field)
                 # modify decimal fields
                 if "number" in str(val) and "string" in str(val):
                     relation_imports[schema_metadata.class_name + "ADD"]["Decimal"] = "decimal"
@@ -57,12 +57,12 @@ def adapt_parse_for_sql(
                     add_relation, relation_imports = create_sql_list(
                         field, schema_metadata.class_name, namespace, add_relation, relation_imports
                     )
-                    del_fields.append(field)
+                    del_fields.add(field)
                 if "$ref" in str(val):  # or "array" in str(val):
                     add_relation, relation_imports = create_sql_field(
                         field, schema_metadata.class_name, namespace, add_relation, relation_imports
                     )
-                    del_fields.append(field)
+                    del_fields.add(field)
             for field in del_fields:
                 del schema_metadata.schema_parsed["properties"][field]
             # store the reduced version. The modified fields will be added in the BaseModel.jinja2 schema
@@ -374,4 +374,4 @@ def format_code(code: str) -> str:
     perform isort and black on code
     """
     code = black.format_str(code, mode=black.Mode())
-    return isort.code(code, known_local_folder=["borm"])
+    return isort.code(code, known_local_folder=["ibims"])
