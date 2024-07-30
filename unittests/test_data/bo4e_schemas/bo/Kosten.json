@@ -1,9 +1,10 @@
 {
-  "description": "Dieses BO wird zur Übertagung von hierarchischen Kostenstrukturen verwendet.\nDie Kosten werden dabei in Kostenblöcke und diese wiederum in Kostenpositionen strukturiert.\n\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/bo/Kosten.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `Kosten JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/Hochfrequenz/BO4E-Schemas/v202401.0.1-/src/bo4e_schemas/bo/Kosten.json>`_",
+  "description": "Dieses BO wird zur Übertagung von hierarchischen Kostenstrukturen verwendet.\nDie Kosten werden dabei in Kostenblöcke und diese wiederum in Kostenpositionen strukturiert.\n\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/bo/Kosten.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `Kosten JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/BO4E/BO4E-Schemas/v202401.3.2/src/bo4e_schemas/bo/Kosten.json>`_",
   "title": "Kosten",
   "additionalProperties": true,
   "properties": {
     "_id": {
+      "description": "Hier können IDs anderer Systeme hinterlegt werden (z.B. eine SAP-GP-Nummer oder eine GUID)",
       "title": " Id",
       "default": null,
       "anyOf": [
@@ -16,6 +17,7 @@
       ]
     },
     "_typ": {
+      "description": "Klasse der Kosten, beispielsweise Fremdkosten",
       "default": "KOSTEN",
       "anyOf": [
         {
@@ -27,8 +29,9 @@
       ]
     },
     "_version": {
+      "description": "Version der BO-Struktur aka \"fachliche Versionierung\"",
       "title": " Version",
-      "default": "v202401.0.1",
+      "default": "v202401.3.2",
       "anyOf": [
         {
           "type": "string"
@@ -39,6 +42,7 @@
       ]
     },
     "gueltigkeit": {
+      "description": "Für diesen Zeitraum wurden die Kosten ermittelt",
       "default": null,
       "anyOf": [
         {
@@ -50,6 +54,7 @@
       ]
     },
     "kostenbloecke": {
+      "description": "In Kostenblöcken werden Kostenpositionen zusammengefasst. Beispiele: Netzkosten, Umlagen, Steuern etc",
       "title": "Kostenbloecke",
       "default": null,
       "anyOf": [
@@ -65,6 +70,7 @@
       ]
     },
     "kostenklasse": {
+      "description": "Klasse der Kosten, beispielsweise Fremdkosten",
       "default": null,
       "anyOf": [
         {
@@ -76,6 +82,7 @@
       ]
     },
     "summeKosten": {
+      "description": "Die Gesamtsumme über alle Kostenblöcke und -positionen",
       "title": "Summekosten",
       "default": null,
       "anyOf": [

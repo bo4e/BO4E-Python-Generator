@@ -1,9 +1,10 @@
 {
-  "description": "Modell für die Abbildung von Rechnungen und Netznutzungsrechnungen im Kontext der Energiewirtschaft;\n\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/bo/Rechnung.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `Rechnung JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/Hochfrequenz/BO4E-Schemas/v202401.0.1-/src/bo4e_schemas/bo/Rechnung.json>`_",
+  "description": "Modell für die Abbildung von Rechnungen und Netznutzungsrechnungen im Kontext der Energiewirtschaft;\n\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/bo/Rechnung.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `Rechnung JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/BO4E/BO4E-Schemas/v202401.3.2/src/bo4e_schemas/bo/Rechnung.json>`_",
   "title": "Rechnung",
   "additionalProperties": true,
   "properties": {
     "_id": {
+      "description": "Hier können IDs anderer Systeme hinterlegt werden (z.B. eine SAP-GP-Nummer oder eine GUID)",
       "title": " Id",
       "default": null,
       "anyOf": [
@@ -16,6 +17,7 @@
       ]
     },
     "_typ": {
+      "description": "Der Zeitraum der zugrunde liegenden Lieferung zur Rechnung",
       "default": "RECHNUNG",
       "anyOf": [
         {
@@ -27,8 +29,9 @@
       ]
     },
     "_version": {
+      "description": "Version der BO-Struktur aka \"fachliche Versionierung\"",
       "title": " Version",
-      "default": "v202401.0.1",
+      "default": "v202401.3.2",
       "anyOf": [
         {
           "type": "string"
@@ -39,6 +42,7 @@
       ]
     },
     "faelligkeitsdatum": {
+      "description": "Zu diesem Datum ist die Zahlung fällig",
       "title": "Faelligkeitsdatum",
       "default": null,
       "anyOf": [
@@ -52,6 +56,7 @@
       ]
     },
     "gesamtbrutto": {
+      "description": "Die Summe aus Netto- und Steuerbetrag",
       "default": null,
       "anyOf": [
         {
@@ -63,6 +68,7 @@
       ]
     },
     "gesamtnetto": {
+      "description": "Die Summe der Nettobeträge der Rechnungsteile",
       "default": null,
       "anyOf": [
         {
@@ -74,6 +80,7 @@
       ]
     },
     "gesamtsteuer": {
+      "description": "Die Summe der Steuerbeträge der Rechnungsteile",
       "default": null,
       "anyOf": [
         {
@@ -85,6 +92,7 @@
       ]
     },
     "istOriginal": {
+      "description": "Kennzeichen, ob es sich um ein Original (true) oder eine Kopie handelt (false)",
       "title": "Istoriginal",
       "default": null,
       "anyOf": [
@@ -97,6 +105,7 @@
       ]
     },
     "istSimuliert": {
+      "description": "Kennzeichen, ob es sich um eine simulierte Rechnung, z.B. zur Rechnungsprüfung handelt",
       "title": "Istsimuliert",
       "default": null,
       "anyOf": [
@@ -109,6 +118,7 @@
       ]
     },
     "istStorno": {
+      "description": "Eine im Verwendungskontext eindeutige Nummer für die Rechnung",
       "title": "Iststorno",
       "default": null,
       "anyOf": [
@@ -121,6 +131,7 @@
       ]
     },
     "marktlokation": {
+      "description": "Marktlokation, auf die sich die Rechnung bezieht",
       "default": null,
       "anyOf": [
         {
@@ -132,6 +143,7 @@
       ]
     },
     "messlokation": {
+      "description": "Messlokation, auf die sich die Rechnung bezieht",
       "default": null,
       "anyOf": [
         {
@@ -143,6 +155,7 @@
       ]
     },
     "netznutzungrechnungsart": {
+      "description": "Aus der INVOIC entnommen, befüllt wenn es sich um eine Netznutzungsrechnung handelt",
       "default": null,
       "anyOf": [
         {
@@ -154,6 +167,7 @@
       ]
     },
     "netznutzungrechnungstyp": {
+      "description": "Aus der INVOIC entnommen, befüllt wenn es sich um eine Netznutzungsrechnung handelt",
       "default": null,
       "anyOf": [
         {
@@ -165,6 +179,7 @@
       ]
     },
     "originalRechnungsnummer": {
+      "description": "Im Falle einer Stornorechnung (storno = true) steht hier die Rechnungsnummer der stornierten Rechnung",
       "title": "Originalrechnungsnummer",
       "default": null,
       "anyOf": [
@@ -177,6 +192,7 @@
       ]
     },
     "rabattBrutto": {
+      "description": "Gesamtrabatt auf den Bruttobetrag",
       "default": null,
       "anyOf": [
         {
@@ -188,6 +204,7 @@
       ]
     },
     "rechnungsdatum": {
+      "description": "Ausstellungsdatum der Rechnung",
       "title": "Rechnungsdatum",
       "default": null,
       "anyOf": [
@@ -201,6 +218,7 @@
       ]
     },
     "rechnungsempfaenger": {
+      "description": "Der Aussteller der Rechnung, die Rollencodenummer kennt man über den im Geschäftspartner verlinkten Marktteilnehmer",
       "default": null,
       "anyOf": [
         {
@@ -212,6 +230,7 @@
       ]
     },
     "rechnungsersteller": {
+      "description": "Der Aussteller der Rechnung, die Rollencodenummer kennt man über den im Geschäftspartner verlinkten Marktteilnehmer",
       "default": null,
       "anyOf": [
         {
@@ -223,6 +242,7 @@
       ]
     },
     "rechnungsnummer": {
+      "description": "Eine im Verwendungskontext eindeutige Nummer für die Rechnung",
       "title": "Rechnungsnummer",
       "default": null,
       "anyOf": [
@@ -235,6 +255,7 @@
       ]
     },
     "rechnungsperiode": {
+      "description": "Der Zeitraum der zugrunde liegenden Lieferung zur Rechnung",
       "default": null,
       "anyOf": [
         {
@@ -246,6 +267,7 @@
       ]
     },
     "rechnungspositionen": {
+      "description": "Die Rechnungspositionen",
       "title": "Rechnungspositionen",
       "default": null,
       "anyOf": [
@@ -261,6 +283,7 @@
       ]
     },
     "rechnungsstatus": {
+      "description": "Status der Rechnung zur Kennzeichnung des Bearbeitungsstandes",
       "default": null,
       "anyOf": [
         {
@@ -272,6 +295,7 @@
       ]
     },
     "rechnungstitel": {
+      "description": "Bezeichnung für die vorliegende Rechnung",
       "title": "Rechnungstitel",
       "default": null,
       "anyOf": [
@@ -284,6 +308,7 @@
       ]
     },
     "rechnungstyp": {
+      "description": "Ein kontextbezogender Rechnungstyp, z.B. Netznutzungsrechnung",
       "default": null,
       "anyOf": [
         {
@@ -295,6 +320,7 @@
       ]
     },
     "sparte": {
+      "description": "Sparte (Strom, Gas ...) für die die Rechnung ausgestellt ist",
       "default": null,
       "anyOf": [
         {
@@ -306,6 +332,7 @@
       ]
     },
     "steuerbetraege": {
+      "description": "Sparte (Strom, Gas ...) für die die Rechnung ausgestellt ist",
       "title": "Steuerbetraege",
       "default": null,
       "anyOf": [
@@ -321,6 +348,7 @@
       ]
     },
     "vorausgezahlt": {
+      "description": "Die Summe evtl. vorausgezahlter Beträge, z.B. Abschläge. Angabe als Bruttowert",
       "default": null,
       "anyOf": [
         {
@@ -332,6 +360,7 @@
       ]
     },
     "zuZahlen": {
+      "description": "Der zu zahlende Betrag, der sich aus (gesamtbrutto - vorausbezahlt - rabattBrutto) ergibt",
       "default": null,
       "anyOf": [
         {

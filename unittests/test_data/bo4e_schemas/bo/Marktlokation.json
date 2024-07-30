@@ -1,9 +1,10 @@
 {
-  "description": "Object containing information about a Marktlokation\n\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/bo/Marktlokation.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `Marktlokation JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/Hochfrequenz/BO4E-Schemas/v202401.0.1-/src/bo4e_schemas/bo/Marktlokation.json>`_",
+  "description": "Object containing information about a Marktlokation\n\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/bo/Marktlokation.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `Marktlokation JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/BO4E/BO4E-Schemas/v202401.3.2/src/bo4e_schemas/bo/Marktlokation.json>`_",
   "title": "Marktlokation",
   "additionalProperties": true,
   "properties": {
     "_id": {
+      "description": "Hier können IDs anderer Systeme hinterlegt werden (z.B. eine SAP-GP-Nummer oder eine GUID)",
       "title": " Id",
       "default": null,
       "anyOf": [
@@ -16,6 +17,7 @@
       ]
     },
     "_typ": {
+      "description": "Identifikationsnummer einer Marktlokation, an der Energie entweder verbraucht, oder erzeugt wird.",
       "default": "MARKTLOKATION",
       "anyOf": [
         {
@@ -27,8 +29,9 @@
       ]
     },
     "_version": {
+      "description": "Version der BO-Struktur aka \"fachliche Versionierung\"",
       "title": " Version",
-      "default": "v202401.0.1",
+      "default": "v202401.3.2",
       "anyOf": [
         {
           "type": "string"
@@ -39,6 +42,7 @@
       ]
     },
     "bilanzierungsgebiet": {
+      "description": "Bilanzierungsgebiet, dem das Netzgebiet zugeordnet ist - im Falle eines Strom Netzes",
       "title": "Bilanzierungsgebiet",
       "default": null,
       "anyOf": [
@@ -51,6 +55,7 @@
       ]
     },
     "bilanzierungsmethode": {
+      "description": "Die Bilanzierungsmethode, RLM oder SLP",
       "default": null,
       "anyOf": [
         {
@@ -62,6 +67,7 @@
       ]
     },
     "endkunde": {
+      "description": "Geschäftspartner, dem diese Marktlokation gehört",
       "default": null,
       "anyOf": [
         {
@@ -73,6 +79,7 @@
       ]
     },
     "energierichtung": {
+      "description": "Kennzeichnung, ob Energie eingespeist oder entnommen (ausgespeist) wird",
       "default": null,
       "anyOf": [
         {
@@ -84,6 +91,7 @@
       ]
     },
     "gasqualitaet": {
+      "description": "Die Gasqualität in diesem Netzgebiet. H-Gas oder L-Gas. Im Falle eines Gas-Netzes",
       "default": null,
       "anyOf": [
         {
@@ -95,6 +103,7 @@
       ]
     },
     "gebietstyp": {
+      "description": "Typ des Netzgebietes, z.B. Verteilnetz",
       "default": null,
       "anyOf": [
         {
@@ -117,6 +126,7 @@
       ]
     },
     "grundversorgercodenr": {
+      "description": "Codenummer des Grundversorgers, der für diese Marktlokation zuständig ist",
       "title": "Grundversorgercodenr",
       "default": null,
       "anyOf": [
@@ -129,6 +139,7 @@
       ]
     },
     "istUnterbrechbar": {
+      "description": "Gibt an, ob es sich um eine unterbrechbare Belieferung handelt",
       "title": "Istunterbrechbar",
       "default": null,
       "anyOf": [
@@ -152,6 +163,7 @@
       ]
     },
     "kundengruppen": {
+      "description": "Kundengruppen der Marktlokation",
       "title": "Kundengruppen",
       "default": null,
       "anyOf": [
@@ -167,6 +179,7 @@
       ]
     },
     "lokationsadresse": {
+      "description": "Die Adresse, an der die Energie-Lieferung oder -Einspeisung erfolgt",
       "default": null,
       "anyOf": [
         {
@@ -177,7 +190,50 @@
         }
       ]
     },
+    "lokationsbuendelObjektcode": {
+      "description": "Lokationsbuendel Code, der die Funktion dieses BOs an der Lokationsbuendelstruktur beschreibt.",
+      "title": "Lokationsbuendelobjektcode",
+      "default": null,
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "lokationszuordnungen": {
+      "description": "Lokationszuordnung, um bspw. die zugehörigen Messlokationen anzugeben",
+      "title": "Lokationszuordnungen",
+      "default": null,
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "Lokationszuordnung.json#"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "marktgebiet": {
+      "description": "für Gas. Code vom EIC, https://www.entsog.eu/data/data-portal/codes-list",
+      "title": "Marktgebiet",
+      "default": null,
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
     "marktlokationsId": {
+      "description": "Identifikationsnummer einer Marktlokation, an der Energie entweder verbraucht, oder erzeugt wird.",
       "title": "Marktlokationsid",
       "default": null,
       "anyOf": [
@@ -190,6 +246,7 @@
       ]
     },
     "netzbetreibercodenr": {
+      "description": "Codenummer des Netzbetreibers, an dessen Netz diese Marktlokation angeschlossen ist.",
       "title": "Netzbetreibercodenr",
       "default": null,
       "anyOf": [
@@ -213,6 +270,7 @@
       ]
     },
     "netzgebietsnr": {
+      "description": "Die ID des Gebietes in der ene't-Datenbank",
       "title": "Netzgebietsnr",
       "default": null,
       "anyOf": [
@@ -224,7 +282,21 @@
         }
       ]
     },
+    "regelzone": {
+      "description": "Kundengruppen der Marktlokation",
+      "title": "Regelzone",
+      "default": null,
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
     "sparte": {
+      "description": "Sparte der Marktlokation, z.B. Gas oder Strom",
       "default": null,
       "anyOf": [
         {
@@ -236,6 +308,7 @@
       ]
     },
     "verbrauchsart": {
+      "description": "Verbrauchsart der Marktlokation.",
       "default": null,
       "anyOf": [
         {
@@ -246,11 +319,47 @@
         }
       ]
     },
-    "zugehoerigeMesslokation": {
+    "verbrauchsmengen": {
+      "title": "Verbrauchsmengen",
       "default": null,
       "anyOf": [
         {
-          "$ref": "../com/Messlokationszuordnung.json#"
+          "items": {
+            "$ref": "../com/Verbrauch.json#"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "zaehlwerke": {
+      "description": "für Gas. Code vom EIC, https://www.entsog.eu/data/data-portal/codes-list",
+      "title": "Zaehlwerke",
+      "default": null,
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "../com/Zaehlwerk.json#"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "zaehlwerkeDerBeteiligtenMarktrolle": {
+      "description": "Lokationszuordnung, um bspw. die zugehörigen Messlokationen anzugeben",
+      "title": "Zaehlwerkederbeteiligtenmarktrolle",
+      "default": null,
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "../com/Zaehlwerk.json#"
+          },
+          "type": "array"
         },
         {
           "type": "null"

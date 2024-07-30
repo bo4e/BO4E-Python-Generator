@@ -22,7 +22,10 @@
     "HALBJAHR",
     "JAHR",
     "PROZENT",
-    "KVAR"
+    "KVAR",
+    "KWHK",
+    "VAR",
+    "VARH"
   ],
   "type": "string"
 }

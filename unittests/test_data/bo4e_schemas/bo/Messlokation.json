@@ -1,9 +1,10 @@
 {
-  "description": "Object containing information about a Messlokation\n\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/bo/Messlokation.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `Messlokation JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/Hochfrequenz/BO4E-Schemas/v202401.0.1-/src/bo4e_schemas/bo/Messlokation.json>`_",
+  "description": "Object containing information about a Messlokation\n\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/bo/Messlokation.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `Messlokation JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/BO4E/BO4E-Schemas/v202401.3.2/src/bo4e_schemas/bo/Messlokation.json>`_",
   "title": "Messlokation",
   "additionalProperties": true,
   "properties": {
     "_id": {
+      "description": "Hier können IDs anderer Systeme hinterlegt werden (z.B. eine SAP-GP-Nummer oder eine GUID)",
       "title": " Id",
       "default": null,
       "anyOf": [
@@ -16,6 +17,7 @@
       ]
     },
     "_typ": {
+      "description": "Die Messlokations-Identifikation; Das ist die frühere Zählpunktbezeichnung",
       "default": "MESSLOKATION",
       "anyOf": [
         {
@@ -27,8 +29,9 @@
       ]
     },
     "_version": {
+      "description": "Version der BO-Struktur aka \"fachliche Versionierung\"",
       "title": " Version",
-      "default": "v202401.0.1",
+      "default": "v202401.3.2",
       "anyOf": [
         {
           "type": "string"
@@ -50,6 +53,7 @@
       ]
     },
     "geraete": {
+      "description": "Liste der Geräte, die zu dieser Messstelle gehört",
       "title": "Geraete",
       "default": null,
       "anyOf": [
@@ -89,10 +93,40 @@
       ]
     },
     "katasterinformation": {
+      "description": "Lokationszuordnung, um bspw. die zugehörigen Marktlokationen anzugeben",
       "default": null,
       "anyOf": [
         {
           "$ref": "../com/Katasteradresse.json#"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "lokationsbuendelObjektcode": {
+      "description": "Lokationsbuendel Code, der die Funktion dieses BOs an der Lokationsbuendelstruktur beschreibt.",
+      "title": "Lokationsbuendelobjektcode",
+      "default": null,
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "lokationszuordnungen": {
+      "description": "Lokationszuordnung, um bspw. die zugehörigen Marktlokationen anzugeben",
+      "title": "Lokationszuordnungen",
+      "default": null,
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "Lokationszuordnung.json#"
+          },
+          "type": "array"
         },
         {
           "type": "null"
@@ -111,6 +145,7 @@
       ]
     },
     "messdienstleistung": {
+      "description": "Liste der Messdienstleistungen, die zu dieser Messstelle gehört",
       "title": "Messdienstleistung",
       "default": null,
       "anyOf": [
@@ -126,6 +161,7 @@
       ]
     },
     "messgebietnr": {
+      "description": "Die Nummer des Messgebietes in der ene't-Datenbank",
       "title": "Messgebietnr",
       "default": null,
       "anyOf": [
@@ -138,6 +174,7 @@
       ]
     },
     "messlokationsId": {
+      "description": "Die Messlokations-Identifikation; Das ist die frühere Zählpunktbezeichnung",
       "title": "Messlokationsid",
       "default": null,
       "anyOf": [
@@ -150,6 +187,7 @@
       ]
     },
     "messlokationszaehler": {
+      "description": "Zähler, die zu dieser Messlokation gehören",
       "title": "Messlokationszaehler",
       "default": null,
       "anyOf": [
@@ -165,6 +203,7 @@
       ]
     },
     "netzebeneMessung": {
+      "description": "Spannungsebene der Messung",
       "default": null,
       "anyOf": [
         {
@@ -176,6 +215,7 @@
       ]
     },
     "sparte": {
+      "description": "Sparte der Messlokation, z.B. Gas oder Strom",
       "default": null,
       "anyOf": [
         {

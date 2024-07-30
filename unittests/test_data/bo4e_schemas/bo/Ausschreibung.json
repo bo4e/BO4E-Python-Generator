@@ -1,9 +1,10 @@
 {
-  "description": "Das BO Ausschreibung dient zur detaillierten Darstellung von ausgeschriebenen Energiemengen in der Energiewirtschaft\n\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/bo/Ausschreibung.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `Ausschreibung JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/Hochfrequenz/BO4E-Schemas/v202401.0.1-/src/bo4e_schemas/bo/Ausschreibung.json>`_",
+  "description": "Das BO Ausschreibung dient zur detaillierten Darstellung von ausgeschriebenen Energiemengen in der Energiewirtschaft\n\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/bo/Ausschreibung.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `Ausschreibung JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/BO4E/BO4E-Schemas/v202401.3.2/src/bo4e_schemas/bo/Ausschreibung.json>`_",
   "title": "Ausschreibung",
   "additionalProperties": true,
   "properties": {
     "_id": {
+      "description": "Hier können IDs anderer Systeme hinterlegt werden (z.B. eine SAP-GP-Nummer oder eine GUID)",
       "title": " Id",
       "default": null,
       "anyOf": [
@@ -16,6 +17,7 @@
       ]
     },
     "_typ": {
+      "description": "Vom Herausgeber der Ausschreibung vergebene eindeutige Nummer",
       "default": "AUSSCHREIBUNG",
       "anyOf": [
         {
@@ -27,8 +29,9 @@
       ]
     },
     "_version": {
+      "description": "Version der BO-Struktur aka \"fachliche Versionierung\"",
       "title": " Version",
-      "default": "v202401.0.1",
+      "default": "v202401.3.2",
       "anyOf": [
         {
           "type": "string"
@@ -61,6 +64,7 @@
       ]
     },
     "ausschreibungportal": {
+      "description": "Aufzählung der unterstützten Ausschreibungsportale",
       "default": null,
       "anyOf": [
         {
@@ -72,6 +76,7 @@
       ]
     },
     "ausschreibungsnummer": {
+      "description": "Vom Herausgeber der Ausschreibung vergebene eindeutige Nummer",
       "title": "Ausschreibungsnummer",
       "default": null,
       "anyOf": [
@@ -84,6 +89,7 @@
       ]
     },
     "ausschreibungsstatus": {
+      "description": "Bezeichnungen für die Ausschreibungsphasen",
       "default": null,
       "anyOf": [
         {
@@ -95,6 +101,7 @@
       ]
     },
     "ausschreibungstyp": {
+      "description": "Aufzählung für die Typisierung von Ausschreibungen",
       "default": null,
       "anyOf": [
         {
@@ -106,6 +113,7 @@
       ]
     },
     "bindefrist": {
+      "description": "Die einzelnen Lose, aus denen sich die Ausschreibung zusammensetzt",
       "default": null,
       "anyOf": [
         {
@@ -117,6 +125,7 @@
       ]
     },
     "istKostenpflichtig": {
+      "description": "Kennzeichen, ob die Ausschreibung kostenpflichtig ist",
       "title": "Istkostenpflichtig",
       "default": null,
       "anyOf": [
@@ -129,6 +138,7 @@
       ]
     },
     "lose": {
+      "description": "Die einzelnen Lose, aus denen sich die Ausschreibung zusammensetzt",
       "title": "Lose",
       "default": null,
       "anyOf": [
@@ -144,6 +154,7 @@
       ]
     },
     "veroeffentlichungszeitpunkt": {
+      "description": "Gibt den Veröffentlichungszeitpunkt der Ausschreibung an",
       "title": "Veroeffentlichungszeitpunkt",
       "default": null,
       "anyOf": [
@@ -157,6 +168,7 @@
       ]
     },
     "webseite": {
+      "description": "Internetseite, auf der die Ausschreibung veröffentlicht wurde (falls vorhanden)",
       "title": "Webseite",
       "default": null,
       "anyOf": [
