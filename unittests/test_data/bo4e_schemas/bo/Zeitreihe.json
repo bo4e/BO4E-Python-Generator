@@ -1,9 +1,10 @@
 {
-  "description": "Abbildung einer allgemeinen Zeitreihe mit einem Wertvektor.\nDie Werte können mit wahlfreier zeitlicher Distanz im Vektor abgelegt sein.\n\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/bo/Zeitreihe.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `Zeitreihe JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/Hochfrequenz/BO4E-Schemas/v202401.0.1-/src/bo4e_schemas/bo/Zeitreihe.json>`_",
+  "description": "Abbildung einer allgemeinen Zeitreihe mit einem Wertvektor.\nDie Werte können mit wahlfreier zeitlicher Distanz im Vektor abgelegt sein.\n\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/bo/Zeitreihe.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `Zeitreihe JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/BO4E/BO4E-Schemas/v202401.3.2/src/bo4e_schemas/bo/Zeitreihe.json>`_",
   "title": "Zeitreihe",
   "additionalProperties": true,
   "properties": {
     "_id": {
+      "description": "Hier können IDs anderer Systeme hinterlegt werden (z.B. eine SAP-GP-Nummer oder eine GUID)",
       "title": " Id",
       "default": null,
       "anyOf": [
@@ -16,6 +17,7 @@
       ]
     },
     "_typ": {
+      "description": "Bezeichnung für die Zeitreihe",
       "default": "ZEITREIHE",
       "anyOf": [
         {
@@ -27,6 +29,7 @@
       ]
     },
     "beschreibung": {
+      "description": "Beschreibt die Verwendung der Zeitreihe",
       "title": "Beschreibung",
       "default": null,
       "anyOf": [
@@ -39,6 +42,7 @@
       ]
     },
     "bezeichnung": {
+      "description": "Bezeichnung für die Zeitreihe",
       "title": "Bezeichnung",
       "default": null,
       "anyOf": [
@@ -51,6 +55,7 @@
       ]
     },
     "einheit": {
+      "description": "Alle Werte in der Tabelle haben die Einheit, die hier angegeben ist",
       "default": null,
       "anyOf": [
         {
@@ -62,6 +67,7 @@
       ]
     },
     "medium": {
+      "description": "Medium, das gemessen wurde (z.B. Wasser, Dampf, Strom, Gas)",
       "default": null,
       "anyOf": [
         {
@@ -73,6 +79,7 @@
       ]
     },
     "messart": {
+      "description": "Beschreibt die Art der Messung (z.B. aktueller Wert, mittlerer Wert, maximaler Wert)",
       "default": null,
       "anyOf": [
         {
@@ -84,6 +91,7 @@
       ]
     },
     "messgroesse": {
+      "description": "Beschreibt, was gemessen wurde (z.B. Strom, Spannung, Wirkleistung, Scheinleistung)",
       "default": null,
       "anyOf": [
         {
@@ -95,6 +103,7 @@
       ]
     },
     "version": {
+      "description": "Version der Zeitreihe",
       "title": "Version",
       "default": null,
       "anyOf": [
@@ -107,6 +116,7 @@
       ]
     },
     "werte": {
+      "description": "Hier liegen jeweils die Werte",
       "title": "Werte",
       "default": null,
       "anyOf": [
@@ -122,6 +132,7 @@
       ]
     },
     "wertherkunft": {
+      "description": "Kennzeichnung, wie die Werte entstanden sind, z.B. durch Messung",
       "default": null,
       "anyOf": [
         {

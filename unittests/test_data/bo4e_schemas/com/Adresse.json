@@ -1,9 +1,10 @@
 {
-  "description": "Contains an address that can be used for most purposes.\n\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/com/Adresse.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `Adresse JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/Hochfrequenz/BO4E-Schemas/v202401.0.1-/src/bo4e_schemas/com/Adresse.json>`_",
+  "description": "Contains an address that can be used for most purposes.\n\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/com/Adresse.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `Adresse JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/BO4E/BO4E-Schemas/v202401.3.2/src/bo4e_schemas/com/Adresse.json>`_",
   "title": "Adresse",
   "additionalProperties": true,
   "properties": {
     "_id": {
+      "description": "Eine generische ID, die für eigene Zwecke genutzt werden kann.\nZ.B. könnten hier UUIDs aus einer Datenbank stehen oder URLs zu einem Backend-System.",
       "title": " Id",
       "default": null,
       "anyOf": [
@@ -16,8 +17,9 @@
       ]
     },
     "_version": {
+      "description": "Version der BO-Struktur aka \"fachliche Versionierung\"",
       "title": " Version",
-      "default": "v202401.0.1",
+      "default": "v202401.3.2",
       "anyOf": [
         {
           "type": "string"
@@ -28,6 +30,7 @@
       ]
     },
     "adresszusatz": {
+      "description": "Zusatzhinweis zum Auffinden der Adresse, z.B. \"3. Stock linke Wohnung\"",
       "title": "Adresszusatz",
       "default": null,
       "anyOf": [
@@ -40,6 +43,7 @@
       ]
     },
     "coErgaenzung": {
+      "description": "Im Falle einer c/o-Adresse steht in diesem Attribut die Anrede. Z.B. \"c/o Veronica Hauptmieterin\"",
       "title": "Coergaenzung",
       "default": null,
       "anyOf": [
@@ -52,6 +56,7 @@
       ]
     },
     "hausnummer": {
+      "description": "Hausnummer inkl. Zusatz; z.B. \"3\", \"4a\"",
       "title": "Hausnummer",
       "default": null,
       "anyOf": [
@@ -64,6 +69,7 @@
       ]
     },
     "landescode": {
+      "description": "Offizieller ISO-Landescode",
       "default": "DE",
       "anyOf": [
         {
@@ -75,6 +81,7 @@
       ]
     },
     "ort": {
+      "description": "Bezeichnung der Stadt; z.B. \"Hückelhoven\"",
       "title": "Ort",
       "default": null,
       "anyOf": [
@@ -87,6 +94,7 @@
       ]
     },
     "ortsteil": {
+      "description": "Bezeichnung des Ortsteils; z.B. \"Mitte\"",
       "title": "Ortsteil",
       "default": null,
       "anyOf": [
@@ -99,6 +107,7 @@
       ]
     },
     "postfach": {
+      "description": "Im Falle einer Postfachadresse das Postfach; Damit werden Straße und Hausnummer nicht berücksichtigt",
       "title": "Postfach",
       "default": null,
       "anyOf": [
@@ -111,6 +120,7 @@
       ]
     },
     "postleitzahl": {
+      "description": "Die Postleitzahl; z.B: \"41836\"",
       "title": "Postleitzahl",
       "default": null,
       "anyOf": [
@@ -123,6 +133,7 @@
       ]
     },
     "strasse": {
+      "description": "Bezeichnung der Straße; z.B. \"Weserstraße\"",
       "title": "Strasse",
       "default": null,
       "anyOf": [

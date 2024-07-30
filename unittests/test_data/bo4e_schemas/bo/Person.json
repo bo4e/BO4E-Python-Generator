@@ -1,9 +1,10 @@
 {
-  "description": "Object containing information about a Ansprechpartner\n\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/bo/Ansprechpartner.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `Ansprechpartner JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/Hochfrequenz/BO4E-Schemas/v202401.0.1-/src/bo4e_schemas/bo/Ansprechpartner.json>`_",
-  "title": "Ansprechpartner",
+  "description": "Object containing information about a Person\n\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/bo/Person.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `Person JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/BO4E/BO4E-Schemas/v202401.3.2/src/bo4e_schemas/bo/Person.json>`_",
+  "title": "Person",
   "additionalProperties": true,
   "properties": {
     "_id": {
+      "description": "Hier können IDs anderer Systeme hinterlegt werden (z.B. eine SAP-GP-Nummer oder eine GUID)",
       "title": " Id",
       "default": null,
       "anyOf": [
@@ -16,7 +17,8 @@
       ]
     },
     "_typ": {
-      "default": "ANSPRECHPARTNER",
+      "description": "Mögliche Anrede der Person",
+      "default": "PERSON",
       "anyOf": [
         {
           "$ref": "../enum/Typ.json#"
@@ -27,8 +29,9 @@
       ]
     },
     "_version": {
+      "description": "Version der BO-Struktur aka \"fachliche Versionierung\"",
       "title": " Version",
-      "default": "v202401.0.1",
+      "default": "v202401.3.2",
       "anyOf": [
         {
           "type": "string"
@@ -39,6 +42,7 @@
       ]
     },
     "adresse": {
+      "description": "Adresse der Person, falls diese von der Adresse des Geschäftspartners abweicht",
       "default": null,
       "anyOf": [
         {
@@ -50,6 +54,7 @@
       ]
     },
     "anrede": {
+      "description": "Mögliche Anrede der Person",
       "default": null,
       "anyOf": [
         {
@@ -60,23 +65,14 @@
         }
       ]
     },
-    "eMailAdresse": {
-      "title": "Emailadresse",
+    "geburtsdatum": {
+      "description": "Geburtsdatum der Person",
+      "title": "Geburtsdatum",
       "default": null,
       "anyOf": [
         {
-          "type": "string"
-        },
-        {
-          "type": "null"
-        }
-      ]
-    },
-    "geschaeftspartner": {
-      "default": null,
-      "anyOf": [
-        {
-          "$ref": "Geschaeftspartner.json#"
+          "type": "string",
+          "format": "date-time"
         },
         {
           "type": "null"
@@ -96,6 +92,7 @@
       ]
     },
     "kommentar": {
+      "description": "Weitere Informationen zur Person",
       "title": "Kommentar",
       "default": null,
       "anyOf": [
@@ -107,7 +104,24 @@
         }
       ]
     },
+    "kontaktwege": {
+      "description": "Kontaktwege der Person",
+      "title": "Kontaktwege",
+      "default": null,
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "../com/Kontaktweg.json#"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
     "nachname": {
+      "description": "Nachname (Familienname) der Person",
       "title": "Nachname",
       "default": null,
       "anyOf": [
@@ -119,18 +133,8 @@
         }
       ]
     },
-    "rufnummer": {
-      "default": null,
-      "anyOf": [
-        {
-          "$ref": "../com/Rufnummer.json#"
-        },
-        {
-          "type": "null"
-        }
-      ]
-    },
     "titel": {
+      "description": "Möglicher Titel der Person",
       "default": null,
       "anyOf": [
         {
@@ -142,6 +146,7 @@
       ]
     },
     "vorname": {
+      "description": "Vorname der Person",
       "title": "Vorname",
       "default": null,
       "anyOf": [
@@ -168,11 +173,16 @@
         }
       ]
     },
-    "zustaendigkeit": {
+    "zustaendigkeiten": {
+      "description": "Liste der Abteilungen und Zuständigkeiten der Person",
+      "title": "Zustaendigkeiten",
       "default": null,
       "anyOf": [
         {
-          "$ref": "../com/Zustaendigkeit.json#"
+          "items": {
+            "$ref": "../com/Zustaendigkeit.json#"
+          },
+          "type": "array"
         },
         {
           "type": "null"

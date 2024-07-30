@@ -13,12 +13,14 @@ from typing import Any, Sequence, Type
 import datamodel_code_generator.parser.base
 import datamodel_code_generator.reference
 from datamodel_code_generator import DataModelType, PythonVersion
+from datamodel_code_generator.format import CodeFormatter
 from datamodel_code_generator.imports import IMPORT_DATETIME
 from datamodel_code_generator.model import DataModelSet, get_data_model_types
 from datamodel_code_generator.model.enum import Enum as _Enum
 from datamodel_code_generator.parser.jsonschema import JsonSchemaParser
 from datamodel_code_generator.types import DataType, StrictTypes, Types
 
+from bo4e_generator.imports import monkey_patch_imports
 from bo4e_generator.schema import SchemaMetadata
 from bo4e_generator.sqlparser import adapt_parse_for_sql, remove_pydantic_field_import, write_many_many_links
 
@@ -75,6 +77,26 @@ def get_bo4e_data_model_types(
         featured in pydantic v2. Instead, the standard datetime type will be used.
         """
 
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+
+            class DataTypeWithForwardRef(self.data_type):
+                """
+                Override the data type to replace explicit type references with forward references if the type
+                is present in namespace.
+                Also, the AwareDateTime import is replaced with the standard datetime import.
+                """
+
+                @property
+                def type_hint(self) -> str:
+                    """Return the type hint for the data type."""
+                    type_ = super().type_hint
+                    if self.reference and type_ in namespace:
+                        type_ = f'"{type_}"'
+                    return type_
+
+            self.data_type = DataTypeWithForwardRef
+
         def type_map_factory(
             self,
             data_type: Type[DataType],
@@ -85,6 +107,8 @@ def get_bo4e_data_model_types(
             result = super().type_map_factory(data_type, strict_types, pattern_key)
             result[Types.date_time] = data_type.from_import(IMPORT_DATETIME)
             return result
+
+    monkey_patch_imports(namespace)
 
     return DataModelSet(
         data_model=BO4EDataModel,
@@ -172,6 +196,16 @@ def bo4e_init_file_content(namespace: dict[str, SchemaMetadata], version: str) -
         init_file_content += f"from .{'.'.join(schema_metadata.module_path)} import {schema_metadata.class_name}\n"
     init_file_content += "\nfrom .__version__ import __version__\n"
 
+    init_file_content += (
+        "from pydantic import BaseModel as _PydanticBaseModel\n"
+        "\n\n# Resolve all ForwardReferences. This design prevents circular import errors.\n"
+        "for cls_name in __all__:\n"
+        "    cls = globals().get(cls_name, None)\n"
+        "    if cls is None or not isinstance(cls, type) or not issubclass(cls, _PydanticBaseModel):\n"
+        "        continue\n"
+        "    cls.model_rebuild(force=True)\n"
+    )
+
     return init_file_content
 
 
@@ -180,6 +214,13 @@ def remove_future_import(python_code: str) -> str:
     Remove the future import from the generated code.
     """
     return re.sub(r"from __future__ import annotations\n\n", "", python_code)
+
+
+def remove_model_rebuild(python_code: str, class_name: str) -> str:
+    """
+    Remove the model_rebuild call from the generated code.
+    """
+    return re.sub(rf"{class_name}\.model_rebuild\(\)\n", "", python_code)
 
 
 def parse_bo4e_schemas(
@@ -218,7 +259,7 @@ def parse_bo4e_schemas(
         use_schema_description=True,
         use_subclass_enum=True,
         use_standard_collections=True,
-        use_union_operator=True,
+        use_union_operator=False,
         use_field_description=True,
         set_default_enum_member=True,
         snake_case_field=True,
@@ -251,6 +292,7 @@ def parse_bo4e_schemas(
             )
 
         python_code = remove_future_import(parse_result.pop(module_path).body)
+        python_code = remove_model_rebuild(python_code, schema_metadata.class_name)
         if output_type is OutputType.SQL_MODEL.name:
             # remove pydantic field
             python_code = remove_pydantic_field_import(python_code)
@@ -266,3 +308,18 @@ def parse_bo4e_schemas(
             file_contents[Path("many.py")] = write_many_many_links(links)
 
     return file_contents
+
+
+def get_formatter() -> CodeFormatter:
+    """
+    Returns a formatter to apply black and isort
+    """
+    return CodeFormatter(
+        PythonVersion.PY_311,
+        None,
+        None,
+        skip_string_normalization=False,
+        known_third_party=None,
+        custom_formatters=None,
+        custom_formatters_kwargs=None,
+    )

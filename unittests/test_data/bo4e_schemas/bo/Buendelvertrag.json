@@ -1,9 +1,10 @@
 {
-  "description": "Abbildung eines Bündelvertrags.\nEs handelt sich hierbei um eine Liste von Einzelverträgen, die in einem Vertragsobjekt gebündelt sind.\n\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/bo/Buendelvertrag.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `Buendelvertrag JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/Hochfrequenz/BO4E-Schemas/v202401.0.1-/src/bo4e_schemas/bo/Buendelvertrag.json>`_",
+  "description": "Abbildung eines Bündelvertrags.\nEs handelt sich hierbei um eine Liste von Einzelverträgen, die in einem Vertragsobjekt gebündelt sind.\n\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/bo/Buendelvertrag.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `Buendelvertrag JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/BO4E/BO4E-Schemas/v202401.3.2/src/bo4e_schemas/bo/Buendelvertrag.json>`_",
   "title": "Buendelvertrag",
   "additionalProperties": true,
   "properties": {
     "_id": {
+      "description": "Hier können IDs anderer Systeme hinterlegt werden (z.B. eine SAP-GP-Nummer oder eine GUID)",
       "title": " Id",
       "default": null,
       "anyOf": [
@@ -16,6 +17,7 @@
       ]
     },
     "_typ": {
+      "description": "Der Typ des Geschäftsobjektes",
       "default": "BUENDELVERTRAG",
       "anyOf": [
         {
@@ -27,8 +29,9 @@
       ]
     },
     "_version": {
+      "description": "Version der BO-Struktur aka \"fachliche Versionierung\"",
       "title": " Version",
-      "default": "v202401.0.1",
+      "default": "v202401.3.2",
       "anyOf": [
         {
           "type": "string"
@@ -39,6 +42,7 @@
       ]
     },
     "beschreibung": {
+      "description": "Beschreibung zum Vertrag",
       "title": "Beschreibung",
       "default": null,
       "anyOf": [
@@ -51,6 +55,7 @@
       ]
     },
     "einzelvertraege": {
+      "description": "Die Liste mit den Einzelverträgen zu den Abnahmestellen",
       "title": "Einzelvertraege",
       "default": null,
       "anyOf": [
@@ -66,6 +71,7 @@
       ]
     },
     "sparte": {
+      "description": "Unterscheidungsmöglichkeiten für die Sparte",
       "default": null,
       "anyOf": [
         {
@@ -77,6 +83,7 @@
       ]
     },
     "unterzeichnervp1": {
+      "description": "Unterzeichner des Vertragspartners1",
       "title": "Unterzeichnervp1",
       "default": null,
       "anyOf": [
@@ -92,6 +99,7 @@
       ]
     },
     "unterzeichnervp2": {
+      "description": "Unterzeichner des Vertragspartners2",
       "title": "Unterzeichnervp2",
       "default": null,
       "anyOf": [
@@ -107,6 +115,7 @@
       ]
     },
     "vertragsart": {
+      "description": "Hier ist festgelegt, um welche Art von Vertrag es sich handelt. Z.B. Netznutzungvertrag",
       "default": null,
       "anyOf": [
         {
@@ -118,6 +127,7 @@
       ]
     },
     "vertragsbeginn": {
+      "description": "Gibt an, wann der Vertrag beginnt (inklusiv)",
       "title": "Vertragsbeginn",
       "default": null,
       "anyOf": [
@@ -131,6 +141,7 @@
       ]
     },
     "vertragsende": {
+      "description": "Gibt an, wann der Vertrag (voraussichtlich) endet oder beendet wurde (exklusiv)",
       "title": "Vertragsende",
       "default": null,
       "anyOf": [
@@ -144,6 +155,7 @@
       ]
     },
     "vertragskonditionen": {
+      "description": "Festlegungen zu Laufzeiten und Kündigungsfristen",
       "title": "Vertragskonditionen",
       "default": null,
       "anyOf": [
@@ -159,6 +171,7 @@
       ]
     },
     "vertragsnummer": {
+      "description": "Eine im Verwendungskontext eindeutige Nummer für den Vertrag",
       "title": "Vertragsnummer",
       "default": null,
       "anyOf": [
@@ -171,6 +184,7 @@
       ]
     },
     "vertragspartner1": {
+      "description": "Beispiel: \"Vertrag zwischen Vertagspartner 1 ...\"",
       "default": null,
       "anyOf": [
         {
@@ -182,6 +196,7 @@
       ]
     },
     "vertragspartner2": {
+      "description": "Beispiel \"Vertrag zwischen Vertagspartner 1 und Vertragspartner 2\"",
       "default": null,
       "anyOf": [
         {
@@ -193,6 +208,7 @@
       ]
     },
     "vertragsstatus": {
+      "description": "Gibt den Status des Vertrages an",
       "default": null,
       "anyOf": [
         {

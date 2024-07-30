@@ -2,20 +2,19 @@
   "description": "Diese Rollen kann ein Marktteilnehmer einnehmen.",
   "title": "Marktrolle",
   "enum": [
-    "NB",
-    "LF",
-    "MSB",
-    "DL",
+    "BTR",
+    "BIKO",
     "BKV",
-    "BKO",
-    "UENB",
-    "KUNDE_SELBST_NN",
-    "MGV",
+    "DP",
     "EIV",
+    "ESA",
+    "KN",
+    "LF",
+    "MGV",
+    "MSB",
+    "NB",
     "RB",
-    "KUNDE",
-    "INTERESSENT",
-    "BTR"
+    "UENB"
   ],
   "type": "string"
 }

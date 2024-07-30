@@ -1,9 +1,10 @@
 {
-  "description": "Die Komponente Ausschreibungsdetail wird verwendet um die Informationen zu einer Abnahmestelle innerhalb eines\nAusschreibungsloses abzubilden.\n\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/com/Ausschreibungsdetail.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `Ausschreibungsdetail JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/Hochfrequenz/BO4E-Schemas/v202401.0.1-/src/bo4e_schemas/com/Ausschreibungsdetail.json>`_",
+  "description": "Die Komponente Ausschreibungsdetail wird verwendet um die Informationen zu einer Abnahmestelle innerhalb eines\nAusschreibungsloses abzubilden.\n\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/com/Ausschreibungsdetail.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `Ausschreibungsdetail JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/BO4E/BO4E-Schemas/v202401.3.2/src/bo4e_schemas/com/Ausschreibungsdetail.json>`_",
   "title": "Ausschreibungsdetail",
   "additionalProperties": true,
   "properties": {
     "_id": {
+      "description": "Eine generische ID, die für eigene Zwecke genutzt werden kann.\nZ.B. könnten hier UUIDs aus einer Datenbank stehen oder URLs zu einem Backend-System.",
       "title": " Id",
       "default": null,
       "anyOf": [
@@ -16,8 +17,9 @@
       ]
     },
     "_version": {
+      "description": "Version der BO-Struktur aka \"fachliche Versionierung\"",
       "title": " Version",
-      "default": "v202401.0.1",
+      "default": "v202401.3.2",
       "anyOf": [
         {
           "type": "string"
@@ -28,6 +30,7 @@
       ]
     },
     "istLastgangVorhanden": {
+      "description": "Zeigt an, ob es zu der Marktlokation einen Lastgang gibt.\nFalls ja, kann dieser abgerufen werden und daraus die Verbrauchswerte ermittelt werden",
       "title": "Istlastgangvorhanden",
       "default": null,
       "anyOf": [
@@ -40,6 +43,7 @@
       ]
     },
     "kunde": {
+      "description": "Bezeichnung des Kunden, der die Marktlokation nutzt",
       "title": "Kunde",
       "default": null,
       "anyOf": [
@@ -52,6 +56,7 @@
       ]
     },
     "lieferzeitraum": {
+      "description": "Angefragter Zeitraum für die ausgeschriebene Belieferung",
       "default": null,
       "anyOf": [
         {
@@ -63,6 +68,7 @@
       ]
     },
     "marktlokationsId": {
+      "description": "Identifikation einer ausgeschriebenen Marktlokation",
       "title": "Marktlokationsid",
       "default": null,
       "anyOf": [
@@ -75,6 +81,7 @@
       ]
     },
     "marktlokationsadresse": {
+      "description": "Die Adresse an der die Marktlokation sich befindet",
       "default": null,
       "anyOf": [
         {
@@ -86,6 +93,7 @@
       ]
     },
     "marktlokationsbezeichnung": {
+      "description": "Bezeichnung für die Lokation, z.B. 'Zentraler Einkauf, Hamburg'",
       "title": "Marktlokationsbezeichnung",
       "default": null,
       "anyOf": [
@@ -98,6 +106,7 @@
       ]
     },
     "netzbetreiber": {
+      "description": "Bezeichnung des zuständigen Netzbetreibers, z.B. 'Stromnetz Hamburg GmbH'",
       "title": "Netzbetreiber",
       "default": null,
       "anyOf": [
@@ -110,6 +119,7 @@
       ]
     },
     "netzebeneLieferung": {
+      "description": "In der angegebenen Netzebene wird die Marktlokation versorgt, z.B. MSP für Mittelspannung",
       "title": "Netzebenelieferung",
       "default": null,
       "anyOf": [
@@ -122,6 +132,7 @@
       ]
     },
     "netzebeneMessung": {
+      "description": "In der angegebenen Netzebene wird die Lokation gemessen, z.B. NSP für Niederspannung",
       "title": "Netzebenemessung",
       "default": null,
       "anyOf": [
@@ -134,6 +145,7 @@
       ]
     },
     "prognoseArbeitLieferzeitraum": {
+      "description": "Ein Prognosewert für die Arbeit innerhalb des angefragten Lieferzeitraums der ausgeschriebenen Lokation",
       "default": null,
       "anyOf": [
         {
@@ -145,6 +157,7 @@
       ]
     },
     "prognoseJahresarbeit": {
+      "description": "Prognosewert für die Jahresarbeit der ausgeschriebenen Lokation",
       "default": null,
       "anyOf": [
         {
@@ -156,6 +169,7 @@
       ]
     },
     "prognoseLeistung": {
+      "description": "Prognosewert für die abgenommene maximale Leistung der ausgeschriebenen Lokation",
       "default": null,
       "anyOf": [
         {
@@ -167,6 +181,7 @@
       ]
     },
     "rechnungsadresse": {
+      "description": "Die (evtl. abweichende) Rechnungsadresse",
       "default": null,
       "anyOf": [
         {
@@ -178,6 +193,7 @@
       ]
     },
     "zaehlernummer": {
+      "description": "Die Bezeichnung des Zählers an der Marktlokation",
       "title": "Zaehlernummer",
       "default": null,
       "anyOf": [
@@ -190,6 +206,7 @@
       ]
     },
     "zaehlertechnik": {
+      "description": "Spezifikation, um welche Zählertechnik es sich im vorliegenden Fall handelt, z.B. Leistungsmessung",
       "default": null,
       "anyOf": [
         {

@@ -50,7 +50,7 @@ class TestParser:
     def test_remove_future_import(self) -> None:
         assert ("") == remove_future_import("from __future__ import annotations\n\n")
 
-    def test_parse_boe4_schemas(self) -> None:
+    def test_parse_bo4e_schemas(self) -> None:
         os.chdir(BASE_DIR)
         namespace = get_namespace(INPUT_DIR)
         input_directory = INPUT_DIR.resolve()

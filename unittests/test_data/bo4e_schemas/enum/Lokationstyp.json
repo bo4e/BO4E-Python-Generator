@@ -3,7 +3,10 @@
   "title": "Lokationstyp",
   "enum": [
     "MALO",
-    "MELO"
+    "MELO",
+    "NELO",
+    "SR",
+    "TR"
   ],
   "type": "string"
 }

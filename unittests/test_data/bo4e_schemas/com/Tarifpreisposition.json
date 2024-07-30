@@ -1,9 +1,10 @@
 {
-  "description": "Mit dieser Komponente können Tarifpreise verschiedener Typen abgebildet werden.\n\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/com/Tarifpreisposition.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `Tarifpreisposition JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/Hochfrequenz/BO4E-Schemas/v202401.0.1-/src/bo4e_schemas/com/Tarifpreisposition.json>`_",
+  "description": "Mit dieser Komponente können Tarifpreise verschiedener Typen abgebildet werden.\n\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/com/Tarifpreisposition.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `Tarifpreisposition JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/BO4E/BO4E-Schemas/v202401.3.2/src/bo4e_schemas/com/Tarifpreisposition.json>`_",
   "title": "Tarifpreisposition",
   "additionalProperties": true,
   "properties": {
     "_id": {
+      "description": "Eine generische ID, die für eigene Zwecke genutzt werden kann.\nZ.B. könnten hier UUIDs aus einer Datenbank stehen oder URLs zu einem Backend-System.",
       "title": " Id",
       "default": null,
       "anyOf": [
@@ -16,8 +17,9 @@
       ]
     },
     "_version": {
+      "description": "Version der BO-Struktur aka \"fachliche Versionierung\"",
       "title": " Version",
-      "default": "v202401.0.1",
+      "default": "v202401.3.2",
       "anyOf": [
         {
           "type": "string"
@@ -28,6 +30,7 @@
       ]
     },
     "bezugseinheit": {
+      "description": "Größe, auf die sich die Einheit bezieht, beispielsweise kWh, Jahr",
       "default": null,
       "anyOf": [
         {
@@ -39,6 +42,7 @@
       ]
     },
     "einheit": {
+      "description": "Einheit des Preises (z.B. EURO)",
       "default": null,
       "anyOf": [
         {
@@ -50,6 +54,7 @@
       ]
     },
     "mengeneinheitstaffel": {
+      "description": "Gibt an, nach welcher Menge die vorgenannte Einschränkung erfolgt (z.B. Jahresstromverbrauch in kWh)",
       "default": null,
       "anyOf": [
         {
@@ -61,6 +66,7 @@
       ]
     },
     "preisstaffeln": {
+      "description": "Hier sind die Staffeln mit ihren Preisenangaben definiert",
       "title": "Preisstaffeln",
       "default": null,
       "anyOf": [
@@ -76,6 +82,7 @@
       ]
     },
     "preistyp": {
+      "description": "Angabe des Preistypes (z.B. Grundpreis)",
       "default": null,
       "anyOf": [
         {

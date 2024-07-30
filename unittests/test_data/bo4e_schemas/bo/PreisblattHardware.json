@@ -1,9 +1,10 @@
 {
-  "description": "Variante des Preisblattmodells zur Abbildung der Preise für zusätzliche Hardware\n\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/bo/PreisblattHardware.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `PreisblattHardware JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/Hochfrequenz/BO4E-Schemas/v202401.0.1-/src/bo4e_schemas/bo/PreisblattHardware.json>`_",
+  "description": "Variante des Preisblattmodells zur Abbildung der Preise für zusätzliche Hardware\n\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/bo/PreisblattHardware.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `PreisblattHardware JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/BO4E/BO4E-Schemas/v202401.3.2/src/bo4e_schemas/bo/PreisblattHardware.json>`_",
   "title": "PreisblattHardware",
   "additionalProperties": true,
   "properties": {
     "_id": {
+      "description": "Hier können IDs anderer Systeme hinterlegt werden (z.B. eine SAP-GP-Nummer oder eine GUID)",
       "title": " Id",
       "default": null,
       "anyOf": [
@@ -16,6 +17,7 @@
       ]
     },
     "_typ": {
+      "description": "Die Preise gelten für Marktlokationen der angebebenen Bilanzierungsmethode",
       "default": "PREISBLATTHARDWARE",
       "anyOf": [
         {
@@ -27,8 +29,9 @@
       ]
     },
     "_version": {
+      "description": "Version der BO-Struktur aka \"fachliche Versionierung\"",
       "title": " Version",
-      "default": "v202401.0.1",
+      "default": "v202401.3.2",
       "anyOf": [
         {
           "type": "string"
@@ -39,6 +42,7 @@
       ]
     },
     "basisgeraet": {
+      "description": "Der Preis betriftt das hier angegebene Gerät, z.B. ein Tarifschaltgerät",
       "default": null,
       "anyOf": [
         {
@@ -50,6 +54,7 @@
       ]
     },
     "bezeichnung": {
+      "description": "Eine Bezeichnung für das Preisblatt",
       "title": "Bezeichnung",
       "default": null,
       "anyOf": [
@@ -62,6 +67,7 @@
       ]
     },
     "bilanzierungsmethode": {
+      "description": "Die Preise gelten für Marktlokationen der angebebenen Bilanzierungsmethode",
       "default": null,
       "anyOf": [
         {
@@ -73,6 +79,7 @@
       ]
     },
     "gueltigkeit": {
+      "description": "Der Zeitraum für den der Preis festgelegt ist",
       "default": null,
       "anyOf": [
         {
@@ -84,6 +91,7 @@
       ]
     },
     "herausgeber": {
+      "description": "Der Netzbetreiber, der die Preise veröffentlicht hat",
       "default": null,
       "anyOf": [
         {
@@ -95,6 +103,7 @@
       ]
     },
     "inklusiveDienstleistungen": {
+      "description": "Im Preis sind die hier angegebenen Dienstleistungen enthalten, z.B. Jährliche Ablesung",
       "title": "Inklusivedienstleistungen",
       "default": null,
       "anyOf": [
@@ -110,6 +119,7 @@
       ]
     },
     "inklusiveGeraete": {
+      "description": "Im Preis sind die hier angegebenen Geräte mit enthalten, z.B. ein Wandler",
       "title": "Inklusivegeraete",
       "default": null,
       "anyOf": [
@@ -125,6 +135,7 @@
       ]
     },
     "messebene": {
+      "description": "Die Preise gelten für Messlokationen in der angebebenen Netzebene",
       "default": null,
       "anyOf": [
         {
@@ -136,6 +147,7 @@
       ]
     },
     "preispositionen": {
+      "description": "Die einzelnen Positionen, die mit dem Preisblatt abgerechnet werden können. Z.B. Arbeitspreis, Grundpreis etc",
       "title": "Preispositionen",
       "default": null,
       "anyOf": [
@@ -151,6 +163,7 @@
       ]
     },
     "preisstatus": {
+      "description": "Merkmal, das anzeigt, ob es sich um vorläufige oder endgültige Preise handelt",
       "default": null,
       "anyOf": [
         {
@@ -162,6 +175,7 @@
       ]
     },
     "sparte": {
+      "description": "Preisblatt gilt für angegebene Sparte",
       "default": null,
       "anyOf": [
         {

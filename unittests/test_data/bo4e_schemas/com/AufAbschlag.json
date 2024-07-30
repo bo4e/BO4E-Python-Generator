@@ -1,9 +1,10 @@
 {
-  "description": "Modell für die preiserhöhenden (Aufschlag) bzw. preisvermindernden (Abschlag) Zusatzvereinbarungen,\ndie individuell zu einem neuen oder bestehenden Liefervertrag abgeschlossen wurden.\n\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/com/AufAbschlag.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `AufAbschlag JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/Hochfrequenz/BO4E-Schemas/v202401.0.1-/src/bo4e_schemas/com/AufAbschlag.json>`_",
+  "description": "Modell für die preiserhöhenden (Aufschlag) bzw. preisvermindernden (Abschlag) Zusatzvereinbarungen,\ndie individuell zu einem neuen oder bestehenden Liefervertrag abgeschlossen wurden.\n\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/com/AufAbschlag.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `AufAbschlag JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/BO4E/BO4E-Schemas/v202401.3.2/src/bo4e_schemas/com/AufAbschlag.json>`_",
   "title": "AufAbschlag",
   "additionalProperties": true,
   "properties": {
     "_id": {
+      "description": "Eine generische ID, die für eigene Zwecke genutzt werden kann.\nZ.B. könnten hier UUIDs aus einer Datenbank stehen oder URLs zu einem Backend-System.",
       "title": " Id",
       "default": null,
       "anyOf": [
@@ -16,8 +17,9 @@
       ]
     },
     "_version": {
+      "description": "Version der BO-Struktur aka \"fachliche Versionierung\"",
       "title": " Version",
-      "default": "v202401.0.1",
+      "default": "v202401.3.2",
       "anyOf": [
         {
           "type": "string"
@@ -28,6 +30,7 @@
       ]
     },
     "aufAbschlagstyp": {
+      "description": "Typ des Aufabschlages (z.B. absolut oder prozentual).",
       "default": null,
       "anyOf": [
         {
@@ -39,6 +42,7 @@
       ]
     },
     "aufAbschlagsziel": {
+      "description": "Diesem Preis oder den Kosten ist der Auf/Abschlag zugeordnet. Z.B. Arbeitspreis, Gesamtpreis etc..",
       "default": null,
       "anyOf": [
         {
@@ -50,6 +54,7 @@
       ]
     },
     "beschreibung": {
+      "description": "Beschreibung zum Auf-/Abschlag",
       "title": "Beschreibung",
       "default": null,
       "anyOf": [
@@ -62,6 +67,7 @@
       ]
     },
     "bezeichnung": {
+      "description": "Bezeichnung des Auf-/Abschlags",
       "title": "Bezeichnung",
       "default": null,
       "anyOf": [
@@ -74,6 +80,7 @@
       ]
     },
     "einheit": {
+      "description": "Gibt an in welcher Währungseinheit der Auf/Abschlag berechnet wird. Euro oder Ct..\n(Nur im Falle absoluter Aufschlagstypen). ",
       "default": null,
       "anyOf": [
         {
@@ -85,6 +92,7 @@
       ]
     },
     "gueltigkeitszeitraum": {
+      "description": "Internetseite, auf der die Informationen zum Auf-/Abschlag veröffentlicht sind.",
       "default": null,
       "anyOf": [
         {
@@ -96,6 +104,7 @@
       ]
     },
     "staffeln": {
+      "description": "Werte für die gestaffelten Auf/Abschläge.",
       "title": "Staffeln",
       "default": null,
       "anyOf": [
@@ -111,6 +120,7 @@
       ]
     },
     "website": {
+      "description": "Internetseite, auf der die Informationen zum Auf-/Abschlag veröffentlicht sind.",
       "title": "Website",
       "default": null,
       "anyOf": [

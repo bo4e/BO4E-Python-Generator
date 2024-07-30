@@ -1,9 +1,10 @@
 {
-  "description": "Objekt zur Kommunikation von Kosten, die im Rahmen der Tarifanwendung entstehen\n\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/bo/Tarifkosten.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `Tarifkosten JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/Hochfrequenz/BO4E-Schemas/v202401.0.1-/src/bo4e_schemas/bo/Tarifkosten.json>`_",
+  "description": "Objekt zur Kommunikation von Kosten, die im Rahmen der Tarifanwendung entstehen\n\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/bo/Tarifkosten.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `Tarifkosten JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/BO4E/BO4E-Schemas/v202401.3.2/src/bo4e_schemas/bo/Tarifkosten.json>`_",
   "title": "Tarifkosten",
   "additionalProperties": true,
   "properties": {
     "_id": {
+      "description": "Hier können IDs anderer Systeme hinterlegt werden (z.B. eine SAP-GP-Nummer oder eine GUID)",
       "title": " Id",
       "default": null,
       "anyOf": [
@@ -16,6 +17,7 @@
       ]
     },
     "_typ": {
+      "description": "Name des Tarifs",
       "default": "TARIFKOSTEN",
       "anyOf": [
         {
@@ -27,8 +29,9 @@
       ]
     },
     "_version": {
+      "description": "Version der BO-Struktur aka \"fachliche Versionierung\"",
       "title": " Version",
-      "default": "v202401.0.1",
+      "default": "v202401.3.2",
       "anyOf": [
         {
           "type": "string"
@@ -39,6 +42,7 @@
       ]
     },
     "anbieter": {
+      "description": "Der Marktteilnehmer (Lieferant), der diesen Tarif anbietet",
       "default": null,
       "anyOf": [
         {
@@ -50,6 +54,7 @@
       ]
     },
     "anbietername": {
+      "description": "Der Name des Marktpartners, der den Tarif anbietet",
       "title": "Anbietername",
       "default": null,
       "anyOf": [
@@ -75,6 +80,7 @@
       ]
     },
     "bemerkung": {
+      "description": "Freitext",
       "title": "Bemerkung",
       "default": null,
       "anyOf": [
@@ -87,6 +93,7 @@
       ]
     },
     "bezeichnung": {
+      "description": "Name des Tarifs",
       "title": "Bezeichnung",
       "default": null,
       "anyOf": [
@@ -99,6 +106,7 @@
       ]
     },
     "energiemix": {
+      "description": "Der Energiemix, der für diesen Tarif gilt",
       "default": null,
       "anyOf": [
         {
@@ -121,6 +129,7 @@
       ]
     },
     "kundentypen": {
+      "description": "Kundentypen für den der Tarif gilt, z.B. Privatkunden",
       "title": "Kundentypen",
       "default": null,
       "anyOf": [
@@ -136,6 +145,7 @@
       ]
     },
     "registeranzahl": {
+      "description": "Die Art des Tarifes, z.B. Eintarif oder Mehrtarif",
       "default": null,
       "anyOf": [
         {
@@ -147,6 +157,7 @@
       ]
     },
     "sparte": {
+      "description": "Strom oder Gas, etc.",
       "default": null,
       "anyOf": [
         {
@@ -158,6 +169,7 @@
       ]
     },
     "tarifmerkmale": {
+      "description": "Weitere Merkmale des Tarifs, z.B. Festpreis oder Vorkasse",
       "title": "Tarifmerkmale",
       "default": null,
       "anyOf": [
@@ -173,6 +185,7 @@
       ]
     },
     "tariftyp": {
+      "description": "Hinweis auf den Tariftyp, z.B. Grundversorgung oder Sondertarif",
       "default": null,
       "anyOf": [
         {
@@ -184,6 +197,7 @@
       ]
     },
     "vertragskonditionen": {
+      "description": "Mindestlaufzeiten und Kündigungsfristen zusammengefasst",
       "default": null,
       "anyOf": [
         {
@@ -195,6 +209,7 @@
       ]
     },
     "website": {
+      "description": "Internetseite auf dem der Tarif zu finden ist",
       "title": "Website",
       "default": null,
       "anyOf": [
@@ -207,6 +222,7 @@
       ]
     },
     "zeitlicheGueltigkeit": {
+      "description": "Angabe, in welchem Zeitraum der Tarif gültig ist",
       "default": null,
       "anyOf": [
         {
