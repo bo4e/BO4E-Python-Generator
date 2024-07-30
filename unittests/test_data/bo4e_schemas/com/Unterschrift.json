@@ -1,9 +1,10 @@
 {
-  "description": "Modellierung einer Unterschrift, z.B. für Verträge, Angebote etc.\n\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/com/Unterschrift.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `Unterschrift JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/Hochfrequenz/BO4E-Schemas/v202401.0.1-/src/bo4e_schemas/com/Unterschrift.json>`_",
+  "description": "Modellierung einer Unterschrift, z.B. für Verträge, Angebote etc.\n\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/com/Unterschrift.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `Unterschrift JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/BO4E/BO4E-Schemas/v202401.3.2/src/bo4e_schemas/com/Unterschrift.json>`_",
   "title": "Unterschrift",
   "additionalProperties": true,
   "properties": {
     "_id": {
+      "description": "Eine generische ID, die für eigene Zwecke genutzt werden kann.\nZ.B. könnten hier UUIDs aus einer Datenbank stehen oder URLs zu einem Backend-System.",
       "title": " Id",
       "default": null,
       "anyOf": [
@@ -16,8 +17,9 @@
       ]
     },
     "_version": {
+      "description": "Version der BO-Struktur aka \"fachliche Versionierung\"",
       "title": " Version",
-      "default": "v202401.0.1",
+      "default": "v202401.3.2",
       "anyOf": [
         {
           "type": "string"
@@ -28,6 +30,7 @@
       ]
     },
     "datum": {
+      "description": "Ort, an dem die Unterschrift geleistet wird",
       "title": "Datum",
       "default": null,
       "anyOf": [
@@ -41,6 +44,7 @@
       ]
     },
     "name": {
+      "description": "Name des Unterschreibers",
       "title": "Name",
       "default": null,
       "anyOf": [
@@ -53,6 +57,7 @@
       ]
     },
     "ort": {
+      "description": "Ort, an dem die Unterschrift geleistet wird",
       "title": "Ort",
       "default": null,
       "anyOf": [

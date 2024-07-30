@@ -1,9 +1,10 @@
 {
-  "description": "Die Variante des Preisblattmodells zur Abbildung der Netznutzungspreise\n\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/bo/PreisblattNetznutzung.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `PreisblattNetznutzung JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/Hochfrequenz/BO4E-Schemas/v202401.0.1-/src/bo4e_schemas/bo/PreisblattNetznutzung.json>`_",
+  "description": "Die Variante des Preisblattmodells zur Abbildung der Netznutzungspreise\n\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/bo/PreisblattNetznutzung.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `PreisblattNetznutzung JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/BO4E/BO4E-Schemas/v202401.3.2/src/bo4e_schemas/bo/PreisblattNetznutzung.json>`_",
   "title": "PreisblattNetznutzung",
   "additionalProperties": true,
   "properties": {
     "_id": {
+      "description": "Hier können IDs anderer Systeme hinterlegt werden (z.B. eine SAP-GP-Nummer oder eine GUID)",
       "title": " Id",
       "default": null,
       "anyOf": [
@@ -16,6 +17,7 @@
       ]
     },
     "_typ": {
+      "description": "Die Preise gelten für Marktlokationen der angebebenen Bilanzierungsmethode",
       "default": "PREISBLATTNETZNUTZUNG",
       "anyOf": [
         {
@@ -27,8 +29,9 @@
       ]
     },
     "_version": {
+      "description": "Version der BO-Struktur aka \"fachliche Versionierung\"",
       "title": " Version",
-      "default": "v202401.0.1",
+      "default": "v202401.3.2",
       "anyOf": [
         {
           "type": "string"
@@ -39,6 +42,7 @@
       ]
     },
     "bezeichnung": {
+      "description": "Eine Bezeichnung für das Preisblatt",
       "title": "Bezeichnung",
       "default": null,
       "anyOf": [
@@ -51,6 +55,7 @@
       ]
     },
     "bilanzierungsmethode": {
+      "description": "Die Preise gelten für Marktlokationen der angebebenen Bilanzierungsmethode",
       "default": null,
       "anyOf": [
         {
@@ -62,6 +67,7 @@
       ]
     },
     "gueltigkeit": {
+      "description": "Der Zeitraum für den der Preis festgelegt ist",
       "default": null,
       "anyOf": [
         {
@@ -73,6 +79,7 @@
       ]
     },
     "herausgeber": {
+      "description": "Der Netzbetreiber, der die Preise veröffentlicht hat",
       "default": null,
       "anyOf": [
         {
@@ -95,6 +102,7 @@
       ]
     },
     "netzebene": {
+      "description": "Die Preise gelten für Marktlokationen in der angebebenen Netzebene",
       "default": null,
       "anyOf": [
         {
@@ -106,6 +114,7 @@
       ]
     },
     "preispositionen": {
+      "description": "Die einzelnen Positionen, die mit dem Preisblatt abgerechnet werden können. Z.B. Arbeitspreis, Grundpreis etc",
       "title": "Preispositionen",
       "default": null,
       "anyOf": [
@@ -121,6 +130,7 @@
       ]
     },
     "preisstatus": {
+      "description": "Merkmal, das anzeigt, ob es sich um vorläufige oder endgültige Preise handelt",
       "default": null,
       "anyOf": [
         {
@@ -132,6 +142,7 @@
       ]
     },
     "sparte": {
+      "description": "Preisblatt gilt für angegebene Sparte",
       "default": null,
       "anyOf": [
         {

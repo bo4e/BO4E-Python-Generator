@@ -1,9 +1,10 @@
 {
-  "description": "Object containing information about a meter/\"Zaehler\".\n\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/bo/Zaehler.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `Zaehler JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/Hochfrequenz/BO4E-Schemas/v202401.0.1-/src/bo4e_schemas/bo/Zaehler.json>`_",
+  "description": "Object containing information about a meter/\"Zaehler\".\n\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/bo/Zaehler.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `Zaehler JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/BO4E/BO4E-Schemas/v202401.3.2/src/bo4e_schemas/bo/Zaehler.json>`_",
   "title": "Zaehler",
   "additionalProperties": true,
   "properties": {
     "_id": {
+      "description": "Hier können IDs anderer Systeme hinterlegt werden (z.B. eine SAP-GP-Nummer oder eine GUID)",
       "title": " Id",
       "default": null,
       "anyOf": [
@@ -16,6 +17,7 @@
       ]
     },
     "_typ": {
+      "description": "Typisierung des Zählers",
       "default": "ZAEHLER",
       "anyOf": [
         {
@@ -27,8 +29,9 @@
       ]
     },
     "_version": {
+      "description": "Version der BO-Struktur aka \"fachliche Versionierung\"",
       "title": " Version",
-      "default": "v202401.0.1",
+      "default": "v202401.3.2",
       "anyOf": [
         {
           "type": "string"
@@ -39,6 +42,7 @@
       ]
     },
     "befestigungsart": {
+      "description": "Besondere Spezifikation des Zählers",
       "default": null,
       "anyOf": [
         {
@@ -50,6 +54,7 @@
       ]
     },
     "eichungBis": {
+      "description": "Zählerkonstante auf dem Zähler",
       "title": "Eichungbis",
       "default": null,
       "anyOf": [
@@ -63,6 +68,7 @@
       ]
     },
     "geraete": {
+      "description": "Größe des Zählers",
       "title": "Geraete",
       "default": null,
       "anyOf": [
@@ -78,6 +84,7 @@
       ]
     },
     "istFernschaltbar": {
+      "description": "Der Hersteller des Zählers",
       "title": "Istfernschaltbar",
       "default": null,
       "anyOf": [
@@ -90,6 +97,7 @@
       ]
     },
     "letzteEichung": {
+      "description": "Bis zu diesem Datum (exklusiv) ist der Zähler geeicht.",
       "title": "Letzteeichung",
       "default": null,
       "anyOf": [
@@ -103,6 +111,7 @@
       ]
     },
     "messwerterfassung": {
+      "description": "Fernschaltung",
       "default": null,
       "anyOf": [
         {
@@ -114,6 +123,7 @@
       ]
     },
     "registeranzahl": {
+      "description": "Spezifikation bezüglich unterstützter Tarif",
       "default": null,
       "anyOf": [
         {
@@ -125,6 +135,7 @@
       ]
     },
     "sparte": {
+      "description": "Nummerierung des Zählers,vergeben durch den Messstellenbetreiber",
       "default": null,
       "anyOf": [
         {
@@ -136,6 +147,7 @@
       ]
     },
     "zaehlerauspraegung": {
+      "description": "Strom oder Gas",
       "default": null,
       "anyOf": [
         {
@@ -147,6 +159,7 @@
       ]
     },
     "zaehlergroesse": {
+      "description": "Befestigungsart",
       "default": null,
       "anyOf": [
         {
@@ -158,6 +171,7 @@
       ]
     },
     "zaehlerhersteller": {
+      "description": "Der Hersteller des Zählers",
       "default": null,
       "anyOf": [
         {
@@ -169,12 +183,12 @@
       ]
     },
     "zaehlerkonstante": {
+      "description": "Spezifikation bezüglich unterstützter Tarif",
       "title": "Zaehlerkonstante",
       "default": null,
       "anyOf": [
         {
-          "type": "string",
-          "format": "decimal"
+          "type": "number"
         },
         {
           "type": "null"
@@ -182,6 +196,7 @@
       ]
     },
     "zaehlernummer": {
+      "description": "Nummerierung des Zählers,vergeben durch den Messstellenbetreiber",
       "title": "Zaehlernummer",
       "default": null,
       "anyOf": [
@@ -194,6 +209,7 @@
       ]
     },
     "zaehlertyp": {
+      "description": "Spezifikation die Richtung des Zählers betreffend",
       "default": null,
       "anyOf": [
         {
@@ -205,6 +221,7 @@
       ]
     },
     "zaehlertypSpezifikation": {
+      "description": "Messwerterfassung des Zählers",
       "default": null,
       "anyOf": [
         {
@@ -216,6 +233,7 @@
       ]
     },
     "zaehlwerke": {
+      "description": "Typisierung des Zählers",
       "title": "Zaehlwerke",
       "default": null,
       "anyOf": [

@@ -1,9 +1,10 @@
 {
-  "description": "Zusammensetzung der gelieferten Energie aus den verschiedenen Primärenergieformen.\n\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/com/Energiemix.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `Energiemix JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/Hochfrequenz/BO4E-Schemas/v202401.0.1-/src/bo4e_schemas/com/Energiemix.json>`_",
+  "description": "Zusammensetzung der gelieferten Energie aus den verschiedenen Primärenergieformen.\n\n.. raw:: html\n\n    <object data=\"../_static/images/bo4e/com/Energiemix.svg\" type=\"image/svg+xml\"></object>\n\n.. HINT::\n    `Energiemix JSON Schema <https://json-schema.app/view/%23?url=https://raw.githubusercontent.com/BO4E/BO4E-Schemas/v202401.3.2/src/bo4e_schemas/com/Energiemix.json>`_",
   "title": "Energiemix",
   "additionalProperties": true,
   "properties": {
     "_id": {
+      "description": "Eine generische ID, die für eigene Zwecke genutzt werden kann.\nZ.B. könnten hier UUIDs aus einer Datenbank stehen oder URLs zu einem Backend-System.",
       "title": " Id",
       "default": null,
       "anyOf": [
@@ -16,8 +17,9 @@
       ]
     },
     "_version": {
+      "description": "Version der BO-Struktur aka \"fachliche Versionierung\"",
       "title": " Version",
-      "default": "v202401.0.1",
+      "default": "v202401.3.2",
       "anyOf": [
         {
           "type": "string"
@@ -28,6 +30,7 @@
       ]
     },
     "anteil": {
+      "description": "Anteile der jeweiligen Erzeugungsart",
       "title": "Anteil",
       "default": null,
       "anyOf": [
@@ -43,12 +46,12 @@
       ]
     },
     "atommuell": {
+      "description": "Höhe des erzeugten Atommülls in g/kWh",
       "title": "Atommuell",
       "default": null,
       "anyOf": [
         {
-          "type": "string",
-          "format": "decimal"
+          "type": "number"
         },
         {
           "type": "null"
@@ -56,6 +59,7 @@
       ]
     },
     "bemerkung": {
+      "description": "Bemerkung zum Energiemix",
       "title": "Bemerkung",
       "default": null,
       "anyOf": [
@@ -68,6 +72,7 @@
       ]
     },
     "bezeichnung": {
+      "description": "Bezeichnung des Energiemix",
       "title": "Bezeichnung",
       "default": null,
       "anyOf": [
@@ -80,12 +85,12 @@
       ]
     },
     "co2Emission": {
+      "description": "Höhe des erzeugten CO2-Ausstosses in g/kWh",
       "title": "Co2Emission",
       "default": null,
       "anyOf": [
         {
-          "type": "string",
-          "format": "decimal"
+          "type": "number"
         },
         {
           "type": "null"
@@ -93,6 +98,7 @@
       ]
     },
     "energieart": {
+      "description": "Strom oder Gas etc.",
       "default": null,
       "anyOf": [
         {
@@ -104,6 +110,7 @@
       ]
     },
     "energiemixnummer": {
+      "description": "Eindeutige Nummer zur Identifizierung des Energiemixes",
       "title": "Energiemixnummer",
       "default": null,
       "anyOf": [
@@ -116,6 +123,7 @@
       ]
     },
     "gueltigkeitsjahr": {
+      "description": "Jahr, für das der Energiemix gilt",
       "title": "Gueltigkeitsjahr",
       "default": null,
       "anyOf": [
@@ -128,6 +136,7 @@
       ]
     },
     "istInOekoTopTen": {
+      "description": "Kennzeichen, ob der Versorger zu den Öko Top Ten gehört",
       "title": "Istinoekotopten",
       "default": null,
       "anyOf": [
@@ -140,6 +149,7 @@
       ]
     },
     "oekolabel": {
+      "description": "Ökolabel für den Energiemix",
       "title": "Oekolabel",
       "default": null,
       "anyOf": [
@@ -155,6 +165,7 @@
       ]
     },
     "oekozertifikate": {
+      "description": "Zertifikate für den Energiemix",
       "title": "Oekozertifikate",
       "default": null,
       "anyOf": [
@@ -170,6 +181,7 @@
       ]
     },
     "website": {
+      "description": "Internetseite, auf der die Strommixdaten veröffentlicht sind",
       "title": "Website",
       "default": null,
       "anyOf": [

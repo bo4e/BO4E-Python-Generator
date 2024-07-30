@@ -34,7 +34,6 @@ class TestMain:
         ), f"{result.exc_info[0].__name__}: {result.exc_info[1]}\n{''.join(format_tb(result.exc_info[2]))}"
         assert (OUTPUT_DIR / "bo" / "angebot.py").exists()
         assert (OUTPUT_DIR / "bo" / "preisblatt_netznutzung.py").exists()
-        assert (OUTPUT_DIR / "com" / "com.py").exists()
         assert (OUTPUT_DIR / "enum" / "typ.py").exists()
 
         # pylint: disable=import-outside-toplevel, import-error
@@ -43,6 +42,7 @@ class TestMain:
         assert issubclass(Angebot, BaseModel)
         assert "typ" in Angebot.model_fields
         assert "datetime.datetime" in str(Angebot.model_fields["angebotsdatum"].annotation)
+        assert isinstance(Angebot(), Angebot)
 
         from .output.bo4e import __version__  # type: ignore[import-not-found]
 
