@@ -18,9 +18,9 @@ def monkey_patch_imports(namespace: dict[str, SchemaMetadata]):
     Overwrites the behaviour how imports are rendered. They are not going through jinja templates.
     They Imports class has a __str__ method, which we will overwrite here.
     """
-    namespace = {k: v for k, v in namespace.items() if k not in ("Typ", "Landescode")}
+    namespace = {k: v for k, v in namespace.items() if v.module_path[0] != "enum"}
     # "Typ" and "Landescode" must not be wrapped inside the "if TYPE_CHECKING" block because they are used explicitly
-    # to set default values.
+    # to set default values. Generally, enums can be excluded since they cannot cause circular reference issues.
     import_type_checking = Import.from_full_path("typing.TYPE_CHECKING")
 
     # pylint: disable=missing-function-docstring
