@@ -1,9 +1,9 @@
 {%- if SQL and SQL['imports']%}
 {%- for class_name, module_path in SQL['imports'].items() %}
 {%- if module_path[:4] == 'enum'%}
-from ibims.orm.models.{{ module_path }} import {{ class_name }}
+from ..{{ module_path }} import {{ class_name }}
 {%- elif module_path == 'Link'%}
-from ibims.orm.models.many import {{ class_name }}
+from ..many import {{ class_name }}
 {%- else %}
 from {{ module_path }} import {{ class_name }}
 {%- endif %}
@@ -13,7 +13,7 @@ from {{ module_path }} import {{ class_name }}
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
 {%- for class_name, module_path in SQL['relationimports'].items() %}
-    from ibims.orm.models.{{ module_path }} import {{ class_name }}
+    from ..{{ module_path }} import {{ class_name }}
 {%- endfor -%}
 {%- endif %}
 {% for decorator in decorators -%}
