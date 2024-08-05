@@ -8,7 +8,6 @@ from bo4e_generator.schema import get_namespace
 from bo4e_generator.sqlparser import (
     adapt_parse_for_sql,
     create_sql_field,
-    format_code,
     remove_pydantic_field_import,
     return_ref,
     write_many_many_links,

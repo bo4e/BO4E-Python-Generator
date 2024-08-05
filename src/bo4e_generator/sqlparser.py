@@ -386,6 +386,9 @@ def format_code(code: str) -> str:
 
 
 def remove_unused_imports(code):
+    """
+    Removes unused imports from the given code using autoflake.
+    """
     # Create a temporary file
     with tempfile.NamedTemporaryFile(suffix=".py", delete=False) as tmp_file:
         tmp_file_name = tmp_file.name
@@ -395,7 +398,7 @@ def remove_unused_imports(code):
     subprocess.run(["autoflake", "--remove-all-unused-imports", "--in-place", tmp_file_name], check=True)
 
     # Read the cleaned code from the temporary file
-    with open(tmp_file_name, "r") as tmp_file:
+    with open(tmp_file_name, "r", encoding="utf-8") as tmp_file:
         cleaned_code = tmp_file.read()
 
     # Clean up the temporary file
