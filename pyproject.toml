@@ -19,6 +19,7 @@ classifiers = [
 dependencies = [
     "datamodel-code-generator",
     "click",
+    "autoflake"
 ]     # add all the dependencies from requirements.in here, too
 dynamic = ["readme", "version"]
 

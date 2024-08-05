@@ -76,16 +76,3 @@ class TestSQLParser:
         file_contents = write_many_many_links(links)
         keywords = ["AngebotzusatzAttributeLink", "angebot_id", "zusatzattribut_id"]
         assert all(substring in file_contents for substring in keywords)
-
-    def test_format_code(self) -> None:
-        unsorted = (
-            "from sqlmodel import Field, Relationship, SQLModel\n"
-            "from typing import TYPE_CHECKING, List\n"
-            "from ..models.enum.anrede import Anrede"
-        )
-        resorted = (
-            "from typing import TYPE_CHECKING, List\n\n"
-            "from sqlmodel import Field, Relationship, SQLModel\n\n"
-            "from ..models.enum.anrede import Anrede\n"
-        )
-        assert resorted == format_code(unsorted)

@@ -53,7 +53,10 @@ def generate_bo4e_schemas(
     for relative_file_path, file_content in file_contents.items():
         file_path = output_directory / relative_file_path
         file_path.parent.mkdir(parents=True, exist_ok=True)
-        if relative_file_path.name not in ["__init__.py", "__version__.py"] and output_type == OutputType.SQL_MODEL:
+        if (
+            relative_file_path.name not in ["__init__.py", "__version__.py"]
+            and OutputType[output_type] == OutputType.SQL_MODEL
+        ):
             file_content = remove_unused_imports(file_content)
         file_content = formatter.format_code(file_content)
         file_path.write_text(file_content, encoding="utf-8")

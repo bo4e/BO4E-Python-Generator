@@ -3,8 +3,8 @@ Contains code to generate SQLModel classes from json schemas.
 Since the used tool doesn't support all features we need, we monkey patch some functions.
 """
 
-import ast
 import json
+import os
 import re
 import subprocess
 import tempfile
@@ -386,40 +386,19 @@ def format_code(code: str) -> str:
 
 
 def remove_unused_imports(code):
-    class ImportVisitor(ast.NodeVisitor):
-        def __init__(self):
-            self.imports = set()
-            self.used_names = set()
+    # Create a temporary file
+    with tempfile.NamedTemporaryFile(suffix=".py", delete=False) as tmp_file:
+        tmp_file_name = tmp_file.name
+        tmp_file.write(code.encode("utf-8"))
 
-        def visit_Import(self, node):
-            for alias in node.names:
-                self.imports.add(alias.name.split(".")[0])
-            self.generic_visit(node)
+    # Run autoflake to remove unused imports
+    subprocess.run(["autoflake", "--remove-all-unused-imports", "--in-place", tmp_file_name], check=True)
 
-        def visit_ImportFrom(self, node):
-            if node.module:
-                self.imports.add(node.module.split(".")[0])
-            self.generic_visit(node)
+    # Read the cleaned code from the temporary file
+    with open(tmp_file_name, "r") as tmp_file:
+        cleaned_code = tmp_file.read()
 
-        def visit_Name(self, node):
-            self.used_names.add(node.id)
-            self.generic_visit(node)
+    # Clean up the temporary file
+    os.remove(tmp_file_name)
 
-    tree = ast.parse(code)
-    visitor = ImportVisitor()
-    visitor.visit(tree)
-
-    unused_imports = visitor.imports - visitor.used_names
-
-    code_lines = code.split("\n")
-    cleaned_code_lines = []
-
-    for line in code_lines:
-        stripped_line = line.strip()
-        if stripped_line.startswith("import ") or stripped_line.startswith("from "):
-            import_name = stripped_line.split()[1].split(".")[0]
-            if import_name in unused_imports:
-                continue
-        cleaned_code_lines.append(line)
-
-    return "\n".join(cleaned_code_lines)
+    return cleaned_code
