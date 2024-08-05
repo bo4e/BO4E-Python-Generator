@@ -3,8 +3,11 @@ Contains code to generate SQLModel classes from json schemas.
 Since the used tool doesn't support all features we need, we monkey patch some functions.
 """
 
+import ast
 import json
 import re
+import subprocess
+import tempfile
 from collections import defaultdict
 from pathlib import Path
 from typing import Any, DefaultDict, Union
@@ -13,7 +16,7 @@ import black
 import isort
 from jinja2 import Environment, FileSystemLoader
 
-from bo4e_generator.schema import SchemaMetadata
+from bo4e_generator.schema import SchemaMetadata, camel_to_snake
 
 
 def remove_pydantic_field_import(python_code: str) -> str:
@@ -65,6 +68,9 @@ def adapt_parse_for_sql(
                     del_fields.add(field)
             for field in del_fields:
                 del schema_metadata.schema_parsed["properties"][field]
+            # delete id field as it is replaced below
+            if schema_metadata.schema_parsed["properties"].get("_id"):
+                del schema_metadata.schema_parsed["properties"]["_id"]
             # store the reduced version. The modified fields will be added in the BaseModel.jinja2 schema
             schema_metadata.schema_text = json.dumps(schema_metadata.schema_parsed, indent=2, ensure_ascii=False)
 
@@ -104,9 +110,8 @@ def additional_sql_arguments(
         if schema_metadata.module_path[0] != "enum":
             # add primary key
             additional_sql_data[schema_metadata.class_name]["SQL"] = {
-                "primary": schema_metadata.class_name.lower()
-                + "_sqlid: uuid_pkg.UUID = Field( default_factory=uuid_pkg.uuid4, primary_key=True, index=True, "
-                "nullable=False )"
+                "primary": "id: uuid_pkg.UUID = Field( default_factory=uuid_pkg.uuid4, primary_key=True, index=True, "
+                'nullable=False, alias="_id", title=" Id" )'
             }
         if schema_metadata.class_name in add_relation:
             additional_sql_data[schema_metadata.class_name]["SQL"]["relations"] = add_relation[
@@ -184,7 +189,7 @@ def create_sql_list(
     add_imports[class_name + "ADD"]["Column, ARRAY"] = "sqlalchemy"
     add_imports[class_name + "ADD"][sa_type] = "sqlalchemy"
 
-    add_fields[class_name][f"{field_name}"] = (
+    add_fields[class_name][f"{camel_to_snake(field_name)}"] = (
         f"List[{type_hint}] "
         + is_optional
         + f' = Field({default}, title="{field_name}", sa_column=Column( ARRAY( {sa_type} )))'
@@ -209,12 +214,14 @@ def sql_reference_enum(
     returns field which references enums.
     """
     if is_list:
-        add_fields[class_name][f"{field_name}"] = (
+        add_fields[class_name][f"{camel_to_snake(field_name)}"] = (
             f"List[{reference_name}]" + is_optional + f" = Field({default},"
             f' sa_column=Column( ARRAY( Enum( {reference_name}, name="{reference_name.lower()}"))))'
         )
     else:
-        add_fields[class_name][f"{field_name}"] = f"{reference_name}" + is_optional + f"= Field({default})"
+        add_fields[class_name][f"{camel_to_snake(field_name)}"] = (
+            f"{reference_name}" + is_optional + f"= Field({default})"
+        )
 
     # import enums
     if is_list:
@@ -265,21 +272,21 @@ def create_sql_field(
             add_fields["MANY"][class_name] = [[reference_name, field_name]]
         elif reference_name not in add_fields["MANY"][class_name]:
             add_fields["MANY"][class_name].append([reference_name, field_name])
-        add_fields[class_name][f"{field_name}"] = (
+        add_fields[class_name][f"{camel_to_snake(field_name)}"] = (
             f'List["{reference_name}"] ='
             f' Relationship(back_populates="{class_name.lower()}_{field_name.lower()}_link", '
             f"link_model={class_name}{field_name}Link)"
         )
         add_fields[reference_name][f"{class_name.lower()}_{field_name.lower()}_link"] = (
             f'List["{class_name}"] ='
-            f' Relationship(back_populates="{field_name}", '
+            f' Relationship(back_populates="{camel_to_snake(field_name)}", '
             f"link_model={class_name}{field_name}Link)"
         )
         add_imports[class_name + "ADD"][f"{class_name}{field_name}Link)"] = "Link"
         add_imports[reference_name + "ADD"][f"{class_name}{field_name}Link)"] = "Link"
     else:
         # cf. https://github.com/tiangolo/sqlmodel/pull/610
-        add_fields[class_name][f"{field_name}_id"] = (
+        add_fields[class_name][f"{camel_to_snake(field_name)}_id"] = (
             "uuid_pkg.UUID " + is_optional + f" = Field(sa_column=Column(UUID(as_uuid=True),"
             f' ForeignKey("{reference_name.lower()}.{reference_name.lower()}_sqlid"'
             f', ondelete="SET NULL")))'
@@ -291,20 +298,20 @@ def create_sql_field(
         # pylint: disable= fixme
         # todo: check default
 
-        add_fields[class_name][f"{field_name}"] = (
+        add_fields[class_name][f"{camel_to_snake(field_name)}"] = (
             f'"{reference_name}" ='
-            f' Relationship(back_populates="{class_name.lower()}_{field_name}",'
-            f' sa_relationship_kwargs= {{ "foreign_keys":"[{class_name}.{field_name}_id]" }})'
+            f' Relationship(back_populates="{class_name.lower()}_{camel_to_snake(field_name)}",'
+            f' sa_relationship_kwargs= {{ "foreign_keys":"[{class_name}.{camel_to_snake(field_name)}_id]" }})'
         )
 
         # cf. https://github.com/tiangolo/sqlmodel/issues/10
         # https://github.com/tiangolo/sqlmodel/issues/213
         # https://dev.to/whchi/disable-sqlmodel-foreign-key-constraint-55kp
-        add_fields[reference_name][f"{class_name.lower()}_{field_name}"] = (
-            f'List["{class_name}"] = Relationship(back_populates="{field_name}",'
+        add_fields[reference_name][f"{class_name.lower()}_{camel_to_snake(field_name)}"] = (
+            f'List["{class_name}"] = Relationship(back_populates="{camel_to_snake(field_name)}",'
             f"sa_relationship_kwargs="
             f'{{"primaryjoin":'
-            f' "{class_name}.{field_name}_id=={reference_name}.{reference_name.lower()}_sqlid",'
+            f' "{class_name}.{camel_to_snake(field_name)}_id=={reference_name}.{reference_name.lower()}_sqlid",'
             f' "lazy": "joined"}})'
         )
     # add_relation_import
@@ -346,11 +353,11 @@ def create_sql_any(
     if is_list:
         add_imports[class_name + "ADD"]["List"] = "typing"
         add_imports[class_name + "ADD"]["ARRAY"] = "sqlalchemy"
-        add_fields[class_name][f"{field_name}"] = (
+        add_fields[class_name][f"{camel_to_snake(field_name)}"] = (
             "List[Any]" + is_optional + f" = Field({default}," f" sa_column=Column( ARRAY( PickleType)))"
         )
     else:
-        add_fields[class_name][f"{field_name}"] = (
+        add_fields[class_name][f"{camel_to_snake(field_name)}"] = (
             "Any" + is_optional + f" = Field({default}," f" sa_column=Column(  PickleType))"
         )
 
@@ -365,7 +372,7 @@ def write_many_many_links(links: dict[str, str]) -> str:
     environment = Environment(loader=FileSystemLoader(template_path))
     template = environment.get_template("ManyLinks.jinja2")
     python_code = template.render({"class": links})
-    python_code = format_code(python_code)
+    # python_code = format_code(python_code)
     return python_code
 
 
@@ -373,5 +380,46 @@ def format_code(code: str) -> str:
     """
     perform isort and black on code
     """
+    code = remove_unused_imports(code)
     code = black.format_str(code, mode=black.Mode())
-    return isort.code(code, known_local_folder=["ibims"])
+    return isort.code(code)
+
+
+def remove_unused_imports(code):
+    class ImportVisitor(ast.NodeVisitor):
+        def __init__(self):
+            self.imports = set()
+            self.used_names = set()
+
+        def visit_Import(self, node):
+            for alias in node.names:
+                self.imports.add(alias.name.split(".")[0])
+            self.generic_visit(node)
+
+        def visit_ImportFrom(self, node):
+            if node.module:
+                self.imports.add(node.module.split(".")[0])
+            self.generic_visit(node)
+
+        def visit_Name(self, node):
+            self.used_names.add(node.id)
+            self.generic_visit(node)
+
+    tree = ast.parse(code)
+    visitor = ImportVisitor()
+    visitor.visit(tree)
+
+    unused_imports = visitor.imports - visitor.used_names
+
+    code_lines = code.split("\n")
+    cleaned_code_lines = []
+
+    for line in code_lines:
+        stripped_line = line.strip()
+        if stripped_line.startswith("import ") or stripped_line.startswith("from "):
+            import_name = stripped_line.split()[1].split(".")[0]
+            if import_name in unused_imports:
+                continue
+        cleaned_code_lines.append(line)
+
+    return "\n".join(cleaned_code_lines)
