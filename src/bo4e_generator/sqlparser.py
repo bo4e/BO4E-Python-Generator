@@ -288,7 +288,7 @@ def create_sql_field(
         # cf. https://github.com/tiangolo/sqlmodel/pull/610
         add_fields[class_name][f"{camel_to_snake(field_name)}_id"] = (
             "uuid_pkg.UUID " + is_optional + f" = Field(sa_column=Column(UUID(as_uuid=True),"
-            f' ForeignKey("{reference_name.lower()}.{reference_name.lower()}_sqlid"'
+            f' ForeignKey("{reference_name.lower()}.id"'
             f', ondelete="SET NULL")))'
         )
         add_imports[class_name + "ADD"]["Column"] = "sqlalchemy"
@@ -311,7 +311,7 @@ def create_sql_field(
             f'List["{class_name}"] = Relationship(back_populates="{camel_to_snake(field_name)}",'
             f"sa_relationship_kwargs="
             f'{{"primaryjoin":'
-            f' "{class_name}.{camel_to_snake(field_name)}_id=={reference_name}.{reference_name.lower()}_sqlid",'
+            f' "{class_name}.{camel_to_snake(field_name)}_id=={reference_name}.id",'
             f' "lazy": "joined"}})'
         )
     # add_relation_import
