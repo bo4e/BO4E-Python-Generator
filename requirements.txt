@@ -16,10 +16,10 @@ click==8.1.7
     # via
     #   BO4E-Python-Generator (pyproject.toml)
     #   black
+datamodel-code-generator==0.25.9
+    # via -r requirements.in
 colorama==0.4.6
     # via click
-datamodel-code-generator==0.25.8
-    # via BO4E-Python-Generator (pyproject.toml)
 dnspython==2.4.2
     # via email-validator
 email-validator==2.0.0.post2
