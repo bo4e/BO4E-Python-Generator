@@ -8,7 +8,6 @@ from bo4e_generator.schema import get_namespace
 from bo4e_generator.sqlparser import (
     adapt_parse_for_sql,
     create_sql_field,
-    format_code,
     remove_pydantic_field_import,
     return_ref,
     write_many_many_links,
@@ -76,16 +75,3 @@ class TestSQLParser:
         file_contents = write_many_many_links(links)
         keywords = ["AngebotzusatzAttributeLink", "angebot_id", "zusatzattribut_id"]
         assert all(substring in file_contents for substring in keywords)
-
-    def test_format_code(self) -> None:
-        unsorted = (
-            "from sqlmodel import Field, Relationship, SQLModel\n"
-            "from typing import TYPE_CHECKING, List\n"
-            "from borm.models.enum.anrede import Anrede"
-        )
-        resorted = (
-            "from typing import TYPE_CHECKING, List\n\n"
-            "from sqlmodel import Field, Relationship, SQLModel\n\n"
-            "from borm.models.enum.anrede import Anrede\n"
-        )
-        assert resorted == format_code(unsorted)

@@ -1,20 +1,30 @@
 {%- if SQL and SQL['imports']%}
-{%- for class_name, module_path in SQL['imports'].items() %}
+{%- for import_class_name, module_path in SQL['imports'].items() %}
 {%- if module_path[:4] == 'enum'%}
-from borm.models.{{ module_path }} import {{ class_name }}
+from ..{{ module_path }} import {{ import_class_name }}
 {%- elif module_path == 'Link'%}
-from borm.models.many import {{ class_name }}
+{% if class_name == 'ZusatzAttribut'%}
+from .many import {{ import_class_name }}
+{% else %}
+from ..many import {{ import_class_name }}
+{% endif %}
 {%- else %}
-from {{ module_path }} import {{ class_name }}
+from {{ module_path }} import {{ import_class_name }}
 {%- endif %}
 {%- endfor -%}
 {%- endif %}
 {%- if SQL and SQL['relationimports']%}
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-{%- for class_name, module_path in SQL['relationimports'].items() %}
-    from borm.models.{{ module_path }} import {{ class_name }}
+{% if class_name == 'ZusatzAttribut'%}
+{%- for import_class_name, module_path in SQL['relationimports'].items() %}
+    from .{{ module_path }} import {{ import_class_name }}
 {%- endfor -%}
+{% else %}
+{%- for import_class_name, module_path in SQL['relationimports'].items() %}
+    from ..{{ module_path }} import {{ import_class_name }}
+{%- endfor -%}
+{%- endif %}
 {%- endif %}
 {% for decorator in decorators -%}
 {{ decorator }}
