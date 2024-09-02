@@ -12,8 +12,6 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any, DefaultDict, Union
 
-import black
-import isort
 from jinja2 import Environment, FileSystemLoader
 
 from bo4e_generator.schema import SchemaMetadata, camel_to_snake
@@ -374,15 +372,6 @@ def write_many_many_links(links: dict[str, str]) -> str:
     python_code = template.render({"class": links})
     # python_code = format_code(python_code)
     return python_code
-
-
-def format_code(code: str) -> str:
-    """
-    perform isort and black on code
-    """
-    code = remove_unused_imports(code)
-    code = black.format_str(code, mode=black.Mode())
-    return isort.code(code)
 
 
 def remove_unused_imports(code):
