@@ -6,7 +6,7 @@
 #
 annotated-types==0.6.0
     # via pydantic
-argcomplete==3.1.2
+argcomplete==3.5.0
     # via datamodel-code-generator
 autoflake==2.3.1
     # via BO4E-Python-Generator (pyproject.toml)
