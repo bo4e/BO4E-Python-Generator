@@ -28,7 +28,7 @@ genson==1.2.2
     # via datamodel-code-generator
 idna==3.10
     # via email-validator
-inflect==5.6.2
+inflect==7.4.0
     # via datamodel-code-generator
 isort==5.13.2
     # via datamodel-code-generator
